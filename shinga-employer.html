@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHINGA — Employer Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1A7A4A;--green-h:#25A865;--green-dim:#145E38;--green-pale:#E8F5EE;
+  --gold:#F5A623;--gold-dim:#C8841A;
+  --dark:#0F1F15;--mid:#3D5C48;--muted:#6B7C73;
+  --light:#F7FAF8;--white:#FFFFFF;--border:#D0E6DA;--border-d:#B8D9C8;
+  --r:10px;--r-lg:16px;--r-xl:24px;
+  --sidebar-w:220px;--topbar-h:60px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);display:flex;flex-direction:column}
+
+/* ── TOPBAR ── */
+.topbar{height:var(--topbar-h);background:var(--dark);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06);z-index:100}
+.tl{font-family:'Playfair Display',serif;font-weight:900;font-size:1.3rem;color:#F7FAF8;letter-spacing:3px;text-decoration:none}
+.tl span{color:var(--green-h)}
+.tr{display:flex;align-items:center;gap:12px}
+.wallet-pill{display:flex;align-items:center;gap:7px;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.22);border-radius:100px;padding:5px 14px;cursor:pointer;transition:background .2s}
+.wallet-pill:hover{background:rgba(245,166,35,.2)}
+.wp-label{font-size:.7rem;color:rgba(247,250,248,.4);font-family:'DM Mono',monospace}
+.wp-amount{font-size:.85rem;font-weight:700;color:var(--gold);font-family:'DM Mono',monospace}
+.t-avi{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dim));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#fff;cursor:pointer}
+.notif-btn{position:relative;background:transparent;border:none;cursor:pointer;color:rgba(247,250,248,.45);font-size:.95rem;padding:4px}
+.n-dot{position:absolute;top:2px;right:2px;width:7px;height:7px;background:var(--gold);border-radius:50%;border:2px solid var(--dark)}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);background:var(--dark);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:3px}.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
+.sb-user{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-avi{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dim));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:10px}
+.sb-name{font-weight:700;font-size:.88rem;color:#F7FAF8}
+.sb-role{font-size:.72rem;color:rgba(247,250,248,.38);margin-top:2px}
+.sb-bal{margin-top:8px;display:flex;align-items:center;gap:6px;font-size:.76rem;font-family:'DM Mono',monospace}
+.sb-bal-label{color:rgba(247,250,248,.35)}
+.sb-bal-val{color:var(--gold);font-weight:700}
+.ns{padding:14px 12px 4px}
+.nl{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(247,250,248,.22);margin-bottom:6px;padding:0 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r);cursor:pointer;color:rgba(247,250,248,.5);font-size:.82rem;font-weight:500;text-decoration:none;margin-bottom:1px;transition:all .15s;border:1px solid transparent}
+.ni:hover{background:rgba(255,255,255,.05);color:#F7FAF8}
+.ni.on{background:rgba(26,122,74,.18);color:var(--green-h);border-color:rgba(26,122,74,.22)}
+.ni-ico{width:16px;text-align:center;font-size:.85rem;flex-shrink:0}
+.nb{margin-left:auto;background:var(--gold);color:var(--dark);font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:100px}
+.nb.g{background:var(--green-pale);color:var(--green)}
+.sf{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.06)}
+.sf a{display:flex;align-items:center;gap:8px;color:rgba(247,250,248,.28);font-size:.76rem;text-decoration:none;padding:7px;transition:color .2s}
+.sf a:hover{color:rgba(247,250,248,.6)}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.main::-webkit-scrollbar{width:5px}.main::-webkit-scrollbar-thumb{background:var(--border-d);border-radius:4px}
+
+/* ── PAGE HEADER ── */
+.ph{padding:24px 28px 0}
+.ph-row{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.ph-eye{font-family:'DM Mono',monospace;font-size:.64rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.ph-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--dark)}
+.ph-acts{display:flex;gap:9px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;border:none;text-decoration:none;transition:all .15s;white-space:nowrap}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--green-h)}
+.btn-gold{background:var(--gold);color:var(--dark)}.btn-gold:hover{background:#F0AC28}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--mid)}.btn-outline:hover{border-color:var(--green);color:var(--green)}
+.btn-sm{padding:6px 13px;font-size:.76rem}
+.btn-cancel{background:var(--light);color:var(--mid);border:1.5px solid var(--border)}.btn-cancel:hover{background:var(--border)}
+.btn-full{width:100%;justify-content:center}
+.btn-wa{background:#25D366;color:#fff}.btn-wa:hover{background:#1aab52}
+
+/* ── KPI ROW ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:0 28px;margin-bottom:20px}
+.kpi{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;cursor:pointer;transition:all .15s}
+.kpi:hover{border-color:var(--green);box-shadow:0 4px 14px rgba(26,122,74,.08)}
+.kpi-label{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px}
+.kpi-num{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;color:var(--dark);line-height:1}
+.kpi-sub{font-size:.72rem;color:var(--muted);margin-top:5px}
+.kpi-up{color:var(--green);font-weight:700}
+
+/* ── CONTENT GRID ── */
+.content-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;padding:0 28px 28px}
+.main-col{}
+.side-col{display:flex;flex-direction:column;gap:18px}
+
+/* ── PANEL ── */
+.panel{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:20px}
+.panel:last-child{margin-bottom:0}
+.p-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.p-title{font-family:'Playfair Display',serif;font-weight:700;font-size:.95rem;color:var(--dark)}
+.p-body{padding:0}
+
+/* ── TAB BAR ── */
+.tab-bar{display:flex;border-bottom:1px solid var(--border);padding:0;background:var(--white)}
+.tab{padding:12px 18px;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--dark)}
+.tab.on{color:var(--green);border-bottom-color:var(--green)}
+.tab-c{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:100px;font-size:.63rem;font-weight:800;margin-left:5px;background:var(--green-pale);color:var(--green)}
+.tab.on .tab-c{background:var(--green);color:#fff}
+
+/* ── JOB ROWS ── */
+.job-row{display:flex;align-items:flex-start;gap:16px;padding:18px 20px;border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer}
+.job-row:last-child{border-bottom:none}
+.job-row:hover{background:var(--light)}
+.jr-logo{width:42px;height:42px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:900;font-size:.9rem;color:#fff;flex-shrink:0}
+.jr-body{flex:1;min-width:0}
+.jr-title{font-weight:700;font-size:.9rem;color:var(--dark);margin-bottom:3px}
+.jr-meta{display:flex;gap:12px;flex-wrap:wrap;font-size:.74rem;color:var(--muted);margin-bottom:8px}
+.jr-m{display:flex;align-items:center;gap:4px}
+.jr-tags{display:flex;gap:6px;flex-wrap:wrap}
+.jr-right{text-align:right;flex-shrink:0}
+.jr-apps{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:var(--green);line-height:1}
+.jr-apps-label{font-size:.68rem;color:var(--muted);margin-top:2px}
+.jr-actions{display:flex;gap:6px;margin-top:10px}
+
+/* ── APPLICATION ROWS ── */
+.app-row{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border);transition:background .12s}
+.app-row:last-child{border-bottom:none}
+.app-row:hover{background:var(--light)}
+.ar-avi{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:.92rem;font-weight:700;color:#fff;flex-shrink:0;position:relative}
+.ar-v{position:absolute;bottom:0;right:0;width:14px;height:14px;background:var(--green);border-radius:50%;border:2px solid #fff;font-size:7px;display:flex;align-items:center;justify-content:center;color:#fff}
+.ar-body{flex:1;min-width:0}
+.ar-name{font-weight:700;font-size:.88rem;color:var(--dark)}
+.ar-role{font-size:.76rem;color:var(--green);font-weight:600;margin-bottom:4px}
+.ar-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:.73rem;color:var(--muted);margin-bottom:8px}
+.ar-note{font-size:.8rem;color:var(--mid);line-height:1.6;background:var(--light);border-radius:var(--r);padding:8px 12px;margin-bottom:10px;font-style:italic}
+.ar-actions{display:flex;gap:7px;flex-wrap:wrap}
+.ar-right{text-align:right;flex-shrink:0}
+.ar-stars{color:var(--gold);font-size:.8rem}
+.ar-rev{font-size:.68rem;color:var(--muted);font-family:'DM Mono',monospace}
+.ar-date{font-size:.7rem;color:var(--muted);margin-top:4px}
+
+/* ── STATUS BADGES ── */
+.st{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:.7rem;font-weight:700}
+.st::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.st-active{background:var(--green-pale);color:var(--green)}.st-active::before{background:var(--green)}
+.st-pending{background:rgba(245,166,35,.1);color:var(--gold-dim)}.st-pending::before{background:var(--gold)}
+.st-filled{background:rgba(37,99,235,.08);color:#1D4ED8}.st-filled::before{background:#2563EB}
+.st-paused{background:rgba(107,124,115,.1);color:var(--muted)}.st-paused::before{background:var(--muted)}
+.st-hired{background:var(--green-pale);color:var(--green)}.st-hired::before{background:var(--green)}
+.st-rejected{background:#FEE2E2;color:#DC2626}.st-rejected::before{background:#DC2626}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:.68rem;font-weight:700;letter-spacing:.4px}
+.badge-green{background:var(--green-pale);color:var(--green)}
+.badge-gold{background:rgba(245,166,35,.12);color:var(--gold-dim)}
+.badge-muted{background:rgba(107,124,115,.08);color:var(--mid)}
+
+/* ── SPEND CHART ── */
+.spend-chart{padding:16px 20px}
+.sc-bars{display:flex;gap:5px;align-items:flex-end;height:80px;margin-bottom:10px}
+.sc-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.sc-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;cursor:pointer;transition:opacity .2s}
+.sc-bar:hover{opacity:.75}
+.sc-label{font-size:.6rem;color:var(--muted);font-family:'DM Mono',monospace}
+.sc-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+.sc-leg-item{display:flex;align-items:center;gap:5px;font-size:.7rem;color:var(--muted)}
+.sc-leg-dot{width:8px;height:8px;border-radius:50%}
+
+/* ── RECENT TRANSACTIONS ── */
+.tx-row{display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--border)}
+.tx-row:last-child{border-bottom:none}
+.tx-ico{width:32px;height:32px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.tx-body{flex:1;min-width:0}
+.tx-desc{font-size:.82rem;font-weight:600;color:var(--dark)}
+.tx-date{font-size:.7rem;color:var(--muted)}
+.tx-amt{font-family:'DM Mono',monospace;font-size:.85rem;font-weight:600;color:var(--dark);flex-shrink:0}
+
+/* ── QUICK POST ── */
+.quick-post{background:linear-gradient(135deg,var(--green) 0%,var(--green-dim) 100%);border-radius:var(--r-lg);padding:20px;color:#fff}
+.qp-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;margin-bottom:6px}
+.qp-sub{font-size:.78rem;opacity:.75;margin-bottom:16px;line-height:1.6}
+
+/* ── EMPTY STATE ── */
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.empty-ico{font-size:2.2rem;margin-bottom:10px}
+.empty p{font-size:.84rem;line-height:1.7}
+
+/* ── DRAWER ── */
+.drawer{position:fixed;right:-460px;top:var(--topbar-h);bottom:0;width:440px;background:var(--white);border-left:1.5px solid var(--border);z-index:400;transition:right .22s ease;overflow-y:auto;display:flex;flex-direction:column}
+.drawer.open{right:0}
+.d-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.d-head h3{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--dark)}
+.d-close{background:transparent;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);padding:3px;transition:color .2s}
+.d-close:hover{color:var(--dark)}
+.d-body{padding:20px 22px;flex:1}
+.d-sec{margin-bottom:22px}
+.d-lbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:9px;font-family:'DM Mono',monospace}
+.d-field{margin-bottom:12px}
+.d-fl{font-size:.73rem;color:var(--muted);margin-bottom:2px}
+.d-fv{font-size:.88rem;color:var(--dark);font-weight:500}
+.d-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.d-avi{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:14px}
+.revealed-number{font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--green);font-weight:700;background:var(--green-pale);border:1px solid rgba(26,122,74,.2);border-radius:var(--r);padding:10px 16px;text-align:center;margin:10px 0}
+
+/* ── MODALS ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,31,21,.8);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--r-xl);max-width:520px;width:100%;max-height:92vh;overflow-y:auto}
+.m-head{padding:24px 28px 0}
+.m-head h2{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--dark);margin-bottom:4px}
+.m-head p{font-size:.78rem;color:var(--muted);padding-bottom:18px;border-bottom:1px solid var(--border)}
+.m-body{padding:20px 28px}
+.m-foot{padding:14px 28px 22px;display:flex;gap:10px}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:.75rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--dark);background:var(--light);outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);background:#fff}
+.field textarea{min-height:80px;resize:vertical}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fee-box{background:var(--green-pale);border:1px solid rgba(26,122,74,.2);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
+.fee-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--green);margin-bottom:10px;font-family:'DM Mono',monospace}
+.fee-row{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px}
+.fee-row:last-child{margin-bottom:0;padding-top:8px;border-top:1px solid rgba(26,122,74,.15);font-weight:700}
+.fee-row span{color:var(--mid)}
+.fee-row strong{font-family:'DM Mono',monospace;color:var(--green)}
+
+/* payment pending */
+.pp{text-align:center;padding:28px 20px}
+.pp-spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pp-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:6px}
+.pp-sub{font-size:.8rem;color:var(--muted);line-height:1.65;max-width:280px;margin:0 auto 14px}
+
+/* success */
+.m-success{padding:44px 28px;text-align:center}
+.ms-ico{font-size:2.8rem;margin-bottom:12px}
+.m-success h2{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--dark);margin-bottom:8px}
+.m-success p{color:var(--muted);font-size:.84rem;line-height:1.7;max-width:320px;margin:0 auto 22px}
+
+/* toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:#F7FAF8;padding:12px 18px;border-radius:var(--r);font-size:.82rem;font-weight:500;z-index:900;transform:translateY(80px);opacity:0;transition:all .3s;border-left:3px solid var(--green);max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:1000px){
+  .content-grid{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <a href="shinga.html" class="tl">SH<span>I</span>NGA</a>
+  <div class="tr">
+    <div class="wallet-pill" onclick="openM('topUpM')">
+      <span class="wp-label">Credits</span>
+      <span class="wp-amount" id="walletDisplay">RWF 24,500</span>
+      <span style="font-size:.7rem;color:var(--gold)">＋</span>
+    </div>
+    <button class="notif-btn" onclick="toast('3 new applications received')">🔔<div class="n-dot"></div></button>
+    <div class="t-avi" onclick="toast('Profile settings')">ME</div>
+  </div>
+</div>
+
+<div class="app">
+
+<!-- ── SIDEBAR ── -->
+<nav class="sidebar">
+  <div class="sb-user">
+    <div class="sb-avi">ME</div>
+    <div class="sb-name">Mugisha Emmanuel</div>
+    <div class="sb-role">Employer · Kigali</div>
+    <div class="sb-bal">
+      <span class="sb-bal-label">Credits:</span>
+      <span class="sb-bal-val" id="sbWallet">RWF 24,500</span>
+    </div>
+  </div>
+
+  <div class="ns">
+    <div class="nl">Menu</div>
+    <a class="ni on" onclick="showPage('overview')"><span class="ni-ico">📊</span> Overview</a>
+    <a class="ni" onclick="showPage('jobs')"><span class="ni-ico">💼</span> My Jobs <span class="nb g">3</span></a>
+    <a class="ni" onclick="showPage('applications')"><span class="ni-ico">📋</span> Applications <span class="nb">8</span></a>
+    <a class="ni" onclick="showPage('workers')"><span class="ni-ico">👤</span> Browse Workers</a>
+    <a class="ni" onclick="showPage('spend')"><span class="ni-ico">💰</span> Spend & Credits</a>
+  </div>
+
+  <div class="sf">
+    <a href="shinga.html" target="_blank"><span>↗</span> SHINGA Platform</a>
+    <a href="#" onclick="toast('Signed out')"><span>🚪</span> Sign Out</a>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main" id="mainContent">
+
+<!-- ════════════════════
+     OVERVIEW
+════════════════════ -->
+<div id="page-overview">
+  <div class="ph">
+    <div class="ph-row">
+      <div><div class="ph-eye">Good morning, Mugisha</div><div class="ph-title">Your Dashboard</div></div>
+      <div class="ph-acts">
+        <button class="btn btn-outline btn-sm" onclick="showPage('workers')">Find Workers</button>
+        <button class="btn btn-green btn-sm" onclick="openM('postJobM')">+ Post a Job</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi" onclick="showPage('jobs')">
+      <div class="kpi-label">Active Jobs</div>
+      <div class="kpi-num">3</div>
+      <div class="kpi-sub">2 open · 1 filled</div>
+    </div>
+    <div class="kpi" onclick="showPage('applications')">
+      <div class="kpi-label">Applications</div>
+      <div class="kpi-num" style="color:var(--gold)">8</div>
+      <div class="kpi-sub"><span class="kpi-up">3 new</span> since yesterday</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Workers Hired</div>
+      <div class="kpi-num">4</div>
+      <div class="kpi-sub">across 6 months</div>
+    </div>
+    <div class="kpi" onclick="showPage('spend')">
+      <div class="kpi-label">Total Spent</div>
+      <div class="kpi-num" style="font-size:1.5rem">RWF 73,500</div>
+      <div class="kpi-sub">all time</div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="main-col">
+      <!-- Recent Applications -->
+      <div class="panel">
+        <div class="p-head">
+          <div class="p-title">New Applications</div>
+          <button class="btn btn-outline btn-sm" onclick="showPage('applications')">View All</button>
+        </div>
+        <div class="p-body" id="ovApps"></div>
+      </div>
+      <!-- Active Jobs -->
+      <div class="panel">
+        <div class="p-head">
+          <div class="p-title">Active Jobs</div>
+          <button class="btn btn-green btn-sm" onclick="openM('postJobM')">+ Post Job</button>
+        </div>
+        <div class="p-body" id="ovJobs"></div>
+      </div>
+    </div>
+    <div class="side-col">
+      <!-- Quick Post -->
+      <div class="quick-post">
+        <div class="qp-title">Need someone today?</div>
+        <div class="qp-sub">Post a daily job and receive applications within the hour.</div>
+        <button class="btn btn-gold btn-full" onclick="openM('postJobM')">Post a Job</button>
+      </div>
+      <!-- Spend Summary -->
+      <div class="panel">
+        <div class="p-head"><div class="p-title">Spend This Month</div></div>
+        <div class="spend-chart" id="ovSpend"></div>
+      </div>
+      <!-- Recent Transactions -->
+      <div class="panel">
+        <div class="p-head"><div class="p-title">Recent Payments</div></div>
+        <div id="ovTx"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════
+     MY JOBS
+════════════════════ -->
+<div id="page-jobs" style="display:none">
+  <div class="ph">
+    <div class="ph-row">
+      <div><div class="ph-eye">My Posted Jobs</div><div class="ph-title">Jobs</div></div>
+      <div class="ph-acts">
+        <button class="btn btn-green btn-sm" onclick="openM('postJobM')">+ Post a Job</button>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 28px">
+    <div class="tab-bar">
+      <div class="tab on" onclick="filterJobTab(this,'all')">All <span class="tab-c">3</span></div>
+      <div class="tab" onclick="filterJobTab(this,'active')">Active <span class="tab-c">2</span></div>
+      <div class="tab" onclick="filterJobTab(this,'filled')">Filled <span class="tab-c">1</span></div>
+    </div>
+    <div class="panel" style="border-top:none;border-radius:0 0 var(--r-lg) var(--r-lg)">
+      <div id="jobsList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════
+     APPLICATIONS
+════════════════════ -->
+<div id="page-applications" style="display:none">
+  <div class="ph">
+    <div class="ph-row">
+      <div><div class="ph-eye">Incoming Applications</div><div class="ph-title">Applications</div></div>
+      <div class="ph-acts">
+        <select class="btn btn-outline btn-sm" id="appJobFilter" onchange="filterApps()" style="padding:6px 13px;font-family:'DM Sans',sans-serif">
+          <option value="">All Jobs</option>
+          <option value="1">Live-in Babysitter</option>
+          <option value="2">House Cleaner 3×/wk</option>
+          <option value="3">40 Brick Lifters</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 28px">
+    <div class="tab-bar">
+      <div class="tab on" onclick="filterAppTab(this,'all')">All <span class="tab-c">8</span></div>
+      <div class="tab" onclick="filterAppTab(this,'pending')">New <span class="tab-c" style="background:var(--gold);color:var(--dark)">3</span></div>
+      <div class="tab" onclick="filterAppTab(this,'contacted')">Contacted <span class="tab-c">3</span></div>
+      <div class="tab" onclick="filterAppTab(this,'hired')">Hired <span class="tab-c">2</span></div>
+    </div>
+    <div class="panel" style="border-top:none;border-radius:0 0 var(--r-lg) var(--r-lg)">
+      <div id="appsList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════
+     BROWSE WORKERS
+════════════════════ -->
+<div id="page-workers" style="display:none">
+  <div class="ph">
+    <div class="ph-row">
+      <div><div class="ph-eye">Find Talent</div><div class="ph-title">Browse Workers</div></div>
+    </div>
+  </div>
+  <div style="padding:0 28px 28px">
+    <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+      <input type="text" placeholder="Search by skill or name…" style="flex:1;min-width:180px;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;background:var(--white)">
+      <select style="padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.84rem;background:var(--white)">
+        <option>All Categories</option><option>Domestic</option><option>Trades</option><option>Health</option><option>Technology</option>
+      </select>
+      <select style="padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.84rem;background:var(--white)">
+        <option>All Districts</option><option>Gasabo</option><option>Kicukiro</option><option>Nyarugenge</option>
+      </select>
+      <button class="btn btn-green">Search</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px" id="workerBrowse"></div>
+  </div>
+</div>
+
+<!-- ════════════════════
+     SPEND
+════════════════════ -->
+<div id="page-spend" style="display:none">
+  <div class="ph">
+    <div class="ph-row">
+      <div><div class="ph-eye">Financials</div><div class="ph-title">Spend & Credits</div></div>
+      <div class="ph-acts"><button class="btn btn-gold btn-sm" onclick="openM('topUpM')">＋ Top Up Credits</button></div>
+    </div>
+  </div>
+  <div style="padding:0 28px 28px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px" id="spendKpis"></div>
+    <div class="panel">
+      <div class="p-head"><div class="p-title">Transaction History</div></div>
+      <div id="txFull"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- ── DRAWER ── -->
+<div class="drawer" id="drawer">
+  <div class="d-head"><h3 id="dTitle">Details</h3><button class="d-close" onclick="closeDrawer()">✕</button></div>
+  <div class="d-body" id="dBody"></div>
+</div>
+
+<!-- ══════════════════════════════
+     MODALS
+══════════════════════════════ -->
+
+<!-- POST JOB -->
+<div class="overlay" id="postJobM">
+  <div class="modal">
+    <div class="m-head"><h2>Post a Job</h2><p>Listing fee charged on submission. Workers apply and contact you directly.</p></div>
+    <div class="m-body">
+      <div class="field"><label>Job Title</label><input type="text" placeholder="e.g. Live-in Babysitter, 40 Brick Lifters…" id="pjTitle" oninput="calcFee()"></div>
+      <div class="fr">
+        <div class="field"><label>Job Type</label>
+          <select id="pjType" onchange="calcFee()">
+            <option value="daily">Daily / One-time — RWF 2,000</option>
+            <option value="weekly">Weekly — RWF 4,000</option>
+            <option value="monthly" selected>Per Month — RWF 8,000</option>
+            <option value="contract">Contract — RWF 8,000</option>
+            <option value="permanent">Permanent — RWF 8,000</option>
+            <option value="task">Per Task — RWF 4,000</option>
+            <option value="bulk">Bulk Hire — RWF 15,000</option>
+          </select>
+        </div>
+        <div class="field"><label>Workers Needed</label><input type="number" id="pjSlots" value="1" min="1" oninput="calcFee()"></div>
+      </div>
+      <div class="fr">
+        <div class="field"><label>Category</label>
+          <select><option>Domestic Services</option><option>Trades & Construction</option><option>Health & Care</option><option>Education</option><option>Technology</option><option>Casual</option></select>
+        </div>
+        <div class="field"><label>District</label>
+          <select><option>Gasabo, Kigali</option><option>Kicukiro, Kigali</option><option>Nyarugenge, Kigali</option><option>Musanze</option><option>Rubavu</option></select>
+        </div>
+      </div>
+      <div class="field"><label>Description</label><textarea placeholder="Describe the work, schedule, pay, accommodation if any…"></textarea></div>
+      <div class="fr">
+        <div class="field"><label>Pay (RWF)</label><input type="number" placeholder="e.g. 10000 per day"></div>
+        <div class="field"><label>Start Date</label><input type="date"></div>
+      </div>
+      <div class="fee-box" id="postFeeBox">
+        <div class="fee-title">Listing Fee</div>
+        <div class="fee-row"><span>Monthly job post</span><strong>RWF 8,000</strong></div>
+        <div class="fee-row"><span>Your credit balance</span><strong id="feeBalance">RWF 24,500</strong></div>
+        <div class="fee-row"><span>Balance after</span><strong id="feeAfter">RWF 16,500</strong></div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-green" style="flex:1" id="postJobBtn" onclick="submitJob()">Pay RWF 8,000 & Post</button>
+      <button class="btn btn-cancel" onclick="closeM('postJobM')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOP UP -->
+<div class="overlay" id="topUpM">
+  <div class="modal">
+    <div class="m-head"><h2>💳 Top Up Credits</h2><p>Buy credits upfront and save up to 25%. Auto-deducted when you post jobs or contact workers.</p></div>
+    <div class="m-body">
+      <div style="background:var(--green-pale);border-radius:var(--r);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div><div style="font-size:.7rem;color:var(--mid);font-weight:700;text-transform:uppercase;letter-spacing:.4px">Current Balance</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--green)" id="modalBalance">RWF 24,500</div></div>
+        <div style="font-size:.76rem;color:var(--muted)">Auto-deducted on actions</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px" id="packGrid"></div>
+      <div class="field"><label>Payment Method</label><select><option>MTN Mobile Money</option><option>Airtel Money</option><option>Bank Transfer</option></select></div>
+      <div class="field"><label>MoMo Number</label><input type="tel" placeholder="+250 7XX XXX XXX" id="topUpPhone"></div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-green" style="flex:1" onclick="doTopUp()">Top Up Now</button>
+      <button class="btn btn-cancel" onclick="closeM('topUpM')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT WORKER -->
+<div class="overlay" id="contactWorkerM">
+  <div class="modal" id="contactWorkerInner">
+    <div id="cwStep1">
+      <div class="m-head"><h2>Contact <span id="cwName">Worker</span></h2><p>Pay to unlock their phone number and WhatsApp contact.</p></div>
+      <div class="m-body">
+        <div class="fee-box">
+          <div class="fee-title">Contact Fee</div>
+          <div class="fee-row"><span>Single contact</span><strong>RWF 1,500</strong></div>
+          <div class="fee-row"><span>Your credit balance</span><strong id="cwBalance">RWF 24,500</strong></div>
+          <div class="fee-row"><span>Balance after</span><strong id="cwAfter">RWF 23,000</strong></div>
+        </div>
+        <div class="field"><label>Message to Worker</label><textarea id="cwMessage" placeholder="Describe the job, location, schedule and pay…"></textarea></div>
+      </div>
+      <div class="m-foot">
+        <button class="btn btn-green" style="flex:1" onclick="doContactWorker()">Pay RWF 1,500 & Unlock</button>
+        <button class="btn btn-cancel" onclick="closeM('contactWorkerM')">Cancel</button>
+      </div>
+    </div>
+    <div id="cwStep2" style="display:none">
+      <div class="pp">
+        <div class="pp-spinner"></div>
+        <div class="pp-title">Processing payment…</div>
+        <div class="pp-sub">Deducting RWF 1,500 from your credit balance.</div>
+      </div>
+    </div>
+    <div id="cwStep3" style="display:none">
+      <div class="m-success">
+        <div class="ms-ico">📞</div>
+        <h2>Contact Unlocked!</h2>
+        <div class="revealed-number" id="cwRevealed">+250 788 123 456</div>
+        <p>You can now reach this worker directly. Save their number and agree on terms before the job starts.</p>
+        <button class="btn btn-wa btn-full" style="margin-bottom:8px" id="cwWaBtn">Open WhatsApp</button>
+        <button class="btn btn-cancel btn-full" onclick="closeM('contactWorkerM');resetCwModal()">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOB POSTED SUCCESS -->
+<div class="overlay" id="jobPostedM">
+  <div class="modal"><div class="m-success">
+    <div class="ms-ico">🎯</div><h2>Job is Live!</h2>
+    <p>Your listing is now visible across Rwanda. Applications will appear here as workers apply.</p>
+    <button class="btn btn-green btn-full" onclick="closeM('jobPostedM');showPage('jobs')">View My Jobs</button>
+  </div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════
+     JAVASCRIPT
+══════════════════════════════ -->
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const GRADS=['#2563EB,#7C3AED','#1A7A4A,#145E38','#0891B2,#059669','#B45309,#D97706','#7C3AED,#EC4899','#DC2626,#C4541A','#0F766E,#0891B2','#16A34A,#059669']
+const g=i=>GRADS[i%GRADS.length]
+const fmt=n=>'RWF '+Number(n).toLocaleString()
+
+let walletBalance = 24500
+
+const PRICES={daily:2000,weekly:4000,monthly:8000,contract:8000,permanent:8000,task:4000,bulk:15000,contact:1500}
+
+const JOBS=[
+  {id:1,title:'Live-in Babysitter',type:'monthly',district:'Gasabo',pay:'RWF 80,000/mo',slots:1,status:'active',apps:5,posted:'2 days ago',gi:1,desc:'Trustworthy babysitter for 2 children. Mon–Sat. Accommodation provided.'},
+  {id:2,title:'House Cleaner 3×/wk',type:'weekly',district:'Gasabo',pay:'RWF 21,000/wk',slots:1,status:'active',apps:3,posted:'Today',gi:6,desc:'Clean 4-bedroom house Mon/Wed/Fri. 4 hrs/visit.'},
+  {id:3,title:'40 Brick Lifters',type:'bulk',district:'Kicukiro',pay:'RWF 8,000/day',slots:40,status:'filled',apps:22,posted:'1 week ago',gi:3,desc:'Site clearing and brick lifting. 6-day week.'},
+]
+
+const APPLICATIONS=[
+  {id:'A1',name:'Jean-Paul Nkusi',role:'Babysitter/Nanny',jobId:1,jobTitle:'Live-in Babysitter',rating:4.8,reviews:52,district:'Gasabo',rate:'RWF 8,000/day',verified:true,status:'pending',date:'Today',note:'I have 2 years caring for young children. First aid trained. Available immediately.',init:'JN',gi:1,phone:'+250 788 123 456'},
+  {id:'A2',name:'Alice Kayitesi',role:'Babysitter/Nanny',jobId:1,jobTitle:'Live-in Babysitter',rating:4.9,reviews:88,district:'Gasabo',rate:'RWF 7,500/day',verified:true,status:'pending',date:'Today',note:'Experienced nanny, bilingual French/Kinyarwanda. Own children so I truly understand.',init:'AK',gi:6,phone:'+250 788 234 567'},
+  {id:'A3',name:'Diane Uwase',role:'Babysitter',jobId:1,jobTitle:'Live-in Babysitter',rating:4.6,reviews:31,district:'Kicukiro',rate:'RWF 8,500/day',verified:false,status:'contacted',date:'Yesterday',note:'Available to start Monday. Excellent references available on request.',init:'DU',gi:5,phone:'+250 788 345 678'},
+  {id:'A4',name:'Marie Mukandori',role:'House Cleaner',jobId:2,jobTitle:'House Cleaner 3×/wk',rating:4.8,reviews:76,district:'Gasabo',rate:'RWF 7,000/day',verified:true,status:'hired',date:'2 days ago',note:'Experienced deep cleaner. Bring my own supplies. Very reliable.',init:'MM',gi:2,phone:'+250 788 456 789'},
+  {id:'A5',name:'Grace Ingabire',role:'House Cleaner',jobId:2,jobTitle:'House Cleaner 3×/wk',rating:4.5,reviews:22,district:'Gasabo',rate:'RWF 6,500/day',verified:false,status:'rejected',date:'2 days ago',note:'Available Mon/Wed/Fri. Transport not a problem.',init:'GI',gi:7,phone:'+250 788 567 890'},
+  {id:'A6',name:'Claude Bizimana',role:'General Labour',jobId:3,jobTitle:'40 Brick Lifters',rating:4.7,reviews:18,district:'Kicukiro',rate:'RWF 7,500/day',verified:true,status:'hired',date:'1 week ago',note:'Strong, experienced in construction sites. Can bring 5 additional workers.',init:'CB',gi:3,phone:'+250 788 678 901'},
+  {id:'A7',name:'Patrick Nkusi',role:'Babysitter',jobId:1,jobTitle:'Live-in Babysitter',rating:4.3,reviews:14,district:'Nyarugenge',rate:'RWF 9,000/day',verified:false,status:'pending',date:'Today',note:'Reliable and patient. Two years with families in Nyarugenge.',init:'PN',gi:4,phone:'+250 788 789 012'},
+  {id:'A8',name:'Solange Ingabire',role:'House Cleaner',jobId:2,jobTitle:'House Cleaner 3×/wk',rating:4.9,reviews:67,district:'Kicukiro',rate:'RWF 8,000/day',verified:true,status:'contacted',date:'Yesterday',note:'Professional cleaner. Can do deep cleaning on first visit.',init:'SI',gi:0,phone:'+250 788 890 123'},
+]
+
+const WORKERS_BROWSE=[
+  {name:'Aline Uwimana',role:'Software Developer',district:'Gasabo',rate:'RWF 45,000/day',rating:4.9,verified:true,init:'AU',gi:0},
+  {name:'Eric Habimana',role:'Registered Nurse',district:'Kicukiro',rate:'RWF 35,000/day',rating:5.0,verified:true,init:'EH',gi:2},
+  {name:'Jean-Paul Nkusi',role:'Babysitter/Nanny',district:'Gasabo',rate:'RWF 8,000/day',rating:4.8,verified:true,init:'JN',gi:1},
+  {name:'Alice Kayitesi',role:'House Cleaner',district:'Gasabo',rate:'RWF 7,000/day',rating:4.9,verified:true,init:'AK',gi:6},
+  {name:'Claude Bizimana',role:'Mechanic',district:'Rubavu',rate:'RWF 18,000/day',rating:5.0,verified:true,init:'CB',gi:3},
+  {name:'Solange Ingabire',role:'Domestic Cook',district:'Kicukiro',rate:'RWF 10,000/day',rating:4.9,verified:false,init:'SI',gi:4},
+]
+
+const TRANSACTIONS=[
+  {type:'Job Post',desc:'Live-in Babysitter — Monthly',amount:-8000,date:'2 days ago',ico:'💼',bg:'rgba(26,122,74,.1)'},
+  {type:'Job Post',desc:'House Cleaner 3×/wk — Weekly',amount:-4000,date:'Today',ico:'💼',bg:'rgba(26,122,74,.1)'},
+  {type:'Contact',desc:'Contacted: Diane Uwase',amount:-1500,date:'Yesterday',ico:'📞',bg:'rgba(59,130,246,.1)'},
+  {type:'Contact',desc:'Contacted: Solange Ingabire',amount:-1500,date:'Yesterday',ico:'📞',bg:'rgba(59,130,246,.1)'},
+  {type:'Top Up',desc:'Credit Pack — RWF 25,000',amount:+25000,date:'3 days ago',ico:'💳',bg:'rgba(245,166,35,.1)'},
+  {type:'Job Post',desc:'40 Brick Lifters — Bulk Hire',amount:-15000,date:'1 week ago',ico:'💼',bg:'rgba(26,122,74,.1)'},
+  {type:'Contact',desc:'Contacted: Claude Bizimana',amount:-1500,date:'1 week ago',ico:'📞',bg:'rgba(59,130,246,.1)'},
+]
+
+const CREDIT_PACKS=[
+  {amount:10000,price:8500,bonus:'15% bonus',popular:false},
+  {amount:25000,price:20000,bonus:'20% bonus',popular:true},
+  {amount:60000,price:45000,bonus:'25% bonus',popular:false},
+]
+
+let selectedPack=1, activeAppFilter='all', activeJobFilter='all', activeWorker=null
+
+// ── NAV ───────────────────────────────────────────────────────
+function showPage(p){
+  document.querySelectorAll('[id^="page-"]').forEach(el=>el.style.display='none')
+  document.getElementById('page-'+p).style.display='block'
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'))
+  const map={overview:'Overview',jobs:'My Jobs',applications:'Applications',workers:'Browse',spend:'Spend'}
+  document.querySelectorAll('.ni').forEach(n=>{if(n.textContent.trim().startsWith(map[p]?.charAt(0)||'Ω'))n.classList.add('on')})
+  closeDrawer()
+  if(p==='jobs')renderJobs(JOBS)
+  if(p==='applications')renderApps(APPLICATIONS)
+  if(p==='workers')renderWorkerBrowse()
+  if(p==='spend')renderSpend()
+}
+
+// ── WALLET ────────────────────────────────────────────────────
+function updateWallet(){
+  document.getElementById('walletDisplay').textContent=fmt(walletBalance)
+  document.getElementById('sbWallet').textContent=fmt(walletBalance)
+  document.getElementById('modalBalance').textContent=fmt(walletBalance)
+  document.getElementById('cwBalance').textContent=fmt(walletBalance)
+  document.getElementById('cwAfter').textContent=fmt(walletBalance-PRICES.contact)
+  document.getElementById('feeBalance').textContent=fmt(walletBalance)
+}
+
+// ── MODALS ────────────────────────────────────────────────────
+function openM(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
+function closeM(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o){o.classList.remove('open');document.body.style.overflow=''}}))
+
+// ── TOAST ─────────────────────────────────────────────────────
+let tt
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3000)}
+
+// ── DRAWER ────────────────────────────────────────────────────
+function openDrawer(title,html){document.getElementById('dTitle').textContent=title;document.getElementById('dBody').innerHTML=html;document.getElementById('drawer').classList.add('open')}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open')}
+
+// ── STATUS HTML ───────────────────────────────────────────────
+function stHtml(s){
+  const m={active:'st-active Active',pending:'st-pending New',filled:'st-filled Filled',contacted:'st-filled Contacted',hired:'st-hired Hired',rejected:'st-rejected Rejected',paused:'st-paused Paused'}
+  const[cls,...rest]=(m[s]||'st-paused '+s).split(' ');return`<span class="st ${cls}">${rest.join(' ')}</span>`
+}
+
+// ── POST JOB FEE CALC ─────────────────────────────────────────
+function calcFee(){
+  const type=document.getElementById('pjType')?.value||'monthly'
+  const slots=parseInt(document.getElementById('pjSlots')?.value)||1
+  let fee=PRICES[type]||PRICES.monthly
+  if(type!=='bulk'&&slots>=10)fee=PRICES.bulk
+  const after=walletBalance-fee
+  const box=document.getElementById('postFeeBox')
+  if(!box)return
+  box.innerHTML=`
+    <div class="fee-title">Listing Fee</div>
+    <div class="fee-row"><span>${type.charAt(0).toUpperCase()+type.slice(1)} job post</span><strong>${fmt(fee)}</strong></div>
+    <div class="fee-row"><span>Your credits</span><strong>${fmt(walletBalance)}</strong></div>
+    <div class="fee-row"><span>Balance after</span><strong style="color:${after<0?'#DC2626':'var(--green)'}">${fmt(Math.abs(after))} ${after<0?'(insufficient)':''}</strong></div>
+  `
+  document.getElementById('postJobBtn').textContent=`Pay ${fmt(fee)} & Post`
+}
+
+function submitJob(){
+  const type=document.getElementById('pjType')?.value||'monthly'
+  const slots=parseInt(document.getElementById('pjSlots')?.value)||1
+  let fee=PRICES[type]||PRICES.monthly
+  if(type!=='bulk'&&slots>=10)fee=PRICES.bulk
+  if(walletBalance<fee){toast('Insufficient credits — please top up');openM('topUpM');return}
+  walletBalance-=fee
+  updateWallet()
+  closeM('postJobM')
+  openM('jobPostedM')
+}
+
+// ── OVERVIEW PANELS ───────────────────────────────────────────
+function renderOverview(){
+  // New applications
+  const newApps=APPLICATIONS.filter(a=>a.status==='pending').slice(0,3)
+  document.getElementById('ovApps').innerHTML=newApps.length
+    ? newApps.map(a=>renderAppRow(a,true)).join('')
+    : '<div class="empty"><div class="empty-ico">📋</div><p>No new applications yet.</p></div>'
+
+  // Active jobs
+  document.getElementById('ovJobs').innerHTML=JOBS.map(j=>renderJobRow(j,true)).join('')
+
+  // Spend chart
+  const cats=[
+    {label:'Job Posts',val:27000,color:'var(--green)'},
+    {label:'Contacts',val:4500,color:'#2563EB'},
+    {label:'Balance',val:walletBalance,color:'var(--gold)'},
+  ]
+  const max=Math.max(...cats.map(c=>c.val))
+  document.getElementById('ovSpend').innerHTML=`
+    <div class="sc-bars">${cats.map(c=>`
+      <div class="sc-col">
+        <div class="sc-bar" style="height:${Math.round((c.val/max)*72)+4}px;background:${c.color};opacity:.75" title="${c.label}: ${fmt(c.val)}"></div>
+        <div class="sc-label">${c.label.split(' ')[0]}</div>
+      </div>`).join('')}
+    </div>
+    <div class="sc-legend">${cats.map(c=>`<div class="sc-leg-item"><div class="sc-leg-dot" style="background:${c.color}"></div>${c.label}: ${fmt(c.val)}</div>`).join('')}</div>
+  `
+
+  // Recent transactions
+  document.getElementById('ovTx').innerHTML=TRANSACTIONS.slice(0,4).map(tx=>`
+    <div class="tx-row">
+      <div class="tx-ico" style="background:${tx.bg}">${tx.ico}</div>
+      <div class="tx-body"><div class="tx-desc">${tx.desc}</div><div class="tx-date">${tx.date}</div></div>
+      <div class="tx-amt" style="color:${tx.amount<0?'var(--dark)':'var(--green)'}">${tx.amount<0?'':'+'}${fmt(Math.abs(tx.amount))}</div>
+    </div>
+  `).join('')
+}
+
+// ── JOB ROWS ──────────────────────────────────────────────────
+function renderJobRow(j,compact=false){
+  const TL={daily:'Daily',weekly:'Weekly',monthly:'Monthly',contract:'Contract',permanent:'Permanent',task:'Per Task',bulk:'Bulk Hire'}
+  return`<div class="job-row" onclick="openJobDrawer(${j.id})">
+    <div class="jr-logo" style="background:linear-gradient(135deg,${g(j.gi)})">${j.title.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+    <div class="jr-body">
+      <div class="jr-title">${j.title}</div>
+      <div class="jr-meta">
+        <span class="jr-m">📍 ${j.district}</span>
+        <span class="jr-m">⏱ ${j.posted}</span>
+        ${j.slots>1?`<span class="jr-m">👥 ${j.slots} workers</span>`:''}
+      </div>
+      <div class="jr-tags">
+        <span class="badge badge-green">${TL[j.type]}</span>
+        ${stHtml(j.status)}
+      </div>
+      ${!compact?`<div class="jr-actions">
+        <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();showAppsForJob(${j.id})">View ${j.apps} Applications</button>
+        <button class="btn btn-sm" style="background:rgba(220,38,38,.08);color:#DC2626;border:1px solid #FECACA" onclick="event.stopPropagation();toast('Job paused')">Pause</button>
+      </div>`:''}
+    </div>
+    <div class="jr-right">
+      <div class="jr-apps">${j.apps}</div>
+      <div class="jr-apps-label">applicants</div>
+      <div style="margin-top:8px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)">${j.pay}</div>
+    </div>
+  </div>`
+}
+
+function renderJobs(list){
+  document.getElementById('jobsList').innerHTML=list.length
+    ? list.map(j=>renderJobRow(j)).join('')
+    : '<div class="empty"><div class="empty-ico">💼</div><p>No jobs match this filter.</p></div>'
+}
+
+function filterJobTab(el,f){
+  document.querySelectorAll('#page-jobs .tab').forEach(t=>t.classList.remove('on'))
+  el.classList.add('on')
+  renderJobs(f==='all'?JOBS:JOBS.filter(j=>j.status===f))
+}
+
+function openJobDrawer(id){
+  const j=JOBS.find(x=>x.id===id)
+  if(!j)return
+  openDrawer(j.title,`
+    <div class="d-sec">
+      <div class="d-lbl">Job Info</div>
+      <div class="d-field"><div class="d-fl">Type</div><div class="d-fv">${j.type}</div></div>
+      <div class="d-field"><div class="d-fl">District</div><div class="d-fv">📍 ${j.district}</div></div>
+      <div class="d-field"><div class="d-fl">Workers Needed</div><div class="d-fv">${j.slots}</div></div>
+      <div class="d-field"><div class="d-fl">Pay</div><div class="d-fv" style="color:var(--green);font-family:'DM Mono',monospace">${j.pay}</div></div>
+      <div class="d-field"><div class="d-fl">Applications</div><div class="d-fv">${j.apps} received</div></div>
+      <div class="d-field"><div class="d-fl">Status</div><div class="d-fv">${stHtml(j.status)}</div></div>
+      <div class="d-field"><div class="d-fl">Posted</div><div class="d-fv">${j.posted}</div></div>
+    </div>
+    <div class="d-sec">
+      <div class="d-lbl">Description</div>
+      <div style="font-size:.84rem;color:var(--mid);line-height:1.7">${j.desc}</div>
+    </div>
+    <div class="d-sec">
+      <div class="d-lbl">Actions</div>
+      <div class="d-acts">
+        <button class="btn btn-green btn-sm" onclick="showAppsForJob(${j.id});closeDrawer()">View Applications</button>
+        <button class="btn btn-outline btn-sm" onclick="toast('Job paused');closeDrawer()">Pause</button>
+        <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;border:1px solid #FECACA" onclick="toast('Job removed');closeDrawer()">Remove</button>
+      </div>
+    </div>
+  `)
+}
+
+// ── APPLICATIONS ──────────────────────────────────────────────
+function renderAppRow(a,compact=false){
+  return`<div class="app-row">
+    <div class="ar-avi" style="background:linear-gradient(135deg,${g(a.gi)})">
+      ${a.init}${a.verified?'<div class="ar-v">✓</div>':''}
+    </div>
+    <div class="ar-body">
+      <div class="ar-name">${a.name} ${a.verified?'<span class="badge badge-green" style="font-size:.62rem">✓ Verified</span>':''}</div>
+      <div class="ar-role">${a.role}</div>
+      <div class="ar-meta">
+        <span>📍 ${a.district}</span>
+        <span>💰 ${a.rate}</span>
+        <span>★ ${a.rating} (${a.reviews} reviews)</span>
+      </div>
+      ${!compact?`<div class="ar-note">"${a.note}"</div>`:''}
+      ${!compact?`<div class="ar-actions">
+        ${a.status==='pending'?`
+          <button class="btn btn-green btn-sm" onclick="contactApplicant(${JSON.stringify(a).replace(/"/g,'&quot;')})">Contact — RWF 1,500</button>
+          <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;border:1px solid #FECACA" onclick="rejectApplicant('${a.id}')">Decline</button>
+        `:''}
+        ${a.status==='contacted'?`<button class="btn btn-green btn-sm" onclick="markHired('${a.id}')">✓ Mark as Hired</button>`:''}
+        <button class="btn btn-outline btn-sm" onclick="openWorkerProfile('${a.id}')">View Profile</button>
+      </div>`:''}
+    </div>
+    <div class="ar-right">
+      ${stHtml(a.status)}
+      <div class="ar-date">${a.date}</div>
+    </div>
+  </div>`
+}
+
+function renderApps(list){
+  document.getElementById('appsList').innerHTML=list.length
+    ? list.map(a=>renderAppRow(a)).join('')
+    : '<div class="empty"><div class="empty-ico">📋</div><p>No applications match this filter.</p></div>'
+}
+
+function filterAppTab(el,f){
+  document.querySelectorAll('#page-applications .tab').forEach(t=>t.classList.remove('on'))
+  el.classList.add('on')
+  activeAppFilter=f
+  renderApps(f==='all'?APPLICATIONS:APPLICATIONS.filter(a=>a.status===f))
+}
+
+function showAppsForJob(jobId){
+  showPage('applications')
+  const filtered=APPLICATIONS.filter(a=>a.jobId===jobId)
+  renderApps(filtered)
+}
+
+function contactApplicant(a){
+  activeWorker=a
+  document.getElementById('cwName').textContent=a.name
+  document.getElementById('cwStep1').style.display='block'
+  document.getElementById('cwStep2').style.display='none'
+  document.getElementById('cwStep3').style.display='none'
+  openM('contactWorkerM')
+}
+
+function doContactWorker(){
+  if(walletBalance<PRICES.contact){toast('Insufficient credits');openM('topUpM');return}
+  document.getElementById('cwStep1').style.display='none'
+  document.getElementById('cwStep2').style.display='block'
+  setTimeout(()=>{
+    walletBalance-=PRICES.contact
+    updateWallet()
+    TRANSACTIONS.unshift({type:'Contact',desc:`Contacted: ${activeWorker?.name||'Worker'}`,amount:-PRICES.contact,date:'Just now',ico:'📞',bg:'rgba(59,130,246,.1)'})
+    // Update application status
+    const app=APPLICATIONS.find(a=>a.name===activeWorker?.name)
+    if(app)app.status='contacted'
+    document.getElementById('cwStep2').style.display='none'
+    document.getElementById('cwStep3').style.display='block'
+    document.getElementById('cwRevealed').textContent=activeWorker?.phone||'+250 788 123 456'
+    document.getElementById('cwWaBtn').onclick=()=>window.open(`https://wa.me/${(activeWorker?.phone||'').replace(/\D/g,'')}`)
+    renderApps(APPLICATIONS)
+  },2500)
+}
+
+function resetCwModal(){
+  document.getElementById('cwStep1').style.display='block'
+  document.getElementById('cwStep2').style.display='none'
+  document.getElementById('cwStep3').style.display='none'
+}
+
+function rejectApplicant(id){
+  const a=APPLICATIONS.find(x=>x.id===id)
+  if(a){a.status='rejected';renderApps(APPLICATIONS.filter(x=>activeAppFilter==='all'||x.status===activeAppFilter));toast(`${a.name} declined`)}
+}
+
+function markHired(id){
+  const a=APPLICATIONS.find(x=>x.id===id)
+  if(a){a.status='hired';renderApps(APPLICATIONS);toast(`✓ ${a.name} marked as hired`)}
+}
+
+function openWorkerProfile(id){
+  window.open('shinga-worker-profile.html','_blank')
+}
+
+// ── WORKER BROWSE ─────────────────────────────────────────────
+function renderWorkerBrowse(){
+  document.getElementById('workerBrowse').innerHTML=WORKERS_BROWSE.map((w,i)=>`
+    <div style="background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'" onclick="openWorkerProfile('${i}')">
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">
+        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,${g(i)});display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;color:#fff;flex-shrink:0;position:relative">
+          ${w.init}${w.verified?`<div style="position:absolute;bottom:0;right:0;width:13px;height:13px;background:var(--green);border-radius:50%;border:2px solid #fff;font-size:7px;display:flex;align-items:center;justify-content:center;color:#fff">✓</div>`:''}
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:.9rem;color:var(--dark)">${w.name}</div>
+          <div style="font-size:.78rem;color:var(--green);font-weight:600">${w.role}</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:2px">📍 ${w.district} · ★ ${w.rating}</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--dark)">${w.rate}</div>
+        <button class="btn btn-green btn-sm" onclick="event.stopPropagation();openContactFromBrowse('${i}')">Contact</button>
+      </div>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:6px;text-align:right">Contact fee: RWF 1,500</div>
+    </div>
+  `).join('')
+}
+
+function openContactFromBrowse(i){
+  activeWorker=WORKERS_BROWSE[i]
+  document.getElementById('cwName').textContent=WORKERS_BROWSE[i].name
+  document.getElementById('cwStep1').style.display='block'
+  document.getElementById('cwStep2').style.display='none'
+  document.getElementById('cwStep3').style.display='none'
+  openM('contactWorkerM')
+}
+
+// ── SPEND PAGE ────────────────────────────────────────────────
+function renderSpend(){
+  const totalSpent=Math.abs(TRANSACTIONS.filter(t=>t.amount<0).reduce((a,t)=>a+t.amount,0))
+  const totalTopUp=TRANSACTIONS.filter(t=>t.amount>0).reduce((a,t)=>a+t.amount,0)
+  document.getElementById('spendKpis').innerHTML=`
+    <div class="kpi"><div class="kpi-label">Total Spent</div><div class="kpi-num" style="font-size:1.4rem">${fmt(totalSpent)}</div><div class="kpi-sub">all time</div></div>
+    <div class="kpi"><div class="kpi-label">Credits Purchased</div><div class="kpi-num" style="font-size:1.4rem;color:var(--green)">${fmt(totalTopUp)}</div><div class="kpi-sub">all time</div></div>
+    <div class="kpi"><div class="kpi-label">Current Balance</div><div class="kpi-num" style="font-size:1.4rem;color:var(--gold)">${fmt(walletBalance)}</div><div class="kpi-sub"><a href="#" onclick="openM('topUpM');return false" style="color:var(--green);font-weight:700">Top up →</a></div></div>
+  `
+  document.getElementById('txFull').innerHTML=TRANSACTIONS.map(tx=>`
+    <div class="tx-row">
+      <div class="tx-ico" style="background:${tx.bg}">${tx.ico}</div>
+      <div class="tx-body">
+        <div class="tx-desc">${tx.desc}</div>
+        <div style="display:flex;gap:8px;margin-top:2px">
+          <span class="badge ${tx.amount<0?'badge-muted':'badge-green'}">${tx.type}</span>
+          <span class="tx-date">${tx.date}</span>
+        </div>
+      </div>
+      <div class="tx-amt" style="color:${tx.amount<0?'var(--dark)':'var(--green)'}">${tx.amount<0?'-':'+'}${fmt(Math.abs(tx.amount))}</div>
+    </div>
+  `).join('')
+}
+
+// ── TOP UP ────────────────────────────────────────────────────
+function renderPackGrid(){
+  document.getElementById('packGrid').innerHTML=CREDIT_PACKS.map((p,i)=>`
+    <div onclick="selectPack(this,${i})" style="border:1.5px solid ${i===1?'var(--green)':'var(--border)'};background:${i===1?'var(--green-pale)':'var(--white)'};border-radius:var(--r);padding:14px 12px;text-align:center;cursor:pointer;position:relative;transition:all .15s">
+      ${p.popular?`<div style="position:absolute;top:-8px;right:8px;background:var(--gold);color:var(--dark);font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:100px">Popular</div>`:''}
+      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dark)">${fmt(p.amount)}</div>
+      <div style="font-size:.7rem;color:var(--green);font-weight:700;margin:3px 0">${p.bonus}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)">${fmt(p.price)}</div>
+    </div>
+  `).join('')
+}
+
+function selectPack(el,i){
+  selectedPack=i
+  document.querySelectorAll('#packGrid>div').forEach((d,j)=>{
+    d.style.borderColor=j===i?'var(--green)':'var(--border)'
+    d.style.background=j===i?'var(--green-pale)':'var(--white)'
+  })
+}
+
+function doTopUp(){
+  const p=CREDIT_PACKS[selectedPack]
+  walletBalance+=p.amount
+  updateWallet()
+  TRANSACTIONS.unshift({type:'Top Up',desc:`Credit Pack — ${fmt(p.amount)}`,amount:+p.amount,date:'Just now',ico:'💳',bg:'rgba(245,166,35,.1)'})
+  closeM('topUpM')
+  toast(`✓ ${fmt(p.amount)} added to your credits`)
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+renderOverview()
+renderPackGrid()
+calcFee()
+updateWallet()
+</script>
+</body>
+</html>

@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHINGA — SMS Notifications Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1A7A4A;--green-h:#25A865;--green-dim:#145E38;--green-pale:#E8F5EE;
+  --gold:#F5A623;--gold-dim:#C8841A;
+  --dark:#0F1F15;--mid:#3D5C48;--muted:#6B7C73;
+  --light:#F7FAF8;--white:#FFFFFF;--border:#D0E6DA;
+  --r:10px;--r-lg:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);line-height:1.6}
+.wrap{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{background:var(--dark);padding:28px 20px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:3px}.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+.s-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.3rem;color:#F7FAF8;letter-spacing:3px;margin-bottom:4px}
+.s-logo span{color:var(--green-h)}
+.s-sub{font-size:.68rem;color:rgba(247,250,248,.28);font-family:'DM Mono',monospace;letter-spacing:1px;margin-bottom:24px}
+.s-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(247,250,248,.22);margin-bottom:7px;margin-top:18px}
+.s-link{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r);color:rgba(247,250,248,.52);font-size:.8rem;text-decoration:none;transition:all .15s;cursor:pointer;margin-bottom:2px}
+.s-link:hover{background:rgba(255,255,255,.05);color:#F7FAF8}
+.s-link.on{background:rgba(26,122,74,.2);color:var(--green-h)}
+
+/* CONTENT */
+.content{padding:44px 56px;max-width:880px}
+.page-eye{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--green);margin-bottom:8px}
+.page-h1{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;color:var(--dark);line-height:1.15;margin-bottom:12px;letter-spacing:-.5px}
+.page-sub{font-size:.98rem;color:var(--muted);line-height:1.78;max-width:600px;margin-bottom:40px}
+h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark);margin:40px 0 14px}
+h3{font-size:.98rem;font-weight:700;color:var(--dark);margin:22px 0 9px}
+p{color:var(--mid);font-size:.88rem;line-height:1.78;margin-bottom:13px}
+ul,ol{color:var(--mid);font-size:.86rem;line-height:1.8;padding-left:20px;margin-bottom:13px}
+li{margin-bottom:3px}
+strong{color:var(--dark)}
+code{font-family:'DM Mono',monospace;font-size:.8rem;background:var(--green-pale);color:var(--green);padding:2px 7px;border-radius:5px}
+
+/* CODE BLOCKS */
+.cw{position:relative;margin:16px 0}
+.cl{font-size:.63rem;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(247,250,248,.38);background:var(--dark);padding:8px 16px 0;border-radius:var(--r-lg) var(--r-lg) 0 0;display:flex;justify-content:space-between;align-items:center}
+.cb{background:rgba(255,255,255,.07);border:none;color:rgba(247,250,248,.45);font-size:.68rem;padding:3px 10px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s}
+.cb:hover{background:rgba(255,255,255,.14);color:#F7FAF8}
+pre{background:var(--dark);padding:20px 20px 22px;border-radius:0 0 var(--r-lg) var(--r-lg);overflow-x:auto;font-family:'DM Mono',monospace;font-size:.78rem;line-height:1.75;color:#E8F5EE;white-space:pre}
+.c{color:rgba(247,250,248,.28)}
+.k{color:var(--green-h)}
+.s{color:var(--gold)}
+.n{color:#7DD3FC}
+.fn{color:#F472B6}
+
+/* INFO CARDS */
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px 24px;margin:16px 0}
+.card.ok{border-color:rgba(26,122,74,.25);background:var(--green-pale)}
+.card.warn{border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.05)}
+.card.note{border-color:rgba(59,130,246,.25);background:rgba(59,130,246,.04)}
+.card-title{font-weight:700;color:var(--dark);font-size:.87rem;margin-bottom:6px}
+.card-body{font-size:.82rem;color:var(--mid);line-height:1.72}
+
+/* TRIGGER TABLE */
+.tbl{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--r-lg);overflow:hidden;border:1.5px solid var(--border);margin:16px 0}
+.tbl thead th{padding:10px 16px;text-align:left;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);background:var(--light);border-bottom:1.5px solid var(--border)}
+.tbl tbody td{padding:12px 16px;font-size:.81rem;border-bottom:1px solid var(--border);vertical-align:top}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover{background:var(--light)}
+.rb{display:inline-flex;padding:2px 9px;border-radius:100px;font-size:.67rem;font-weight:700}
+.rb-w{background:var(--green-pale);color:var(--green)}
+.rb-e{background:rgba(37,99,235,.08);color:#1D4ED8}
+.rb-b{background:rgba(245,166,35,.1);color:var(--gold-dim)}
+
+/* SMS PHONE PREVIEW */
+.preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.phone{background:var(--dark);border-radius:20px;padding:20px 16px;min-height:120px}
+.notch{width:60px;height:6px;background:rgba(255,255,255,.12);border-radius:3px;margin:0 auto 16px}
+.bubble{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:12px 12px 12px 2px;padding:10px 14px;max-width:90%}
+.bubble-sender{font-size:.62rem;font-weight:700;color:var(--green-h);font-family:'DM Mono',monospace;letter-spacing:.8px;margin-bottom:4px}
+.bubble-text{font-size:.76rem;color:rgba(247,250,248,.85);line-height:1.6}
+.bubble-time{font-size:.6rem;color:rgba(247,250,248,.25);text-align:right;margin-top:5px;font-family:'DM Mono',monospace}
+.phone-label{font-size:.72rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-family:'DM Mono',monospace}
+
+/* ENV TABLE */
+.env-tbl{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--r-lg);overflow:hidden;border:1.5px solid var(--border);margin:16px 0}
+.env-tbl thead th{padding:10px 14px;text-align:left;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);background:var(--light);border-bottom:1.5px solid var(--border)}
+.env-tbl tbody td{padding:11px 14px;font-size:.8rem;border-bottom:1px solid var(--border)}
+.env-tbl tbody tr:last-child td{border-bottom:none}
+.ev{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--green)}
+.req{font-size:.67rem;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(220,38,38,.08);color:#DC2626;border:1px solid rgba(220,38,38,.15)}
+.opt{font-size:.67rem;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--green-pale);color:var(--green);border:1px solid rgba(26,122,74,.2)}
+
+.divider{height:1px;background:var(--border);margin:36px 0}
+
+@media(max-width:800px){.wrap{grid-template-columns:1fr}.sidebar{display:none}.content{padding:28px 20px}.preview-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="s-logo">SH<span>I</span>NGA</div>
+  <div class="s-sub">SMS NOTIFICATIONS GUIDE</div>
+  <div class="s-label">Overview</div>
+  <a class="s-link on" onclick="go('overview')">📱 Overview</a>
+  <a class="s-link" onclick="go('triggers')">⚡ All Triggers</a>
+  <a class="s-link" onclick="go('provider')">⚙️ Provider Setup</a>
+  <a class="s-link" onclick="go('env')">🔑 Environment</a>
+  <div class="s-label">Implementation</div>
+  <a class="s-link" onclick="go('lib')">📦 sms.ts Library</a>
+  <a class="s-link" onclick="go('templates')">✉️ Templates</a>
+  <a class="s-link" onclick="go('queue')">🔄 SMS Queue</a>
+  <div class="s-label">Notifications</div>
+  <a class="s-link" onclick="go('n1')">💼 Job Posted</a>
+  <a class="s-link" onclick="go('n2')">📨 Application</a>
+  <a class="s-link" onclick="go('n3')">📞 Worker Contacted</a>
+  <a class="s-link" onclick="go('n4')">💳 Payment</a>
+  <a class="s-link" onclick="go('n5')">✅ Hired</a>
+  <a class="s-link" onclick="go('n6')">🛡️ Verification</a>
+  <a class="s-link" onclick="go('n7')">⏰ Expiry Warning</a>
+  <a class="s-link" onclick="go('n8')">💰 Wallet Low</a>
+  <div class="s-label">Production</div>
+  <a class="s-link" onclick="go('schema')">🗄️ DB Schema</a>
+  <a class="s-link" onclick="go('testing')">🧪 Testing</a>
+</aside>
+
+<!-- CONTENT -->
+<div class="content">
+
+<div id="overview">
+  <div class="page-eye">Integration Guide</div>
+  <h1 class="page-h1">SMS Notifications</h1>
+  <p class="page-sub">Complete Africa's Talking SMS integration for SHINGA. Every key platform event — job posted, application received, worker contacted, payment confirmed, verification approved — triggers a targeted SMS to the right person, in Kinyarwanda or English.</p>
+  <div class="card ok">
+    <div class="card-title">✅ What this covers</div>
+    <div class="card-body">
+      <strong>Provider:</strong> Africa's Talking — Rwanda local rates (~RWF 28–35/SMS)<br>
+      <strong>8 notification triggers</strong> covering both worker and employer sides<br>
+      <strong>Bilingual templates</strong> — Kinyarwanda (default) + English<br>
+      <strong>Rate limiting</strong> — max 5 SMS per user per hour, configurable<br>
+      <strong>Delivery logging</strong> — every SMS stored in Supabase, visible in admin<br>
+      <strong>Async queue</strong> — SMS never blocks your API response time
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="triggers">
+  <h2>All Notification Triggers</h2>
+  <table class="tbl">
+    <thead><tr><th>Event</th><th>Who Gets It</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Job Posted</strong></td><td><span class="rb rb-e">Employer</span></td><td>After MoMo payment confirmed, job goes live</td></tr>
+      <tr><td><strong>Application Received</strong></td><td><span class="rb rb-e">Employer</span></td><td>Worker pays and submits application</td></tr>
+      <tr><td><strong>Application Sent</strong></td><td><span class="rb rb-w">Worker</span></td><td>Same event — confirm to worker it went through</td></tr>
+      <tr><td><strong>Worker Contacted</strong></td><td><span class="rb rb-w">Worker</span></td><td>Employer pays contact fee and unlocks number</td></tr>
+      <tr><td><strong>Payment Confirmed</strong></td><td><span class="rb rb-b">Both</span></td><td>Any MoMo webhook confirmation</td></tr>
+      <tr><td><strong>Marked as Hired</strong></td><td><span class="rb rb-w">Worker</span></td><td>Employer clicks "Mark as Hired" in dashboard</td></tr>
+      <tr><td><strong>Verification Approved</strong></td><td><span class="rb rb-w">Worker</span></td><td>Admin approves ID check in admin panel</td></tr>
+      <tr><td><strong>Job Expiry Warning</strong></td><td><span class="rb rb-e">Employer</span></td><td>Cron job — 3 days before listing expires</td></tr>
+      <tr><td><strong>Wallet Low</strong></td><td><span class="rb rb-e">Employer</span></td><td>Credit balance drops below RWF 3,000</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<div id="provider">
+  <h2>Africa's Talking Setup</h2>
+  <ol>
+    <li>Create account at <strong>africastalking.com</strong></li>
+    <li>Go to <strong>SMS → Sender IDs</strong> → request <code>SHINGA</code> as sender ID (1–3 days in Rwanda)</li>
+    <li>Go to <strong>Settings → API Key</strong> → copy your key</li>
+    <li>Fund your AT account — minimum RWF 5,000 to start sending</li>
+    <li>For testing: use username <code>sandbox</code> with any API key — no real SMS sent</li>
+  </ol>
+  <div class="card warn">
+    <div class="card-title">⚠️ Apply for your Sender ID immediately</div>
+    <div class="card-body">Without an approved sender ID, messages arrive from a random short code. Apply for <strong>SHINGA</strong> on day one — approval takes 1–3 business days. Use <code>sandbox</code> mode during that wait.</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="env">
+  <h2>Environment Variables</h2>
+  <div class="cw">
+    <div class="cl">.env.local<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="c"># ── Africa's Talking ──────────────────────────────────</span>
+<span class="n">AT_API_KEY</span>=<span class="s">your-api-key-from-dashboard</span>
+<span class="n">AT_USERNAME</span>=<span class="s">shinga</span>              <span class="c"># use 'sandbox' for local dev</span>
+<span class="n">AT_SENDER_ID</span>=<span class="s">SHINGA</span>            <span class="c"># approved sender name</span>
+
+<span class="c"># ── SMS Config ────────────────────────────────────────</span>
+<span class="n">SMS_ENABLED</span>=<span class="s">true</span>               <span class="c"># false = log only, no actual send</span>
+<span class="n">SMS_DEFAULT_LANG</span>=<span class="s">rw</span>            <span class="c"># rw = Kinyarwanda | en = English</span>
+<span class="n">SMS_RATE_LIMIT_PER_HOUR</span>=<span class="s">5</span>     <span class="c"># max per user per hour</span></pre>
+  </div>
+  <table class="env-tbl">
+    <thead><tr><th>Variable</th><th>Source</th><th></th></tr></thead>
+    <tbody>
+      <tr><td><span class="ev">AT_API_KEY</span></td><td>AT dashboard → Settings → API Key</td><td><span class="req">Required</span></td></tr>
+      <tr><td><span class="ev">AT_USERNAME</span></td><td>Your AT username. <code>sandbox</code> for dev</td><td><span class="req">Required</span></td></tr>
+      <tr><td><span class="ev">AT_SENDER_ID</span></td><td>Approved sender name shown on phone</td><td><span class="req">Required</span></td></tr>
+      <tr><td><span class="ev">SMS_ENABLED</span></td><td>Set <code>false</code> to skip real sends in dev</td><td><span class="opt">Optional</span></td></tr>
+      <tr><td><span class="ev">SMS_DEFAULT_LANG</span></td><td><code>rw</code> or <code>en</code> — default message language</td><td><span class="opt">Optional</span></td></tr>
+      <tr><td><span class="ev">SMS_RATE_LIMIT_PER_HOUR</span></td><td>Max SMS per user/hour to prevent spam</td><td><span class="opt">Optional</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<div id="lib">
+  <h2>Core SMS Library</h2>
+  <p>Create <code>lib/shinga/sms.ts</code>. All notification sending flows through <code>notify()</code>. Direct sends use <code>sendSms()</code>.</p>
+  <div class="cw">
+    <div class="cl">lib/shinga/sms.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="c">// ═══════════════════════════════════════════════════════
+// SHINGA — SMS Library (Africa's Talking)
+// ═══════════════════════════════════════════════════════</span>
+<span class="k">import</span> { createServerClient } <span class="k">from</span> <span class="s">'./supabase'</span>
+<span class="k">import</span> { SMS_TEMPLATES }     <span class="k">from</span> <span class="s">'./sms-templates'</span>
+
+<span class="k">export type</span> SmsEvent =
+  | <span class="s">'job_posted'</span>         | <span class="s">'application_received'</span>
+  | <span class="s">'application_sent'</span>   | <span class="s">'worker_contacted'</span>
+  | <span class="s">'payment_confirmed'</span>  | <span class="s">'marked_hired'</span>
+  | <span class="s">'verification_approved'</span>
+  | <span class="s">'job_expiry_warning'</span> | <span class="s">'wallet_low'</span>
+
+<span class="k">export interface</span> SmsPayload {
+  to:      string                        <span class="c">// +250XXXXXXXXX</span>
+  event:   SmsEvent
+  lang?:   <span class="s">'en'</span> | <span class="s">'rw'</span>                 <span class="c">// default: process.env.SMS_DEFAULT_LANG</span>
+  data:    Record&lt;string, string&gt;        <span class="c">// template variables</span>
+  userId?: string                        <span class="c">// for rate limiting + logging</span>
+}
+
+<span class="c">// ── DIRECT SEND ──────────────────────────────────────</span>
+
+<span class="k">export async function</span> <span class="fn">sendSms</span>(
+  to: string, message: string,
+  event?: SmsEvent, userId?: string
+): Promise&lt;void&gt; {
+
+  <span class="k">if</span> (process.env.SMS_ENABLED === <span class="s">'false'</span>) {
+    console.log(<span class="s">`[SMS SKIP] </span><span class="n">${to}</span><span class="s">: </span><span class="n">${message}</span><span class="s">`</span>)
+    <span class="k">return</span>
+  }
+
+  <span class="c">// Rate limit</span>
+  <span class="k">if</span> (userId &amp;&amp; <span class="k">await</span> <span class="fn">isRateLimited</span>(userId)) {
+    console.warn(<span class="s">`[SMS] Rate limited: </span><span class="n">${userId}</span><span class="s">`</span>)
+    <span class="k">return</span>
+  }
+
+  <span class="k">try</span> {
+    <span class="k">const</span> res = <span class="k">await</span> fetch(
+      <span class="s">'https://api.africastalking.com/version1/messaging'</span>,
+      {
+        method: <span class="s">'POST'</span>,
+        headers: {
+          <span class="s">'apiKey'</span>:       process.env.AT_API_KEY!,
+          <span class="s">'Content-Type'</span>: <span class="s">'application/x-www-form-urlencoded'</span>,
+          <span class="s">'Accept'</span>:       <span class="s">'application/json'</span>,
+        },
+        body: <span class="k">new</span> URLSearchParams({
+          username: process.env.AT_USERNAME!,
+          to, message,
+          from: process.env.AT_SENDER_ID || <span class="s">'SHINGA'</span>,
+        }).toString(),
+      }
+    )
+    <span class="k">const</span> result    = <span class="k">await</span> res.json()
+    <span class="k">const</span> recipient = result.SMSMessageData?.Recipients?.[0]
+
+    <span class="c">// Log every send — fire and forget</span>
+    <span class="fn">logSms</span>({
+      phone: to, message,
+      event: event || <span class="s">'payment_confirmed'</span>,
+      status: recipient?.status  || <span class="s">'unknown'</span>,
+      cost:   recipient?.cost    || <span class="s">'0'</span>,
+      user_id: userId,
+    }).catch(console.error)
+
+  } <span class="k">catch</span> (err) {
+    console.error(<span class="s">'[SMS] Failed:'</span>, err)
+  }
+}
+
+<span class="c">// ── TEMPLATE-BASED NOTIFY ────────────────────────────</span>
+
+<span class="k">export async function</span> <span class="fn">notify</span>(payload: SmsPayload): Promise&lt;void&gt; {
+  <span class="k">const</span> lang    = payload.lang
+    ?? (process.env.SMS_DEFAULT_LANG <span class="k">as</span> <span class="s">'en'</span> | <span class="s">'rw'</span>)
+    ?? <span class="s">'rw'</span>
+  <span class="k">const</span> tpl     = SMS_TEMPLATES[payload.event]?.[lang]
+  <span class="k">if</span> (!tpl) { console.warn(<span class="s">`[SMS] No template: </span><span class="n">${payload.event}</span><span class="s">`</span>); <span class="k">return</span> }
+
+  <span class="k">const</span> message = tpl.replace(
+    /\{\{(\w+)\}\}/g,
+    (_, k) => payload.data[k] ?? <span class="s">`[</span><span class="n">${k}</span><span class="s">]`</span>
+  )
+  <span class="k">await</span> <span class="fn">sendSms</span>(payload.to, message, payload.event, payload.userId)
+}
+
+<span class="c">// ── RATE LIMIT ───────────────────────────────────────</span>
+
+<span class="k">async function</span> <span class="fn">isRateLimited</span>(userId: string): Promise&lt;boolean&gt; {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> limit    = parseInt(process.env.SMS_RATE_LIMIT_PER_HOUR || <span class="s">'5'</span>)
+  <span class="k">const</span> hourAgo  = <span class="k">new</span> Date(Date.now() - 3_600_000).toISOString()
+  <span class="k">const</span> { count } = <span class="k">await</span> supabase
+    .from(<span class="s">'sms_log'</span>)
+    .select(<span class="s">'id'</span>, { count: <span class="s">'exact'</span>, head: <span class="k">true</span> })
+    .eq(<span class="s">'user_id'</span>, userId)
+    .gte(<span class="s">'created_at'</span>, hourAgo)
+  <span class="k">return</span> (count ?? 0) >= limit
+}
+
+<span class="c">// ── DB LOG ───────────────────────────────────────────</span>
+
+<span class="k">async function</span> <span class="fn">logSms</span>(d: {
+  phone: string; message: string; event: string;
+  status: string; cost: string; user_id?: string
+}) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">await</span> supabase.from(<span class="s">'sms_log'</span>).insert(d)
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="templates">
+  <h2>Message Templates</h2>
+  <p>All 9 events in both languages. Keep each message under 160 characters — longer messages are split into two by carriers and cost double.</p>
+  <div class="cw">
+    <div class="cl">lib/shinga/sms-templates.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">import type</span> { SmsEvent } <span class="k">from</span> <span class="s">'./sms'</span>
+
+<span class="k">export const</span> SMS_TEMPLATES: Record&lt;SmsEvent,{en:string;rw:string}&gt; = {
+
+  job_posted: {
+    en: <span class="s">`SHINGA: Job "{{title}}" is live! Workers can now apply. Ref: {{ref}}.`</span>,
+    rw: <span class="s">`SHINGA: Akazi "{{title}}" gasohowe. Abakozi barashobora gusaba. Ref: {{ref}}.`</span>,
+  },
+
+  application_received: {
+    en: <span class="s">`SHINGA: {{worker}} applied for "{{job}}". Login to review them.`</span>,
+    rw: <span class="s">`SHINGA: {{worker}} yasabye akazi "{{job}}". Injira kuri SHINGA urebe.`</span>,
+  },
+
+  application_sent: {
+    en: <span class="s">`SHINGA: Application sent for "{{job}}"! If selected, the employer contacts you.`</span>,
+    rw: <span class="s">`SHINGA: Umusaba ku "{{job}}" woherejwe! Niba wahiswe, umukoresha azakuvugisha.`</span>,
+  },
+
+  worker_contacted: {
+    en: <span class="s">`SHINGA: {{employer}} wants you for "{{job}}" in {{district}}. Pay: {{pay}}.`</span>,
+    rw: <span class="s">`SHINGA: {{employer}} ashaka akazi "{{job}}" i {{district}}. Umushimire cyangwa mutumanahane.`</span>,
+  },
+
+  payment_confirmed: {
+    en: <span class="s">`SHINGA: RWF {{amount}} confirmed. Ref: {{ref}}. Balance: RWF {{balance}}.`</span>,
+    rw: <span class="s">`SHINGA: RWF {{amount}} kwemejwe. Ref: {{ref}}. Umuzigo: RWF {{balance}}.`</span>,
+  },
+
+  marked_hired: {
+    en: <span class="s">`SHINGA: Congratulations! {{employer}} selected you for "{{job}}". Contact them to confirm start.`</span>,
+    rw: <span class="s">`SHINGA: Simbuka! {{employer}} yakugize uwabo ku "{{job}}". Bavugishe kugira ngo mumenye itariki.`</span>,
+  },
+
+  verification_approved: {
+    en: <span class="s">`SHINGA: Your Verified badge is now active for 1 year. You appear first in search!`</span>,
+    rw: <span class="s">`SHINGA: Ikimenyetso cya Verified gikora umwaka. Ubu ugaragara mbere mu gushakisha!`</span>,
+  },
+
+  job_expiry_warning: {
+    en: <span class="s">`SHINGA: "{{title}}" expires in 3 days. Login to renew and keep receiving applications.`</span>,
+    rw: <span class="s">`SHINGA: "{{title}}" irangira mu minsi 3. Injira kuri SHINGA ugashyira vuba.`</span>,
+  },
+
+  wallet_low: {
+    en: <span class="s">`SHINGA: Low credits (RWF {{balance}}). Top up to keep posting jobs and contacting workers.`</span>,
+    rw: <span class="s">`SHINGA: Amafaranga yo muri konti yawe arapunguka (RWF {{balance}}). Yongereho gukomeza gukoresha.`</span>,
+  },
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- NOTIFICATION PREVIEWS -->
+<div id="n1">
+  <h2>1 — Job Posted</h2>
+  <p>Sent to the <strong>employer</strong> after MoMo webhook confirms payment and the job goes live.</p>
+  <div class="cw">
+    <div class="cl">Usage in fulfillPayment() — case 'post_job'<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">await</span> <span class="fn">notify</span>({
+  to:    employerPhone,
+  event: <span class="s">'job_posted'</span>,
+  data:  { title: job.title, ref: referenceId.slice(0,8) },
+  userId: employerId,
+})</pre>
+  </div>
+  <div class="preview-grid">
+    <div>
+      <div class="phone-label">English</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Job "Live-in Babysitter" is live! Workers can now apply. Ref: 3f8a9b2c.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+    <div>
+      <div class="phone-label">Kinyarwanda</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Akazi "Live-in Babysitter" gasohowe. Abakozi barashobora gusaba. Ref: 3f8a9b2c.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="n2">
+  <h2>2 — Application Received &amp; Sent</h2>
+  <p>Two SMS fire at once: <strong>employer</strong> gets an alert, <strong>worker</strong> gets a confirmation.</p>
+  <div class="cw">
+    <div class="cl">Usage in fulfillPayment() — case 'apply_job'<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">await</span> Promise.all([
+  <span class="fn">notify</span>({
+    to: employerPhone, event: <span class="s">'application_received'</span>,
+    data: { worker: workerName, job: job.title },
+    userId: employerId,
+  }),
+  <span class="fn">notify</span>({
+    to: workerPhone, event: <span class="s">'application_sent'</span>,
+    data: { job: job.title },
+    userId: workerId,
+  }),
+])</pre>
+  </div>
+  <div class="preview-grid">
+    <div>
+      <div class="phone-label">→ Employer (EN)</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Jean-Paul Nkusi applied for "Live-in Babysitter". Login to review them.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+    <div>
+      <div class="phone-label">→ Worker (RW)</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Umusaba ku "Live-in Babysitter" woherejwe! Niba wahiswe, umukoresha azakuvugisha.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="n3">
+  <h2>3 — Worker Contacted</h2>
+  <p>Sent to the <strong>worker</strong> when employer pays to unlock their contact. Includes employer name, job, location and pay so the worker has context before calling back.</p>
+  <div class="cw">
+    <div class="cl">Usage in fulfillPayment() — case 'contact_worker'<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">await</span> <span class="fn">notify</span>({
+  to:    workerPhone,
+  event: <span class="s">'worker_contacted'</span>,
+  data:  {
+    employer: employerName,
+    job:      jobTitle,
+    district: jobDistrict,
+    pay:      jobPay,
+  },
+  userId: workerId,
+})</pre>
+  </div>
+  <div class="preview-grid">
+    <div>
+      <div class="phone-label">English</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Mugisha Emmanuel wants you for "Babysitter" in Gasabo. Pay: RWF 80,000/mo.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+    <div>
+      <div class="phone-label">Kinyarwanda</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Mugisha Emmanuel ashaka akazi "Babysitter" i Gasabo. Umushimire cyangwa mutumanahane.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="n4">
+  <h2>4 — Payment Confirmed</h2>
+  <p>Sent after every MoMo webhook confirmation. Acts as the user's receipt.</p>
+  <div class="preview-grid">
+    <div>
+      <div class="phone-label">English</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">RWF 8,000 confirmed. Ref: 3f8a9b2c. Balance: RWF 16,500.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+    <div>
+      <div class="phone-label">Kinyarwanda</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">RWF 8,000 kwemejwe. Ref: 3f8a9b2c. Umuzigo: RWF 16,500.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="n5">
+  <h2>5 — Marked as Hired</h2>
+  <p>Sent to the <strong>worker</strong> when employer clicks "Mark as Hired" in their employer dashboard.</p>
+  <div class="cw">
+    <div class="cl">app/api/applications/[id]/hire/route.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">export async function</span> <span class="fn">POST</span>(_: NextRequest, { params }) {
+  <span class="k">const</span> user     = <span class="k">await</span> <span class="fn">getUser</span>()
+  <span class="k">if</span> (!user) <span class="k">return</span> NextResponse.json({ error: <span class="s">'Unauthorized'</span> }, { status: 401 })
+
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data: app } = <span class="k">await</span> supabase
+    .from(<span class="s">'applications'</span>)
+    .update({ status: <span class="s">'hired'</span> })
+    .eq(<span class="s">'id'</span>, params.id)
+    .select(<span class="s">'*, worker:workers(*), job:jobs(*)'</span>)
+    .single()
+
+  <span class="k">if</span> (!app) <span class="k">return</span> NextResponse.json({ error: <span class="s">'Not found'</span> }, { status: 404 })
+
+  <span class="k">await</span> <span class="fn">notify</span>({
+    to:    app.worker.phone,
+    event: <span class="s">'marked_hired'</span>,
+    data:  {
+      employer: user.user_metadata?.full_name || <span class="s">'The employer'</span>,
+      job:      app.job.title,
+    },
+    userId: app.worker_id,
+  })
+
+  <span class="k">return</span> NextResponse.json({ success: <span class="k">true</span> })
+}</pre>
+  </div>
+  <div class="preview-grid">
+    <div>
+      <div class="phone-label">English</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Congratulations! Mugisha Emmanuel selected you for "Babysitter". Contact them to confirm start.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+    <div>
+      <div class="phone-label">Kinyarwanda</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Simbuka! Mugisha Emmanuel yakugize uwabo ku "Babysitter". Bavugishe kugira ngo mumenye itariki.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="n6">
+  <h2>6 — Verification Approved</h2>
+  <p>Sent by the admin when they approve a worker's SHINGA Verified badge in the admin dashboard after ID check.</p>
+  <div class="cw">
+    <div class="cl">Admin panel — approve worker action<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="c">// In admin: PATCH /api/admin/workers/:id/approve</span>
+<span class="k">await</span> supabase.from(<span class="s">'workers'</span>).update({
+  status:        <span class="s">'active'</span>,
+  verified:      <span class="k">true</span>,
+  featured_until: <span class="k">new</span> Date(Date.now() + 365*24*60*60*1000).toISOString(),
+}).eq(<span class="s">'id'</span>, workerId)
+
+<span class="k">await</span> <span class="fn">notify</span>({
+  to:    worker.phone,
+  event: <span class="s">'verification_approved'</span>,
+  data:  {},
+  userId: worker.profile_id,
+})</pre>
+  </div>
+  <div class="preview-grid">
+    <div>
+      <div class="phone-label">English</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Your Verified badge is now active for 1 year. You appear first in search!</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+    <div>
+      <div class="phone-label">Kinyarwanda</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Ikimenyetso cya Verified gikora umwaka. Ubu ugaragara mbere mu gushakisha!</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="n7">
+  <h2>7 — Job Expiry Warning</h2>
+  <p>A cron job runs daily at 8AM Kigali time. It finds jobs expiring in exactly 3 days and SMS the employer to renew.</p>
+  <div class="cw">
+    <div class="cl">app/api/cron/expiry-warnings/route.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="c">// vercel.json: { "crons": [{ "path": "/api/cron/expiry-warnings", "schedule": "0 6 * * *" }] }</span>
+<span class="k">export async function</span> <span class="fn">GET</span>() {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> in3Days  = <span class="k">new</span> Date(Date.now() + 3*24*60*60*1000)
+  <span class="k">const</span> in4Days  = <span class="k">new</span> Date(Date.now() + 4*24*60*60*1000)
+
+  <span class="k">const</span> { data: jobs } = <span class="k">await</span> supabase
+    .from(<span class="s">'jobs'</span>)
+    .select(<span class="s">'id, title, employer_id, employer:profiles(phone, sms_lang)'</span>)
+    .eq(<span class="s">'status'</span>, <span class="s">'active'</span>)
+    .gte(<span class="s">'expires_at'</span>, in3Days.toISOString())
+    .lt(<span class="s">'expires_at'</span>,  in4Days.toISOString())
+
+  <span class="k">for</span> (<span class="k">const</span> job <span class="k">of</span> jobs ?? []) {
+    <span class="k">if</span> (!job.employer?.phone) <span class="k">continue</span>
+    <span class="k">await</span> <span class="fn">notify</span>({
+      to:    job.employer.phone,
+      event: <span class="s">'job_expiry_warning'</span>,
+      lang:  job.employer.sms_lang || <span class="s">'rw'</span>,
+      data:  { title: job.title },
+      userId: job.employer_id,
+    })
+  }
+
+  <span class="k">return</span> NextResponse.json({ sent: jobs?.length ?? 0 })
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="n8">
+  <h2>8 — Wallet Low</h2>
+  <p>Triggered automatically after any debit from a user's credit wallet when balance falls below <strong>RWF 3,000</strong>.</p>
+  <div class="cw">
+    <div class="cl">Add to end of fulfillPayment() in lib/shinga/payments.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="c">// After marking payment 'completed', check wallet balance</span>
+<span class="k">const</span> LOW_THRESHOLD = 3000
+
+<span class="k">const</span> { data: wallet } = <span class="k">await</span> supabase
+  .from(<span class="s">'wallets'</span>)
+  .select(<span class="s">'balance'</span>)
+  .eq(<span class="s">'user_id'</span>, payment.user_id)
+  .single()
+
+<span class="k">if</span> (wallet &amp;&amp; wallet.balance &lt; LOW_THRESHOLD) {
+  <span class="k">const</span> { data: profile } = <span class="k">await</span> supabase
+    .from(<span class="s">'profiles'</span>)
+    .select(<span class="s">'phone, sms_lang'</span>)
+    .eq(<span class="s">'id'</span>, payment.user_id)
+    .single()
+
+  <span class="k">if</span> (profile?.phone) {
+    <span class="k">await</span> <span class="fn">notify</span>({
+      to:    profile.phone,
+      event: <span class="s">'wallet_low'</span>,
+      lang:  profile.sms_lang || <span class="s">'rw'</span>,
+      data:  { balance: wallet.balance.toLocaleString() },
+      userId: payment.user_id,
+    })
+  }
+}</pre>
+  </div>
+  <div class="preview-grid">
+    <div>
+      <div class="phone-label">English</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Low credits (RWF 2,500). Top up to keep posting jobs and contacting workers.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+    <div>
+      <div class="phone-label">Kinyarwanda</div>
+      <div class="phone"><div class="notch"></div><div class="bubble">
+        <div class="bubble-sender">SHINGA</div>
+        <div class="bubble-text">Amafaranga muri konti yawe arapunguka (RWF 2,500). Yongereho gukomeza gukoresha.</div>
+        <div class="bubble-time">Just now</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="schema">
+  <h2>Database Schema Addition</h2>
+  <p>Run this in Supabase SQL Editor to add the SMS log table and user language preferences.</p>
+  <div class="cw">
+    <div class="cl">Add to shinga-schema.sql<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="c">-- ── SMS LOG ──────────────────────────────────────────</span>
+<span class="k">create table</span> sms_log (
+  id         bigserial <span class="k">primary key</span>,
+  user_id    uuid <span class="k">references</span> profiles(id) <span class="k">on delete set null</span>,
+  phone      text <span class="k">not null</span>,
+  event      text <span class="k">not null</span>,
+  message    text <span class="k">not null</span>,
+  status     text <span class="k">default</span> <span class="s">'queued'</span>,
+  cost       text,
+  created_at timestamptz <span class="k">default</span> now()
+);
+
+<span class="k">create index</span> sms_user_idx    <span class="k">on</span> sms_log(user_id);
+<span class="k">create index</span> sms_event_idx   <span class="k">on</span> sms_log(event);
+<span class="k">create index</span> sms_created_idx <span class="k">on</span> sms_log(created_at <span class="k">desc</span>);
+
+<span class="c">-- ── USER SMS PREFERENCES (add to profiles) ───────────</span>
+<span class="k">alter table</span> profiles
+  <span class="k">add column if not exists</span> sms_lang    text <span class="k">default</span> <span class="s">'rw'</span>
+    <span class="k">check</span> (sms_lang <span class="k">in</span> (<span class="s">'rw'</span>, <span class="s">'en'</span>)),
+  <span class="k">add column if not exists</span> sms_enabled boolean <span class="k">default true</span>;
+
+<span class="c">-- ── RLS ──────────────────────────────────────────────</span>
+<span class="k">alter table</span> sms_log <span class="k">enable row level security</span>;
+
+<span class="k">create policy</span> <span class="s">"sms_own_read"</span> <span class="k">on</span> sms_log
+  <span class="k">for select using</span> (user_id = auth.uid());
+
+<span class="c">-- Admin read-all policy (set in Supabase dashboard
+-- using service role or a separate admin policy)</span></pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="queue">
+  <h2>Async SMS Queue</h2>
+  <p>For high-traffic moments, queue SMS instead of sending inline — so your API never waits on Africa's Talking.</p>
+  <div class="cw">
+    <div class="cl">lib/shinga/sms-queue.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="c">// Use queueSms() instead of notify() when you want non-blocking sends.
+// A Supabase Edge Function or Vercel cron drains the queue every 30s.</span>
+
+<span class="k">export async function</span> <span class="fn">queueSms</span>(payload: SmsPayload): Promise&lt;void&gt; {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> lang     = payload.lang ?? <span class="s">'rw'</span>
+  <span class="k">const</span> tpl      = SMS_TEMPLATES[payload.event]?.[lang]
+  <span class="k">if</span> (!tpl) <span class="k">return</span>
+  <span class="k">const</span> message  = tpl.replace(/\{\{(\w+)\}\}/g, (_, k) => payload.data[k] ?? <span class="s">`[</span><span class="n">${k}</span><span class="s">]`</span>)
+
+  <span class="k">await</span> supabase.from(<span class="s">'sms_queue'</span>).insert({
+    to: payload.to, message,
+    event:   payload.event,
+    user_id: payload.userId,
+    status:  <span class="s">'pending'</span>,
+  })
+}
+
+<span class="c">// ── Queue table (add to shinga-schema.sql) ───────────
+// create table sms_queue (
+//   id         bigserial primary key,
+//   to_phone   text not null,
+//   message    text not null,
+//   event      text,
+//   user_id    uuid,
+//   status     text default 'pending'
+//                check (status in ('pending','sent','failed')),
+//   attempts   integer default 0,
+//   created_at timestamptz default now(),
+//   sent_at    timestamptz
+// );</span></pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="testing">
+  <h2>Testing</h2>
+  <div class="card warn">
+    <div class="card-title">⚠️ Always use sandbox during development</div>
+    <div class="card-body">Set <code>AT_USERNAME=sandbox</code> in <code>.env.local</code>. SMS appear in your AT sandbox dashboard but never reach real phones. Switch to your real username + API key only in production.</div>
+  </div>
+  <div class="cw">
+    <div class="cl">scripts/test-sms.ts — run with: npx tsx scripts/test-sms.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">import</span> { notify } <span class="k">from</span> <span class="s">'../lib/shinga/sms'</span>
+
+<span class="k">const</span> PHONE = <span class="s">'+250788000000'</span>  <span class="c">// your own number</span>
+
+<span class="k">async function</span> <span class="fn">runTests</span>() {
+  console.log(<span class="s">'Testing all SHINGA SMS notifications...\n'</span>)
+
+  <span class="k">const</span> tests = [
+    { event: <span class="s">'job_posted'</span>,           data: { title: <span class="s">'Babysitter'</span>, ref: <span class="s">'abc12345'</span> } },
+    { event: <span class="s">'application_received'</span>,  data: { worker: <span class="s">'Jean-Paul'</span>, job: <span class="s">'Babysitter'</span> } },
+    { event: <span class="s">'application_sent'</span>,      data: { job: <span class="s">'Babysitter'</span> } },
+    { event: <span class="s">'worker_contacted'</span>,      data: { employer: <span class="s">'Mugisha'</span>, job: <span class="s">'Babysitter'</span>, district: <span class="s">'Gasabo'</span>, pay: <span class="s">'RWF 80,000'</span> } },
+    { event: <span class="s">'payment_confirmed'</span>,     data: { amount: <span class="s">'8,000'</span>, ref: <span class="s">'abc12345'</span>, balance: <span class="s">'16,500'</span> } },
+    { event: <span class="s">'marked_hired'</span>,          data: { employer: <span class="s">'Mugisha'</span>, job: <span class="s">'Babysitter'</span> } },
+    { event: <span class="s">'verification_approved'</span>, data: {} },
+    { event: <span class="s">'job_expiry_warning'</span>,    data: { title: <span class="s">'Babysitter'</span> } },
+    { event: <span class="s">'wallet_low'</span>,            data: { balance: <span class="s">'2,500'</span> } },
+  ]
+
+  <span class="k">for</span> (<span class="k">const</span> t <span class="k">of</span> tests) {
+    console.log(<span class="s">`Sending: </span><span class="n">${t.event}</span><span class="s">`</span>)
+    <span class="k">await</span> <span class="fn">notify</span>({ to: PHONE, event: t.event <span class="k">as</span> <span class="k">any</span>, data: t.data, lang: <span class="s">'rw'</span> })
+    <span class="k">await</span> <span class="k">new</span> Promise(r => setTimeout(r, 500))
+  }
+
+  console.log(<span class="s">'\nDone. Check AT sandbox dashboard for delivery reports.'</span>)
+}
+
+<span class="fn">runTests</span>()</pre>
+  </div>
+
+  <div class="card ok">
+    <div class="card-title">✅ Cost estimate — Rwanda</div>
+    <div class="card-body">
+      Africa's Talking Rwanda rate: approx <strong>RWF 28–35 per SMS</strong>.<br>
+      At 500 transactions/month × avg 2 SMS each = 1,000 SMS = <strong>~RWF 30,000/month</strong>.<br>
+      At 2,000 transactions/month = ~RWF 120,000/month in SMS costs.<br>
+      Your listing fees (RWF 2,000–15,000 each) cover this many times over.
+    </div>
+  </div>
+
+  <div class="card note">
+    <div class="card-title">💡 File locations summary</div>
+    <div class="card-body">
+      <code>lib/shinga/sms.ts</code> — core sendSms + notify functions<br>
+      <code>lib/shinga/sms-templates.ts</code> — all message templates<br>
+      <code>lib/shinga/sms-queue.ts</code> — async queue for high volume<br>
+      <code>app/api/cron/expiry-warnings/route.ts</code> — daily cron job<br>
+      <code>scripts/test-sms.ts</code> — manual test runner
+    </div>
+  </div>
+</div>
+
+</div><!-- end .content -->
+</div><!-- end .wrap -->
+
+<script>
+function go(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'})}
+function cp(btn){
+  const pre=btn.closest('.cw').querySelector('pre')
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)
+  })
+}
+document.querySelectorAll('.s-link').forEach(l=>l.addEventListener('click',function(){
+  document.querySelectorAll('.s-link').forEach(x=>x.classList.remove('on'))
+  this.classList.add('on')
+}))
+</script>
+</body>
+</html>

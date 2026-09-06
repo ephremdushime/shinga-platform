@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHINGA — Worker Profile</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1A7A4A;--green-h:#25A865;--green-dim:#145E38;--green-pale:#E8F5EE;
+  --gold:#F5A623;--gold-dim:#C8841A;
+  --dark:#0F1F15;--mid:#3D5C48;--muted:#6B7C73;
+  --light:#F7FAF8;--white:#FFFFFF;--border:#D0E6DA;--border-d:#B8D9C8;
+  --r:10px;--r-lg:16px;--r-xl:24px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);line-height:1.6}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;border:none;text-decoration:none;transition:all .18s;white-space:nowrap}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--green-h);transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,122,74,.3)}
+.btn-gold{background:var(--gold);color:var(--dark)}.btn-gold:hover{background:#F0AC28;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--green);border:1.5px solid var(--green)}.btn-outline:hover{background:var(--green-pale)}
+.btn-ghost-d{background:rgba(255,255,255,.07);color:#F7FAF8;border:1px solid rgba(255,255,255,.12)}.btn-ghost-d:hover{background:rgba(255,255,255,.13)}
+.btn-sm{padding:8px 16px;font-size:.8rem}
+.btn-lg{padding:14px 32px;font-size:1rem}
+.btn-full{width:100%;justify-content:center}
+.btn-cancel{background:var(--light);color:var(--mid);border:1.5px solid var(--border)}.btn-cancel:hover{background:var(--border)}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:100px;font-size:.71rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.badge-green{background:var(--green-pale);color:var(--green);border:1px solid rgba(26,122,74,.2)}
+.badge-gold{background:rgba(245,166,35,.12);color:var(--gold-dim);border:1px solid rgba(245,166,35,.25)}
+.badge-muted{background:rgba(61,92,72,.08);color:var(--mid);border:1px solid rgba(61,92,72,.15)}
+.badge-verified{background:var(--green);color:#fff;gap:5px}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:200;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:var(--dark);border-bottom:1px solid rgba(255,255,255,.06)}
+.logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:#F7FAF8;letter-spacing:4px;text-decoration:none}
+.logo span{color:var(--green-h)}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{color:rgba(247,250,248,.55);text-decoration:none;font-size:.85rem;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:#F7FAF8}
+.nav-right{display:flex;gap:10px;align-items:center}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{background:var(--white);border-bottom:1px solid var(--border);padding:12px 48px;display:flex;align-items:center;gap:8px}
+.bc-link{font-size:.8rem;color:var(--muted);text-decoration:none;transition:color .2s}
+.bc-link:hover{color:var(--green)}
+.bc-sep{font-size:.8rem;color:var(--border-d)}
+.bc-current{font-size:.8rem;color:var(--dark);font-weight:600}
+
+/* ── PROFILE HERO ── */
+.profile-hero{background:var(--dark);padding:48px 48px 0;position:relative;overflow:hidden}
+.ph-bg{position:absolute;font-family:'Playfair Display',serif;font-weight:900;font-size:16vw;color:rgba(26,122,74,.04);top:50%;right:-2%;transform:translateY(-50%);pointer-events:none;user-select:none}
+.ph-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:flex-start;position:relative;z-index:1;padding-bottom:0}
+.ph-avi-wrap{position:relative}
+.ph-avi{width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:900;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.1)}
+.ph-verif-ring{position:absolute;bottom:4px;right:4px;width:28px;height:28px;background:var(--green);border-radius:50%;border:3px solid var(--dark);display:flex;align-items:center;justify-content:center;font-size:.85rem}
+.ph-info{padding-top:8px}
+.ph-name{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;color:#F7FAF8;letter-spacing:-.5px;margin-bottom:6px}
+.ph-role{font-size:1rem;color:var(--green-h);font-weight:600;margin-bottom:14px}
+.ph-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.ph-meta{display:flex;gap:20px;flex-wrap:wrap}
+.ph-m{display:flex;align-items:center;gap:6px;font-size:.82rem;color:rgba(247,250,248,.55)}
+.ph-m-icon{font-size:.9rem}
+.ph-actions{display:flex;flex-direction:column;gap:10px;padding-top:8px;min-width:200px}
+.ph-rate-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-lg);padding:16px 20px;text-align:center;margin-bottom:4px}
+.ph-rate-label{font-size:.68rem;color:rgba(247,250,248,.4);text-transform:uppercase;letter-spacing:.8px;font-family:'DM Mono',monospace;margin-bottom:4px}
+.ph-rate-val{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:#F7FAF8}
+.ph-rate-unit{font-size:.72rem;color:rgba(247,250,248,.4)}
+.contact-fee-note{font-size:.72rem;color:rgba(247,250,248,.35);text-align:center;margin-top:4px;font-family:'DM Mono',monospace}
+
+/* ── TABS ── */
+.profile-tabs{background:var(--dark);border-bottom:1px solid rgba(255,255,255,.07)}
+.pt-inner{max-width:1100px;margin:0 auto;display:flex;padding:0 48px}
+.ptab{padding:16px 20px;font-size:.85rem;font-weight:600;color:rgba(247,250,248,.45);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;white-space:nowrap}
+.ptab:hover{color:#F7FAF8}
+.ptab.on{color:var(--green-h);border-bottom-color:var(--green-h)}
+
+/* ── MAIN LAYOUT ── */
+.profile-body{max-width:1100px;margin:0 auto;padding:36px 48px;display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:flex-start}
+.main-col{}
+.side-col{display:flex;flex-direction:column;gap:18px}
+
+/* ── SECTION CARD ── */
+.scard{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:20px}
+.scard:last-child{margin-bottom:0}
+.sc-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--dark);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+
+/* ── ABOUT ── */
+.about-text{font-size:.88rem;color:var(--mid);line-height:1.8}
+
+/* ── SKILLS TAGS ── */
+.skills-list{display:flex;flex-wrap:wrap;gap:8px}
+.skill-tag{padding:6px 14px;background:var(--green-pale);border:1px solid rgba(26,122,74,.18);border-radius:100px;font-size:.78rem;font-weight:600;color:var(--green)}
+
+/* ── STATS ROW ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:20px}
+.stat-item{padding:18px 16px;text-align:center;border-right:1px solid var(--border)}
+.stat-item:last-child{border-right:none}
+.stat-n{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--green);line-height:1}
+.stat-l{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-top:4px;font-family:'DM Mono',monospace}
+
+/* ── REVIEWS ── */
+.review-list{display:flex;flex-direction:column;gap:16px}
+.review{padding-bottom:16px;border-bottom:1px solid var(--border)}
+.review:last-child{border-bottom:none;padding-bottom:0}
+.review-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:12px}
+.reviewer-avi{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:.85rem;color:#fff;flex-shrink:0}
+.reviewer-name{font-weight:700;font-size:.85rem;color:var(--dark)}
+.reviewer-meta{font-size:.72rem;color:var(--muted);margin-top:2px}
+.review-stars{color:var(--gold);font-size:.85rem;letter-spacing:1px;flex-shrink:0}
+.review-text{font-size:.83rem;color:var(--mid);line-height:1.7}
+.review-date{font-size:.7rem;color:var(--muted);margin-top:6px;font-family:'DM Mono',monospace}
+
+/* ── RATING BREAKDOWN ── */
+.rating-breakdown{display:flex;gap:20px;align-items:center;margin-bottom:20px}
+.rb-big{text-align:center;flex-shrink:0}
+.rb-big-n{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;color:var(--dark);line-height:1}
+.rb-big-stars{color:var(--gold);font-size:1.1rem;letter-spacing:2px;margin-top:4px}
+.rb-big-count{font-size:.72rem;color:var(--muted);margin-top:3px}
+.rb-bars{flex:1}
+.rb-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.rb-bar-label{font-size:.72rem;color:var(--muted);font-family:'DM Mono',monospace;width:30px;text-align:right;flex-shrink:0}
+.rb-bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.rb-bar-fill{height:100%;background:var(--gold);border-radius:3px;transition:width .4s ease}
+.rb-bar-n{font-size:.7rem;color:var(--muted);font-family:'DM Mono',monospace;width:20px}
+
+/* ── SIDEBAR CARDS ── */
+.side-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.side-card-head{padding:14px 18px;border-bottom:1px solid var(--border);font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem;color:var(--dark)}
+.side-card-body{padding:16px 18px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:.82rem}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:var(--muted);font-weight:500}
+.detail-val{color:var(--dark);font-weight:600;text-align:right}
+
+/* ── AVAILABILITY CALENDAR ── */
+.avail-legend{display:flex;gap:12px;margin-bottom:12px}
+.avail-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.avail-dot.available{background:var(--green)}
+.avail-dot.unavailable{background:var(--border-d)}
+.avail-legend-label{font-size:.72rem;color:var(--muted)}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.day-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-family:'DM Mono',monospace;font-weight:500}
+.day-cell.av{background:var(--green-pale);color:var(--green)}
+.day-cell.na{background:var(--light);color:var(--border-d)}
+.day-label{font-size:.65rem;color:var(--muted);text-align:center;margin-bottom:4px;font-family:'DM Mono',monospace}
+
+/* ── SIMILAR WORKERS ── */
+.similar-list{display:flex;flex-direction:column;gap:12px}
+.sim-worker{display:flex;align-items:center;gap:12px;cursor:pointer;padding:8px;border-radius:var(--r);transition:background .15s}
+.sim-worker:hover{background:var(--light)}
+.sim-avi{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:.9rem;color:#fff;flex-shrink:0}
+.sim-name{font-weight:600;font-size:.83rem;color:var(--dark)}
+.sim-role{font-size:.74rem;color:var(--muted)}
+.sim-rate{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--green);margin-top:2px}
+
+/* ── CONTACT STICKY (mobile) ── */
+.sticky-contact{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1.5px solid var(--border);padding:14px 20px;z-index:100;gap:10px}
+
+/* ── MODALS ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,31,21,.82);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--r-xl);max-width:500px;width:100%;max-height:92vh;overflow-y:auto}
+.modal-head{padding:26px 28px 0}
+.modal-head h2{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--dark);margin-bottom:4px}
+.modal-head p{font-size:.8rem;color:var(--muted);padding-bottom:18px;border-bottom:1px solid var(--border)}
+.modal-body{padding:20px 28px}
+.modal-foot{padding:14px 28px 24px;display:flex;gap:10px}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:.75rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--dark);background:var(--light);outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);background:#fff}
+.field textarea{min-height:80px;resize:vertical}
+.fee-box{background:var(--green-pale);border:1px solid rgba(26,122,74,.2);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
+.fee-box-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--green);margin-bottom:10px;font-family:'DM Mono',monospace}
+.fee-row{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;margin-bottom:6px}
+.fee-row:last-child{margin-bottom:0;padding-top:8px;border-top:1px solid rgba(26,122,74,.15);font-weight:700}
+.fee-row span{color:var(--mid)}
+.fee-row strong{font-family:'DM Mono',monospace;color:var(--green)}
+
+/* payment pending state */
+.payment-pending{text-align:center;padding:32px 20px}
+.pp-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pp-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dark);margin-bottom:8px}
+.pp-sub{font-size:.82rem;color:var(--muted);line-height:1.7;max-width:300px;margin:0 auto 20px}
+.pp-phone{font-family:'DM Mono',monospace;font-size:1rem;color:var(--green);font-weight:600;margin:8px 0}
+
+/* success */
+.modal-success{padding:48px 28px;text-align:center}
+.s-ico{font-size:3rem;margin-bottom:14px}
+.modal-success h2{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--dark);margin-bottom:10px}
+.modal-success p{color:var(--muted);font-size:.86rem;line-height:1.75;max-width:320px;margin:0 auto 24px}
+.revealed-contact{font-family:'DM Mono',monospace;font-size:1.1rem;color:var(--green);font-weight:600;background:var(--green-pale);border:1px solid rgba(26,122,74,.2);border-radius:var(--r);padding:12px 20px;margin:12px auto;display:inline-block}
+
+/* toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:#F7FAF8;padding:12px 18px;border-radius:var(--r);font-size:.82rem;font-weight:500;z-index:900;transform:translateY(80px);opacity:0;transition:all .3s;border-left:3px solid var(--green);max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:900px){
+  nav{padding:0 20px}.nav-links{display:none}
+  .breadcrumb{padding:12px 20px}
+  .profile-hero{padding:32px 20px 0}
+  .ph-inner{grid-template-columns:auto 1fr;gap:18px}
+  .ph-actions{display:none}
+  .pt-inner{padding:0 20px}
+  .profile-body{padding:24px 20px;grid-template-columns:1fr}
+  .side-col{order:-1}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .stat-item:nth-child(2){border-right:none}
+  .sticky-contact{display:flex}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="shinga.html" class="logo">SH<span>I</span>NGA</a>
+  <ul class="nav-links">
+    <li><a href="shinga.html#jobs">Jobs</a></li>
+    <li><a href="shinga.html#workers">Workers</a></li>
+    <li><a href="shinga.html#pricing">Pricing</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="shinga.html" class="btn btn-ghost-d btn-sm">← Back to Platform</a>
+  </div>
+</nav>
+
+<!-- ── BREADCRUMB ── -->
+<div class="breadcrumb">
+  <a href="shinga.html" class="bc-link">SHINGA</a>
+  <span class="bc-sep">›</span>
+  <a href="shinga.html#workers" class="bc-link">Workers</a>
+  <span class="bc-sep">›</span>
+  <span class="bc-current" id="bcName">Loading…</span>
+</div>
+
+<!-- ── PROFILE HERO ── -->
+<div class="profile-hero">
+  <div class="ph-bg" id="phBgText">JN</div>
+  <div class="ph-inner">
+    <div class="ph-avi-wrap">
+      <div class="ph-avi" id="phAvi">JN</div>
+      <div class="ph-verif-ring" id="phVerifRing" style="display:none">✓</div>
+    </div>
+    <div class="ph-info">
+      <div class="ph-name" id="phName">Jean-Paul Nkusi</div>
+      <div class="ph-role" id="phRole">Babysitter / Nanny</div>
+      <div class="ph-badges" id="phBadges"></div>
+      <div class="ph-meta" id="phMeta"></div>
+    </div>
+    <div class="ph-actions">
+      <div class="ph-rate-box">
+        <div class="ph-rate-label">Expected Rate</div>
+        <div class="ph-rate-val" id="phRate">RWF 8,000</div>
+        <div class="ph-rate-unit" id="phRateUnit">per day</div>
+      </div>
+      <button class="btn btn-green btn-full" onclick="openContactModal()">Contact This Worker</button>
+      <div class="contact-fee-note" id="contactFeeNote">Unlock contact for RWF 1,500</div>
+      <button class="btn btn-outline btn-full btn-sm" onclick="toast('Saved to shortlist')">♡ Save Worker</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TABS ── -->
+<div class="profile-tabs">
+  <div class="pt-inner">
+    <div class="ptab on" onclick="showTab('about',this)">About</div>
+    <div class="ptab" onclick="showTab('reviews',this)">Reviews</div>
+    <div class="ptab" onclick="showTab('availability',this)">Availability</div>
+  </div>
+</div>
+
+<!-- ── BODY ── -->
+<div class="profile-body">
+  <div class="main-col">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-item"><div class="stat-n" id="statRating">4.8</div><div class="stat-l">Rating</div></div>
+      <div class="stat-item"><div class="stat-n" id="statReviews">52</div><div class="stat-l">Reviews</div></div>
+      <div class="stat-item"><div class="stat-n" id="statJobs">67</div><div class="stat-l">Jobs Done</div></div>
+      <div class="stat-item"><div class="stat-n" id="statExp">2 yrs</div><div class="stat-l">Experience</div></div>
+    </div>
+
+    <!-- ABOUT TAB -->
+    <div id="tab-about">
+      <div class="scard">
+        <div class="sc-title">About</div>
+        <div class="about-text" id="workerBio">Loading…</div>
+      </div>
+      <div class="scard">
+        <div class="sc-title">Skills & Specialisations</div>
+        <div class="skills-list" id="skillsList"></div>
+      </div>
+    </div>
+
+    <!-- REVIEWS TAB -->
+    <div id="tab-reviews" style="display:none">
+      <div class="scard">
+        <div class="sc-title">
+          Reviews
+          <span class="badge badge-gold" id="reviewCount">52 total</span>
+        </div>
+        <div class="rating-breakdown" id="ratingBreakdown"></div>
+        <div class="review-list" id="reviewList"></div>
+      </div>
+    </div>
+
+    <!-- AVAILABILITY TAB -->
+    <div id="tab-availability" style="display:none">
+      <div class="scard">
+        <div class="sc-title">Weekly Availability</div>
+        <div class="avail-legend">
+          <div style="display:flex;align-items:center;gap:6px"><div class="avail-dot available"></div><span class="avail-legend-label">Available</span></div>
+          <div style="display:flex;align-items:center;gap:6px"><div class="avail-dot unavailable"></div><span class="avail-legend-label">Unavailable</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px" id="dayLabels"></div>
+        <div class="week-grid" id="weekGrid"></div>
+        <div style="margin-top:16px;padding:12px 14px;background:var(--green-pale);border-radius:var(--r);font-size:.8rem;color:var(--green);font-weight:600" id="availNote"></div>
+      </div>
+    </div>
+
+  </div><!-- end .main-col -->
+
+  <div class="side-col">
+
+    <!-- CONTACT CARD -->
+    <div class="side-card">
+      <div class="side-card-head">Contact Worker</div>
+      <div class="side-card-body">
+        <div style="font-size:.82rem;color:var(--mid);line-height:1.65;margin-bottom:14px">Unlock this worker's phone number and WhatsApp to contact them directly.</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--green-pale);border-radius:var(--r);margin-bottom:14px">
+          <span style="font-size:.8rem;font-weight:600;color:var(--mid)">Contact fee</span>
+          <span style="font-family:'DM Mono',monospace;font-size:.95rem;font-weight:700;color:var(--green)" id="sideContactFee">RWF 1,500</span>
+        </div>
+        <button class="btn btn-green btn-full" onclick="openContactModal()">Unlock Contact</button>
+        <div style="margin-top:10px;font-size:.72rem;color:var(--muted);text-align:center;line-height:1.6">Pay once. Contact directly. No subscription needed.</div>
+      </div>
+    </div>
+
+    <!-- WORKER DETAILS ── -->
+    <div class="side-card">
+      <div class="side-card-head">Details</div>
+      <div class="side-card-body" style="padding:0">
+        <div id="workerDetails"></div>
+      </div>
+    </div>
+
+    <!-- SIMILAR WORKERS -->
+    <div class="side-card">
+      <div class="side-card-head">Similar Workers</div>
+      <div class="side-card-body">
+        <div class="similar-list" id="similarList"></div>
+      </div>
+    </div>
+
+  </div><!-- end .side-col -->
+</div>
+
+<!-- ── STICKY MOBILE CTA ── -->
+<div class="sticky-contact">
+  <div style="flex:1">
+    <div style="font-weight:700;font-size:.88rem;color:var(--dark)" id="stickyName">Jean-Paul Nkusi</div>
+    <div style="font-size:.74rem;color:var(--muted)">Contact fee: <span style="color:var(--green);font-weight:700">RWF 1,500</span></div>
+  </div>
+  <button class="btn btn-green" onclick="openContactModal()">Unlock Contact</button>
+</div>
+
+<!-- ── CONTACT MODAL ── -->
+<div class="overlay" id="contactM">
+  <div class="modal" id="contactModalInner">
+    <div id="contactStep1">
+      <div class="modal-head">
+        <h2>Contact <span id="cModalName">this worker</span></h2>
+        <p>Pay once to unlock their phone number and WhatsApp directly.</p>
+      </div>
+      <div class="modal-body">
+        <div class="fee-box">
+          <div class="fee-box-title">Contact Fee</div>
+          <div class="fee-row"><span>Single contact unlock</span><strong id="cFee1">RWF 1,500</strong></div>
+          <div class="fee-row"><span>Bundle — 5 contacts (save RWF 1,500)</span><strong id="cFee5">RWF 6,000</strong></div>
+          <div class="fee-row"><span>Paying now (single)</span><strong id="cFeeTotal">RWF 1,500</strong></div>
+        </div>
+        <div class="field"><label>Your Name</label><input type="text" id="contactYourName" placeholder="Your full name"></div>
+        <div class="field"><label>Your Phone (WhatsApp)</label><input type="tel" id="contactYourPhone" placeholder="+250 7XX XXX XXX"></div>
+        <div class="field"><label>Message to Worker</label><textarea id="contactMsg" placeholder="Describe the job, location, schedule, and pay…"></textarea></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-green" style="flex:1" onclick="initiateContactPayment()">Pay & Unlock Contact</button>
+        <button class="btn btn-cancel" onclick="closeM('contactM')">Cancel</button>
+      </div>
+    </div>
+    <div id="contactStep2" style="display:none">
+      <div class="payment-pending">
+        <div class="pp-spinner"></div>
+        <div class="pp-title">Waiting for MoMo approval</div>
+        <div class="pp-sub">A payment request has been sent to your phone. Enter your MoMo PIN to approve.</div>
+        <div class="pp-phone" id="ppPhone">+250 788 XXX XXX</div>
+        <div style="font-size:.75rem;color:var(--muted)">Amount: <strong id="ppAmount">RWF 1,500</strong></div>
+        <button class="btn btn-cancel btn-sm" style="margin-top:20px" onclick="closeM('contactM');resetContactModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SUCCESS MODAL ── -->
+<div class="overlay" id="contactSuccess">
+  <div class="modal">
+    <div class="modal-success">
+      <div class="s-ico">📞</div>
+      <h2>Contact Unlocked!</h2>
+      <div class="revealed-contact" id="revealedPhone">+250 788 123 456</div>
+      <p>You can now reach this worker directly on WhatsApp or by phone. Good luck with your hire!</p>
+      <button class="btn btn-green btn-full" onclick="closeM('contactSuccess')">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════
+     JAVASCRIPT
+══════════════════ -->
+<script>
+// ── WORKER DATA ───────────────────────────────────────────────
+// In production: fetched from /api/shinga/workers/:id
+const WORKERS = {
+  'jean-paul-nkusi': {
+    name:'Jean-Paul Nkusi', role:'Babysitter / Nanny', cat:'Health & Care',
+    district:'Gasabo, Kigali', sector:'Kimironko', rate:'RWF 8,000', rateUnit:'per day',
+    verified:true, featured:false, exp:'2 yrs', jobs:67, rating:4.8, reviews:52,
+    init:'JN', grad:'#E8A020,#A06D10', phone:'+250 788 123 456',
+    avail:'Weekdays + Saturday', availDays:[true,true,true,true,true,true,false],
+    bio:'I have been caring for young children for over 2 years, working with families across Kigali. I am trained in basic first aid and child safety. I am patient, reliable, and genuinely enjoy working with children of all ages. I speak Kinyarwanda, French, and basic English.',
+    skills:['Infant Care','Toddler Development','Basic First Aid','Meal Preparation','School Pick-up','Light Housekeeping','Bilingual (RW/FR)','CPR Certified'],
+    tags:[{l:'Verified',c:'badge-verified'},{l:'Available Now',c:'badge-green'},{l:'First Aid Trained',c:'badge-muted'}],
+    meta:[{i:'📍',t:'Gasabo, Kigali'},{i:'🗓',t:'2 years experience'},{i:'⏱',t:'Weekdays + Saturday'},{i:'💬',t:'Kinyarwanda · French · English'}],
+    ratings:{5:38,4:10,3:3,2:1,1:0},
+    reviews:[
+      {name:'Mugisha Emmanuel',init:'ME',grad:'#2563EB,#7C3AED',rating:5,text:'Jean-Paul cared for my daughter for 4 months. He is extraordinarily patient, trustworthy, and my daughter loved him. I would hire him again without hesitation.',date:'March 2025',jobType:'Monthly'},
+      {name:'Aline Uwimana',init:'AU',grad:'#1A7A4A,#145E38',rating:5,text:'Excellent with my twins aged 2 and 4. Always on time, kept the house tidy, and communicated well about the children\'s day.',date:'February 2025',jobType:'Weekly'},
+      {name:'Sandrine Mukamana',init:'SM',grad:'#DC2626,#C4541A',rating:4,text:'Very reliable and kind. Good with children. Could improve on meal variety but overall a great nanny.',date:'January 2025',jobType:'Daily'},
+      {name:'Patrick Nzeyimana',init:'PN',grad:'#7C3AED,#EC4899',rating:5,text:'Trusted Jean-Paul with our 18-month-old for 3 months. Never had a single concern. Highly recommended.',date:'December 2024',jobType:'Monthly'},
+    ],
+    similar:[
+      {name:'Alice Kayitesi',role:'Babysitter',rate:'RWF 7,000/day',init:'AK',grad:'#0F766E,#0891B2',verified:true},
+      {name:'Diane Uwase',role:'Nanny / Au Pair',rate:'RWF 9,000/day',init:'DU',grad:'#E8A020,#A06D10',verified:false},
+      {name:'Grace Ingabire',role:'Childcare Worker',rate:'RWF 6,500/day',init:'GI',grad:'#16A34A,#059669',verified:true},
+    ]
+  }
+}
+
+// ── PRICING ───────────────────────────────────────────────────
+const PRICES = { contact_fee_single:1500, contact_fee_5:6000 }
+
+// ── LOAD PROFILE ──────────────────────────────────────────────
+function loadProfile(){
+  // In production: parse slug from URL params
+  const w = WORKERS['jean-paul-nkusi']
+  if(!w) return
+
+  document.title = `${w.name} — SHINGA`
+  document.getElementById('bcName').textContent = w.name
+  document.getElementById('phBgText').textContent = w.init
+  document.getElementById('stickyName').textContent = w.name
+
+  // Avatar
+  const avi = document.getElementById('phAvi')
+  avi.textContent = w.init
+  avi.style.background = `linear-gradient(135deg,${w.grad})`
+
+  if(w.verified){
+    document.getElementById('phVerifRing').style.display='flex'
+  }
+
+  document.getElementById('phName').textContent = w.name
+  document.getElementById('phRole').textContent = w.role
+  document.getElementById('phRate').textContent = w.rate
+  document.getElementById('phRateUnit').textContent = w.rateUnit
+  document.getElementById('contactFeeNote').textContent = `Unlock contact for RWF ${PRICES.contact_fee_single.toLocaleString()}`
+  document.getElementById('sideContactFee').textContent = `RWF ${PRICES.contact_fee_single.toLocaleString()}`
+
+  // Badges
+  document.getElementById('phBadges').innerHTML = w.tags.map(t=>`<span class="badge ${t.c}">${t.l}</span>`).join('')
+
+  // Meta
+  document.getElementById('phMeta').innerHTML = w.meta.map(m=>`
+    <div class="ph-m"><span class="ph-m-icon">${m.i}</span>${m.t}</div>
+  `).join('')
+
+  // Stats
+  document.getElementById('statRating').textContent = w.rating
+  document.getElementById('statReviews').textContent = w.reviews
+  document.getElementById('statJobs').textContent = w.jobs
+  document.getElementById('statExp').textContent = w.exp
+
+  // Bio
+  document.getElementById('workerBio').textContent = w.bio
+
+  // Skills
+  document.getElementById('skillsList').innerHTML = w.skills.map(s=>`<span class="skill-tag">${s}</span>`).join('')
+
+  // Details sidebar
+  document.getElementById('workerDetails').innerHTML = [
+    {l:'Category',v:w.cat},{l:'District',v:w.district},{l:'Sector',v:w.sector},
+    {l:'Availability',v:w.avail},{l:'Rate',v:w.rate+' '+w.rateUnit},
+    {l:'Verified',v:w.verified?'✅ SHINGA Verified':'Not verified'},
+    {l:'Languages',v:'Kinyarwanda, French, English'},
+  ].map(d=>`
+    <div class="detail-row">
+      <span class="detail-label">${d.l}</span>
+      <span class="detail-val">${d.v}</span>
+    </div>
+  `).join('')
+
+  // Similar workers
+  document.getElementById('similarList').innerHTML = w.similar.map(s=>`
+    <div class="sim-worker">
+      <div class="sim-avi" style="background:linear-gradient(135deg,${s.grad})">${s.init}</div>
+      <div>
+        <div class="sim-name">${s.name} ${s.verified?'<span style="color:var(--green);font-size:.65rem">✓</span>':''}</div>
+        <div class="sim-role">${s.role}</div>
+        <div class="sim-rate">${s.rate}</div>
+      </div>
+    </div>
+  `).join('')
+
+  // Rating breakdown
+  const total = Object.values(w.ratings).reduce((a,b)=>a+b,0)
+  document.getElementById('ratingBreakdown').innerHTML = `
+    <div class="rb-big">
+      <div class="rb-big-n">${w.rating}</div>
+      <div class="rb-big-stars">${'★'.repeat(Math.floor(w.rating))}${'☆'.repeat(5-Math.floor(w.rating))}</div>
+      <div class="rb-big-count">${total} reviews</div>
+    </div>
+    <div class="rb-bars">
+      ${[5,4,3,2,1].map(star=>{
+        const pct = total ? Math.round((w.ratings[star]/total)*100) : 0
+        return `
+          <div class="rb-bar-row">
+            <div class="rb-bar-label">${star}★</div>
+            <div class="rb-bar-track"><div class="rb-bar-fill" style="width:${pct}%"></div></div>
+            <div class="rb-bar-n">${w.ratings[star]}</div>
+          </div>
+        `
+      }).join('')}
+    </div>
+  `
+  document.getElementById('reviewCount').textContent = `${total} total`
+
+  // Reviews
+  document.getElementById('reviewList').innerHTML = w.reviews.map(r=>`
+    <div class="review">
+      <div class="review-top">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="reviewer-avi" style="background:linear-gradient(135deg,${r.grad})">${r.init}</div>
+          <div>
+            <div class="reviewer-name">${r.name}</div>
+            <div class="reviewer-meta">${r.jobType} hire</div>
+          </div>
+        </div>
+        <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+      </div>
+      <div class="review-text">${r.text}</div>
+      <div class="review-date">${r.date}</div>
+    </div>
+  `).join('')
+
+  // Availability
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+  document.getElementById('dayLabels').innerHTML = days.map(d=>`<div class="day-label">${d}</div>`).join('')
+  document.getElementById('weekGrid').innerHTML = days.map((_,i)=>`
+    <div class="day-cell ${w.availDays[i]?'av':'na'}">${w.availDays[i]?'✓':'—'}</div>
+  `).join('')
+  document.getElementById('availNote').textContent = `Currently available: ${w.avail}`
+
+  // Modal name
+  document.getElementById('cModalName').textContent = w.name
+  document.getElementById('cFee1').textContent = `RWF ${PRICES.contact_fee_single.toLocaleString()}`
+  document.getElementById('cFee5').textContent = `RWF ${PRICES.contact_fee_5.toLocaleString()}`
+  document.getElementById('cFeeTotal').textContent = `RWF ${PRICES.contact_fee_single.toLocaleString()}`
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function showTab(tab, el){
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.style.display='none')
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'))
+  document.getElementById('tab-'+tab).style.display='block'
+  el.classList.add('on')
+}
+
+// ── CONTACT FLOW ──────────────────────────────────────────────
+function openContactModal(){
+  document.getElementById('contactStep1').style.display='block'
+  document.getElementById('contactStep2').style.display='none'
+  openM('contactM')
+}
+
+function initiateContactPayment(){
+  const phone = document.getElementById('contactYourPhone').value
+  if(!phone){ toast('Enter your phone number'); return }
+  document.getElementById('contactStep1').style.display='none'
+  document.getElementById('contactStep2').style.display='block'
+  document.getElementById('ppPhone').textContent = phone
+  document.getElementById('ppAmount').textContent = `RWF ${PRICES.contact_fee_single.toLocaleString()}`
+
+  // Simulate MoMo confirmation (in production: poll /api/payments/status/:ref)
+  setTimeout(()=>{
+    closeM('contactM')
+    resetContactModal()
+    const w = WORKERS['jean-paul-nkusi']
+    document.getElementById('revealedPhone').textContent = w.phone
+    openM('contactSuccess')
+  }, 3500)
+}
+
+function resetContactModal(){
+  document.getElementById('contactStep1').style.display='block'
+  document.getElementById('contactStep2').style.display='none'
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openM(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
+function closeM(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o){o.classList.remove('open');document.body.style.overflow=''}}))
+
+// ── TOAST ─────────────────────────────────────────────────────
+let tt
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3000)}
+
+// ── INIT ──────────────────────────────────────────────────────
+loadProfile()
+</script>
+</body>
+</html>

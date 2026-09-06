@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHINGA — Worker Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1A7A4A;--gh:#25A865;--gd:#145E38;--gp:#E8F5EE;
+  --gold:#F5A623;--goldd:#C8841A;
+  --dark:#0F1F15;--mid:#3D5C48;--muted:#6B7C73;
+  --light:#F7FAF8;--white:#fff;--border:#D0E6DA;--bord:#B8D9C8;
+  --r:10px;--rl:16px;--rx:22px;
+  --shadow:0 2px 12px rgba(15,31,21,.07);
+  --shadow-lg:0 8px 32px rgba(15,31,21,.12);
+}
+html,body{height:100%;margin:0}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+@media(max-width:768px){.app{grid-template-columns:1fr}}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--dark);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:3px}.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+.sb-top{padding:22px 20px 18px}
+.sb-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.3rem;color:#F7FAF8;letter-spacing:3px;text-decoration:none;display:block;margin-bottom:18px}
+.sb-logo span{color:var(--gh)}
+.sb-profile{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:var(--rl);padding:11px 13px;margin-bottom:6px}
+.sb-avi{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--gd));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:.82rem;color:#fff;flex-shrink:0;position:relative}
+.sb-vbadge{position:absolute;bottom:-1px;right:-1px;width:12px;height:12px;background:var(--gh);border-radius:50%;border:2px solid var(--dark);font-size:6px;display:flex;align-items:center;justify-content:center;color:#fff}
+.sb-name{font-weight:700;font-size:.82rem;color:#F7FAF8;line-height:1.2}
+.sb-role{font-size:.68rem;color:rgba(247,250,248,.4);margin-top:1px}
+.avail-toggle{display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:var(--r);cursor:pointer;transition:all .18s;margin-bottom:2px;border:1px solid transparent}
+.avail-toggle.off{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}
+.avail-toggle.on{background:rgba(26,122,74,.15);border-color:rgba(26,122,74,.25)}
+.at-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .2s}
+.avail-toggle.off .at-dot{background:rgba(255,255,255,.2)}
+.avail-toggle.on .at-dot{background:#5EE89A;animation:pulse 1.3s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.at-txt{font-size:.76rem;font-weight:600;transition:color .2s}
+.avail-toggle.off .at-txt{color:rgba(247,250,248,.45)}
+.avail-toggle.on .at-txt{color:#5EE89A}
+.at-sub{font-size:.64rem;color:rgba(247,250,248,.28);margin-top:1px}
+.sb-nav{padding:8px 12px;flex:1}
+.sb-section{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:rgba(247,250,248,.22);padding:14px 8px 6px;font-family:'DM Mono',monospace}
+.sb-link{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r);color:rgba(247,250,248,.5);font-size:.83rem;font-weight:500;cursor:pointer;transition:all .15s;text-decoration:none;margin-bottom:2px;border:1px solid transparent}
+.sb-link:hover{background:rgba(255,255,255,.05);color:#F7FAF8}
+.sb-link.on{background:rgba(26,122,74,.18);color:var(--gh);border-color:rgba(26,122,74,.2)}
+.sb-link-ico{font-size:.95rem;flex-shrink:0;width:18px;text-align:center}
+.sb-badge{margin-left:auto;background:var(--g);color:#fff;font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:100px;font-family:'DM Mono',monospace}
+.sb-bottom{padding:14px 20px;border-top:1px solid rgba(255,255,255,.06)}
+.sb-signout{display:flex;align-items:center;gap:8px;color:rgba(247,250,248,.3);font-size:.78rem;cursor:pointer;transition:color .15s}
+.sb-signout:hover{color:rgba(247,250,248,.6)}
+@media(max-width:768px){
+  .sidebar{display:none;position:fixed;inset:0;z-index:500;height:100%;overflow-y:auto}
+  .sidebar.open{display:flex;flex-direction:column}
+}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--white);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:200}
+.topbar-burger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:4px;padding:4px}
+.topbar-burger span{width:20px;height:2px;background:var(--dark);border-radius:1px;display:block}
+@media(max-width:768px){.topbar-burger{display:flex}}
+.topbar-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--dark)}
+.topbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.notif-btn{position:relative;width:38px;height:38px;border-radius:50%;background:var(--light);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;transition:all .15s}
+.notif-btn:hover{background:var(--gp);border-color:var(--g)}
+.notif-badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--gold);border-radius:50%;border:2px solid #fff;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--dark);font-family:'DM Mono',monospace}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;overflow-y:auto;padding:28px 28px 48px}
+@media(max-width:600px){.main{padding:16px 16px 48px}}
+.page{display:none}.page.on{display:block}
+
+/* ── PAGE HEADER ── */
+.ph{margin-bottom:24px}
+.ph-eye{font-family:'DM Mono',monospace;font-size:.66rem;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:5px}
+.ph-h{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--dark);line-height:1.2}
+.ph-sub{font-size:.83rem;color:var(--muted);margin-top:4px}
+.ph-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+
+/* ── KPI CARDS ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:28px}
+.kpi{background:var(--white);border:1.5px solid var(--border);border-radius:var(--rl);padding:18px 20px;transition:all .18s}
+.kpi:hover{border-color:var(--g);box-shadow:var(--shadow)}
+.kpi-ico{font-size:1.3rem;margin-bottom:10px}
+.kpi-n{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;color:var(--dark);line-height:1}
+.kpi-l{font-size:.72rem;color:var(--muted);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.kpi-trend{font-size:.72rem;margin-top:6px;display:flex;align-items:center;gap:3px}
+.kpi-up{color:#16A34A}.kpi-down{color:#DC2626}.kpi-neu{color:var(--muted)}
+
+/* ── SECTION CARD ── */
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:20px}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card-title{font-family:'Playfair Display',serif;font-weight:700;font-size:.98rem;color:var(--dark)}
+.card-sub{font-size:.76rem;color:var(--muted);margin-top:1px}
+.card-body{padding:18px 20px}
+.card-empty{padding:40px 20px;text-align:center}
+.ce-ico{font-size:2rem;margin-bottom:10px}
+.ce-h{font-weight:700;color:var(--dark);margin-bottom:4px}
+.ce-p{font-size:.8rem;color:var(--muted);line-height:1.65}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:var(--r);font-weight:700;font-size:.85rem;cursor:pointer;border:none;transition:all .18s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.btn-primary{background:var(--g);color:#fff}.btn-primary:hover{background:var(--gh);transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,122,74,.25)}
+.btn-gold{background:var(--gold);color:var(--dark)}.btn-gold:hover{background:#F7B830}
+.btn-soft{background:var(--gp);color:var(--g);border:1px solid rgba(26,122,74,.15)}.btn-soft:hover{background:var(--bord)}
+.btn-outline{background:transparent;color:var(--g);border:1.5px solid var(--g)}.btn-outline:hover{background:var(--gp)}
+.btn-danger{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}.btn-danger:hover{background:#FEE2E2}
+.btn-sm{padding:7px 14px;font-size:.78rem;border-radius:8px}
+.btn-full{width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:.69rem;font-weight:700}
+.bg-green{background:var(--gp);color:var(--g);border:1px solid rgba(26,122,74,.18)}
+.bg-gold{background:rgba(245,166,35,.1);color:var(--goldd);border:1px solid rgba(245,166,35,.22)}
+.bg-muted{background:rgba(107,124,115,.08);color:var(--mid);border:1px solid rgba(107,124,115,.14)}
+.bg-red{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}
+.bg-blue{background:rgba(37,99,235,.06);color:#1D4ED8;border:1px solid rgba(37,99,235,.15)}
+
+/* ── APPLICATION LIST ── */
+.app-list{display:flex;flex-direction:column;gap:10px}
+.app-item{border:1.5px solid var(--border);border-radius:var(--rl);padding:16px 18px;transition:all .18s;cursor:pointer}
+.app-item:hover{border-color:var(--g);box-shadow:var(--shadow)}
+.app-item.status-hired{border-color:rgba(26,122,74,.3);background:var(--gp)}
+.app-item.status-rejected{opacity:.6}
+.ai-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.ai-title{font-family:'Playfair Display',serif;font-weight:700;font-size:.95rem;color:var(--dark);margin-bottom:2px}
+.ai-company{font-size:.76rem;color:var(--mid)}
+.ai-meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+.ai-m{font-size:.74rem;color:var(--muted);display:flex;align-items:center;gap:4px}
+.ai-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.waitlist-item{border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.04)}
+
+/* ── PROFILE FORM ── */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.profile-grid{grid-template-columns:1fr}}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:.73rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--dark);background:var(--light);outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g);background:#fff}
+.field small{font-size:.71rem;color:var(--muted);margin-top:4px;display:block}
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:7px;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--light);cursor:text;min-height:46px;transition:border-color .2s}
+.tag-input-wrap:focus-within{border-color:var(--g);background:#fff}
+.tag-chip{display:inline-flex;align-items:center;gap:5px;background:var(--gp);color:var(--g);border:1px solid rgba(26,122,74,.18);border-radius:100px;padding:3px 10px;font-size:.74rem;font-weight:600}
+.tag-chip button{background:none;border:none;cursor:pointer;color:var(--g);font-size:.8rem;line-height:1;padding:0;display:flex}
+.tag-input{border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--dark);min-width:80px;flex:1}
+.avail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.avail-opt{border:1.5px solid var(--border);border-radius:var(--r);padding:11px 8px;text-align:center;cursor:pointer;transition:all .15s;background:var(--white)}
+.avail-opt:hover{border-color:var(--g)}
+.avail-opt.on{border-color:var(--g);background:var(--gp)}
+.avail-opt.on .ao-lbl{color:var(--g)}
+.ao-ico{font-size:1.1rem;margin-bottom:4px}
+.ao-lbl{font-size:.72rem;font-weight:600;color:var(--mid)}
+
+/* ── VERIFY BANNER ── */
+.verify-banner{background:linear-gradient(135deg,var(--dark),#1A3325);border-radius:var(--rl);padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.vb-ico{font-size:2rem;flex-shrink:0}
+.vb-title{font-family:'Playfair Display',serif;font-weight:700;color:#F7FAF8;font-size:.98rem;margin-bottom:3px}
+.vb-sub{font-size:.78rem;color:rgba(247,250,248,.5);line-height:1.6}
+.vb-act{margin-left:auto;flex-shrink:0}
+
+/* ── AVAILABILITY CARD ── */
+.avail-now-card{border:2px solid var(--border);border-radius:var(--rl);padding:18px 20px;cursor:pointer;transition:all .22s;display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.avail-now-card.on{border-color:var(--gh);background:rgba(26,122,74,.05)}
+.anc-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;transition:all .22s;border:2px solid var(--border)}
+.avail-now-card.on .anc-dot{background:#5EE89A;border-color:var(--gh);animation:pulse 1.3s infinite}
+.anc-body{flex:1}
+.anc-title{font-weight:700;font-size:.9rem;color:var(--dark)}
+.anc-sub{font-size:.76rem;color:var(--muted);margin-top:2px;line-height:1.55}
+.anc-timer{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--g);margin-top:4px}
+
+/* ── PAYMENT HISTORY ── */
+.tx-list{display:flex;flex-direction:column;gap:1px}
+.tx-item{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border);transition:background .12s}
+.tx-item:last-child{border-bottom:none}
+.tx-item:hover{background:var(--light)}
+.tx-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.tx-ico-out{background:var(--gp)}
+.tx-ico-in{background:rgba(245,166,35,.1)}
+.tx-label{font-size:.84rem;font-weight:600;color:var(--dark);margin-bottom:1px}
+.tx-date{font-size:.72rem;color:var(--muted)}
+.tx-amt{margin-left:auto;font-family:'DM Mono',monospace;font-size:.86rem;font-weight:600}
+.tx-amt.out{color:#DC2626}.tx-amt.in{color:var(--g)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:#F7FAF8;padding:12px 17px;border-radius:var(--rl);font-size:.82rem;font-weight:500;z-index:800;transform:translateY(60px);opacity:0;transition:all .28s;border-left:3px solid var(--g);max-width:300px;box-shadow:0 6px 24px rgba(0,0,0,.3)}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:480px){.toast{left:14px;right:14px;bottom:14px}}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,31,21,.7);z-index:600;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
+.overlay.open{display:flex}
+@media(min-width:580px){.overlay{align-items:center;padding:20px}}
+.modal{background:#fff;width:100%;max-width:460px;border-radius:var(--rx) var(--rx) 0 0;max-height:94svh;overflow-y:auto;animation:up .22s ease}
+@media(min-width:580px){.modal{border-radius:var(--rx)}}
+@keyframes up{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:34px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0}
+.modal-head{padding:18px 22px 0}
+.modal-head h2{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+.modal-head p{font-size:.79rem;color:var(--muted);padding-bottom:14px;border-bottom:1px solid var(--border)}
+.modal-body{padding:16px 22px}
+.modal-foot{padding:12px 22px 22px;display:flex;gap:8px}
+.modal-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:var(--light);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--muted);transition:all .14s;z-index:2}
+.modal-close:hover{background:var(--border);color:var(--dark)}
+.fee-box{background:var(--gp);border:1px solid rgba(26,122,74,.18);border-radius:var(--r);padding:12px 14px;margin-bottom:13px}
+.fee-row{display:flex;justify-content:space-between;align-items:center;font-size:.81rem;margin-bottom:4px}
+.fee-row:last-child{margin-bottom:0;padding-top:6px;border-top:1px solid rgba(26,122,74,.14);font-weight:700}
+.fee-row span{color:var(--mid)}.fee-row strong{font-family:'DM Mono',monospace;color:var(--g)}
+.phone-wrap{display:flex}
+.phone-pre{padding:11px 12px;background:var(--light);border:1.5px solid var(--border);border-right:none;border-radius:var(--r) 0 0 var(--r);font-family:'DM Mono',monospace;font-size:.84rem;color:var(--mid);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.phone-inp{border-radius:0 var(--r) var(--r) 0!important;border-left:none!important;width:100%;padding:11px 13px;border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--dark);background:var(--light);outline:none}
+.phone-inp:focus{border-color:var(--g)!important;border-left:1.5px solid var(--g)!important}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-top">
+    <a class="sb-logo" href="shinga.html">SH<span>I</span>NGA</a>
+    <div class="sb-profile">
+      <div class="sb-avi" id="sbAvi">JN<div class="sb-vbadge" id="sbVbadge" style="display:none">✓</div></div>
+      <div><div class="sb-name" id="sbName">Jean-Paul Nkusi</div><div class="sb-role" id="sbRole">Babysitter / Nanny · Gasabo</div></div>
+    </div>
+    <!-- Available Now toggle -->
+    <div class="avail-toggle off" id="availToggle" onclick="toggleAvailNow()">
+      <div class="at-dot"></div>
+      <div>
+        <div class="at-txt" id="availTxt">Available Now: Off</div>
+        <div class="at-sub" id="availSub">Toggle to appear in nearby searches</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Worker Dashboard</div>
+    <a class="sb-link on" id="lnk-overview" onclick="goPage('overview')"><span class="sb-link-ico">🏠</span>Overview</a>
+    <a class="sb-link" id="lnk-applications" onclick="goPage('applications')"><span class="sb-link-ico">📋</span>My Applications<span class="sb-badge" id="appBadge">3</span></a>
+    <a class="sb-link" id="lnk-waitlist" onclick="goPage('waitlist')"><span class="sb-link-ico">⏳</span>Waitlist<span class="sb-badge" id="wlBadge" style="background:var(--gold);color:var(--dark)">2</span></a>
+    <div class="sb-section">My Profile</div>
+    <a class="sb-link" id="lnk-profile" onclick="goPage('profile')"><span class="sb-link-ico">👤</span>Edit Profile</a>
+    <a class="sb-link" id="lnk-availability" onclick="goPage('availability')"><span class="sb-link-ico">📅</span>Availability</a>
+    <a class="sb-link" id="lnk-verify" onclick="goPage('verify')"><span class="sb-link-ico">✅</span>Get Verified</a>
+    <div class="sb-section">Money</div>
+    <a class="sb-link" id="lnk-payments" onclick="goPage('payments')"><span class="sb-link-ico">💰</span>Payment History</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-signout" onclick="signOut()">← Sign Out</div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div style="display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <button class="topbar-burger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+  <div class="topbar-title" id="topbarTitle">Overview</div>
+  <div class="topbar-right">
+    <div class="notif-btn" onclick="goPage('applications')" title="New notifications">
+      🔔<div class="notif-badge" id="notifBadge">3</div>
+    </div>
+    <button class="btn btn-soft btn-sm" onclick="goPage('profile')">Edit Profile</button>
+  </div>
+</div>
+
+<!-- ══ PAGE: OVERVIEW ══ -->
+<div class="main page on" id="page-overview">
+  <div class="ph">
+    <div class="ph-eye">Worker Dashboard</div>
+    <div class="ph-h">Good morning, <span id="workerFirstName">Jean-Paul</span> 👋</div>
+    <div class="ph-sub" id="overviewSub">You have <strong>3 active applications</strong> and <strong>2 waitlist positions</strong>.</div>
+  </div>
+
+  <!-- Verify banner (shown if not verified) -->
+  <div class="verify-banner" id="verifyBanner">
+    <div class="vb-ico">✅</div>
+    <div>
+      <div class="vb-title">Get SHINGA Verified — stand out from the crowd</div>
+      <div class="vb-sub">Verified workers are hired 3× faster. One-time annual fee. Employers filter for verified first.</div>
+    </div>
+    <div class="vb-act"><button class="btn btn-gold btn-sm" onclick="goPage('verify')">Get Verified — RWF 10,000</button></div>
+  </div>
+
+  <!-- Available Now card -->
+  <div class="avail-now-card" id="availNowCard" onclick="toggleAvailNow()">
+    <div class="anc-dot" id="ancDot"></div>
+    <div class="anc-body">
+      <div class="anc-title" id="ancTitle">Available Now — Off</div>
+      <div class="anc-sub">Turn this on to appear in nearby employer searches. Workers who are "Available Now" are shown first and get 4× more contact requests.</div>
+      <div class="anc-timer" id="ancTimer"></div>
+    </div>
+    <button class="btn btn-soft btn-sm" id="ancBtn">Turn On</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-ico">📋</div><div class="kpi-n" id="kpi-apps">5</div><div class="kpi-l">Total Applications</div><div class="kpi-trend kpi-up">↑ 2 this week</div></div>
+    <div class="kpi"><div class="kpi-ico">✅</div><div class="kpi-n" id="kpi-hired">2</div><div class="kpi-l">Times Hired</div><div class="kpi-trend kpi-up">↑ 1 this month</div></div>
+    <div class="kpi"><div class="kpi-ico">👁️</div><div class="kpi-n" id="kpi-views">147</div><div class="kpi-l">Profile Views</div><div class="kpi-trend kpi-up">↑ 23 this week</div></div>
+    <div class="kpi"><div class="kpi-ico">💰</div><div class="kpi-n" id="kpi-spent">RWF 2,500</div><div class="kpi-l">Fees Paid</div><div class="kpi-trend kpi-neu">5 applications</div></div>
+  </div>
+
+  <!-- Recent applications -->
+  <div class="card">
+    <div class="card-head">
+      <div><div class="card-title">Recent Applications</div><div class="card-sub">Your 3 most recent</div></div>
+      <button class="btn btn-soft btn-sm" onclick="goPage('applications')">View All</button>
+    </div>
+    <div class="card-body" style="padding:0">
+      <div class="app-list" id="recentAppsList"></div>
+    </div>
+  </div>
+
+  <!-- Quick links -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+    <div class="card" style="margin-bottom:0;cursor:pointer" onclick="goPage('profile')">
+      <div class="card-body" style="display:flex;gap:12px;align-items:center">
+        <div style="font-size:1.5rem">👤</div>
+        <div><div style="font-weight:700;font-size:.88rem;color:var(--dark)">Edit Your Profile</div><div style="font-size:.74rem;color:var(--muted);margin-top:2px">Update skills, rate, bio</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:0;cursor:pointer" onclick="window.location.href='shinga.html'">
+      <div class="card-body" style="display:flex;gap:12px;align-items:center">
+        <div style="font-size:1.5rem">🔍</div>
+        <div><div style="font-weight:700;font-size:.88rem;color:var(--dark)">Browse Jobs</div><div style="font-size:.74rem;color:var(--muted);margin-top:2px">Find new opportunities</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE: APPLICATIONS ══ -->
+<div class="main page" id="page-applications">
+  <div class="ph">
+    <div class="ph-row">
+      <div><div class="ph-eye">My Work</div><div class="ph-h">My Applications</div><div class="ph-sub">All jobs you've applied to</div></div>
+      <button class="btn btn-primary btn-sm" onclick="window.location.href='shinga.html'">+ Find More Jobs</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px" id="appFilterBtns">
+    <button class="btn btn-soft btn-sm on-filter" onclick="filterApps('all',this)">All</button>
+    <button class="btn btn-sm" style="background:var(--light);color:var(--mid);border:1.5px solid var(--border)" onclick="filterApps('pending',this)">Pending</button>
+    <button class="btn btn-sm" style="background:var(--light);color:var(--mid);border:1.5px solid var(--border)" onclick="filterApps('contacted',this)">Contacted</button>
+    <button class="btn btn-sm" style="background:var(--light);color:var(--mid);border:1.5px solid var(--border)" onclick="filterApps('hired',this)">Hired ✓</button>
+    <button class="btn btn-sm" style="background:var(--light);color:var(--mid);border:1.5px solid var(--border)" onclick="filterApps('rejected',this)">Not Selected</button>
+  </div>
+  <div class="app-list" id="fullAppsList"></div>
+</div>
+
+<!-- ══ PAGE: WAITLIST ══ -->
+<div class="main page" id="page-waitlist">
+  <div class="ph">
+    <div class="ph-eye">Waiting</div>
+    <div class="ph-h">My Waitlist</div>
+    <div class="ph-sub">Jobs where you're next in line. Free to be here — you only pay if you choose to apply when a slot opens.</div>
+  </div>
+  <div class="app-list" id="waitlistList"></div>
+</div>
+
+<!-- ══ PAGE: PROFILE ══ -->
+<div class="main page" id="page-profile">
+  <div class="ph">
+    <div class="ph-row">
+      <div><div class="ph-eye">Your Identity</div><div class="ph-h">Edit Profile</div><div class="ph-sub">Keep your profile updated — more complete profiles get 3× more views.</div></div>
+      <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">Basic Information</div></div>
+    <div class="card-body">
+      <div class="profile-grid">
+        <div class="field"><label>Full Name</label><input type="text" id="pfName" value="Jean-Paul Nkusi"></div>
+        <div class="field"><label>Phone</label><input type="tel" id="pfPhone" value="+250 788 123 456" readonly style="opacity:.6;cursor:not-allowed"><small>Phone number cannot be changed. Contact support if needed.</small></div>
+        <div class="field"><label>District</label>
+          <select id="pfDistrict">
+            <option selected>Gasabo</option><option>Kicukiro</option><option>Nyarugenge</option>
+            <option>Musanze</option><option>Rubavu</option><option>Huye</option><option>Rwamagana</option>
+            <option>Bugesera</option><option>Nyagatare</option><option>Karongi</option>
+          </select>
+        </div>
+        <div class="field"><label>Sector / Neighbourhood</label><input type="text" id="pfSector" value="Kimironko"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">Work Details</div></div>
+    <div class="card-body">
+      <div class="profile-grid">
+        <div class="field"><label>Job Category</label>
+          <select id="pfCat">
+            <option value="domestic">🏠 Domestic Services</option>
+            <option value="trades">🔧 Trades & Construction</option>
+            <option value="health" selected>👶 Health & Care</option>
+            <option value="education">📚 Education</option>
+            <option value="technology">💻 Technology</option>
+            <option value="casual">⚡ Casual / General</option>
+          </select>
+        </div>
+        <div class="field"><label>Your Role / Skill Title</label><input type="text" id="pfSkill" value="Babysitter / Nanny"><small>What employers search for — be specific.</small></div>
+        <div class="field"><label>Rate (RWF)</label><input type="number" id="pfRate" value="8000"></div>
+        <div class="field"><label>Per</label>
+          <select id="pfRateUnit">
+            <option value="day" selected>Day</option><option value="week">Week</option>
+            <option value="month">Month</option><option value="hour">Hour</option><option value="task">Task</option>
+          </select>
+        </div>
+        <div class="field"><label>Years of Experience</label>
+          <select id="pfExp">
+            <option>Less than 1 year</option><option>1 year</option><option>2 years</option>
+            <option selected>3 years</option><option>5+ years</option><option>10+ years</option>
+          </select>
+        </div>
+        <div class="field"><label>Can you travel to other districts?</label>
+          <select id="pfTravel"><option value="false" selected>No — my district only</option><option value="true">Yes — I can travel</option></select>
+        </div>
+      </div>
+      <div class="field" style="margin-top:4px"><label>Skill Tags</label>
+        <div class="tag-input-wrap" id="tagWrap" onclick="document.getElementById('tagInput').focus()">
+          <div class="tag-chip">Childcare<button onclick="removeTag(this,'Childcare')">✕</button></div>
+          <div class="tag-chip">First Aid<button onclick="removeTag(this,'First Aid')">✕</button></div>
+          <div class="tag-chip">Cooking<button onclick="removeTag(this,'Cooking')">✕</button></div>
+          <input class="tag-input" id="tagInput" placeholder="Add a skill…" onkeydown="addTag(event)">
+        </div>
+        <small>Press Enter to add. These appear on your profile and help employers find you.</small>
+      </div>
+      <div class="field"><label>Bio / About You</label>
+        <textarea id="pfBio" rows="4" style="resize:vertical">5 years caring for children aged 1–12. Reliable, patient, and experienced with babies. CPR certified. References available.</textarea>
+        <small>A strong bio gets 3× more contact requests. Be honest and specific.</small>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px">
+    <button class="btn btn-soft" onclick="goPage('overview')">Cancel</button>
+    <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+  </div>
+</div>
+
+<!-- ══ PAGE: AVAILABILITY ══ -->
+<div class="main page" id="page-availability">
+  <div class="ph">
+    <div class="ph-eye">Schedule</div>
+    <div class="ph-h">My Availability</div>
+    <div class="ph-sub">Let employers know when you're available. This appears on your public profile.</div>
+  </div>
+
+  <!-- Available Now -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">Available Right Now</div><div class="card-sub">Appears in nearby GPS searches · Auto-expires after 8 hours</div></div>
+    <div class="card-body">
+      <div class="avail-now-card" id="availNowCard2" onclick="toggleAvailNow()" style="margin-bottom:8px">
+        <div class="anc-dot" id="ancDot2"></div>
+        <div class="anc-body">
+          <div class="anc-title" id="ancTitle2">I'm available right now</div>
+          <div class="anc-sub">Employers searching for workers near your location will see you first. Auto-turns off after 8 hours.</div>
+          <div class="anc-timer" id="ancTimer2"></div>
+        </div>
+        <button class="btn btn-soft btn-sm" id="ancBtn2">Turn On</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- General availability -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">General Availability</div></div>
+    <div class="card-body">
+      <div class="avail-grid" id="availGrid">
+        <div class="avail-opt on" onclick="setAvail(this,'full_time')"><div class="ao-ico">🌕</div><div class="ao-lbl">Full-time</div></div>
+        <div class="avail-opt" onclick="setAvail(this,'part_time')"><div class="ao-ico">🌗</div><div class="ao-lbl">Part-time</div></div>
+        <div class="avail-opt" onclick="setAvail(this,'weekdays')"><div class="ao-ico">📅</div><div class="ao-lbl">Weekdays</div></div>
+        <div class="avail-opt" onclick="setAvail(this,'weekends')"><div class="ao-ico">📆</div><div class="ao-lbl">Weekends</div></div>
+        <div class="avail-opt" onclick="setAvail(this,'daily_gigs')"><div class="ao-ico">⚡</div><div class="ao-lbl">Daily Gigs</div></div>
+        <div class="avail-opt" onclick="setAvail(this,'flexible')"><div class="ao-ico">🔄</div><div class="ao-lbl">Flexible</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly schedule -->
+  <div class="card">
+    <div class="card-head"><div class="card-title">Weekly Schedule</div><div class="card-sub">Tap to toggle days you are available</div></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px" id="dayGrid">
+        <div class="avail-opt on" onclick="this.classList.toggle('on')"><div class="ao-ico" style="font-size:.8rem">Mon</div></div>
+        <div class="avail-opt on" onclick="this.classList.toggle('on')"><div class="ao-ico" style="font-size:.8rem">Tue</div></div>
+        <div class="avail-opt on" onclick="this.classList.toggle('on')"><div class="ao-ico" style="font-size:.8rem">Wed</div></div>
+        <div class="avail-opt on" onclick="this.classList.toggle('on')"><div class="ao-ico" style="font-size:.8rem">Thu</div></div>
+        <div class="avail-opt on" onclick="this.classList.toggle('on')"><div class="ao-ico" style="font-size:.8rem">Fri</div></div>
+        <div class="avail-opt" onclick="this.classList.toggle('on')"><div class="ao-ico" style="font-size:.8rem">Sat</div></div>
+        <div class="avail-opt" onclick="this.classList.toggle('on')"><div class="ao-ico" style="font-size:.8rem">Sun</div></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:16px;width:100%" onclick="saveAvailability()">Save Availability</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE: VERIFY ══ -->
+<div class="main page" id="page-verify">
+  <div class="ph">
+    <div class="ph-eye">Trust & Safety</div>
+    <div class="ph-h">Get SHINGA Verified ✅</div>
+    <div class="ph-sub">Verified workers are hired 3× faster and appear first in employer searches.</div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">What Verification Gives You</div></div>
+    <div class="card-body">
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--g);font-size:1rem;flex-shrink:0">✓</span><div><strong>Green ✅ badge</strong> on your profile and all search results</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--g);font-size:1rem;flex-shrink:0">✓</span><div><strong>Priority ranking</strong> — you appear before unverified workers</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--g);font-size:1rem;flex-shrink:0">✓</span><div><strong>3× more contact requests</strong> from employers who trust verified workers</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--g);font-size:1rem;flex-shrink:0">✓</span><div><strong>Valid for 1 full year</strong> from payment date</div></div>
+      </div>
+      <div class="fee-box">
+        <div style="font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--g);margin-bottom:8px;font-family:'DM Mono',monospace">Verification Fee</div>
+        <div class="fee-row"><span>Annual fee</span><strong>RWF 10,000</strong></div>
+        <div class="fee-row"><span>Renewal</span><strong>RWF 10,000 / year</strong></div>
+      </div>
+      <div class="field"><label>National ID Number</label><input type="text" id="verifyIdNum" placeholder="1 XXXX X XXXXXXX X XX"></div>
+      <div class="field"><label>MoMo Number to Pay From</label>
+        <div class="phone-wrap"><div class="phone-pre">🇷🇼 +250</div><input class="phone-inp" type="tel" id="verifyMoMo" placeholder="7XX XXX XXX" maxlength="9" inputmode="numeric"></div>
+      </div>
+      <button class="btn btn-gold btn-full" onclick="submitVerify()" style="margin-top:4px">Pay RWF 10,000 & Apply for Verification</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE: PAYMENTS ══ -->
+<div class="main page" id="page-payments">
+  <div class="ph">
+    <div class="ph-eye">Money</div>
+    <div class="ph-h">Payment History</div>
+    <div class="ph-sub">All fees you've paid on SHINGA</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+    <div class="kpi"><div class="kpi-ico">💸</div><div class="kpi-n">RWF 2,500</div><div class="kpi-l">Total Paid</div></div>
+    <div class="kpi"><div class="kpi-ico">📋</div><div class="kpi-n">5</div><div class="kpi-l">Applications Paid</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">All Transactions</div></div>
+    <div class="tx-list" id="txList"></div>
+  </div>
+</div>
+
+</div><!-- end main column -->
+</div><!-- end .app -->
+
+<!-- MODALS -->
+<!-- Verify success -->
+<div class="overlay" id="verifySuccessM">
+  <div class="modal" style="position:relative">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeM('verifySuccessM')">✕</button>
+    <div style="text-align:center;padding:40px 22px">
+      <div style="font-size:3rem;margin-bottom:14px">✅</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--dark);margin-bottom:8px">Application Submitted!</div>
+      <div style="font-size:.82rem;color:var(--muted);line-height:1.75;max-width:280px;margin:0 auto 22px">Your verification application is under review. You'll receive an SMS within 24 hours. Once approved, your ✅ badge goes live immediately.</div>
+      <button class="btn btn-primary btn-full" onclick="closeM('verifySuccessM')">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ DATA ══════════════════════════════════════════════
+const WORKER = {
+  name: 'Jean-Paul Nkusi', firstName: 'Jean-Paul',
+  role: 'Babysitter / Nanny', district: 'Gasabo', sector: 'Kimironko',
+  verified: false, availNow: false, availNowExpiry: null,
+  rating: 4.8, rev: 52, views: 147, hired: 2,
+}
+
+const APPLICATIONS = [
+  {id:1, job:'Live-in Babysitter', company:'Private Family · Kicukiro', type:'Monthly', pay:'RWF 80,000/mo', status:'contacted', appliedDate:'2 days ago', note:'Employer contacted you — check your phone.',gi:0},
+  {id:2, job:'House Cleaner 3× per week', company:'Private Client · Gasabo', type:'Weekly', pay:'RWF 21,000/wk', status:'pending', appliedDate:'3 days ago', note:'Application under review.',gi:2},
+  {id:3, job:'Domestic Cook — Full-time', company:'Private Household · Nyarugenge', type:'Monthly', pay:'RWF 120,000/mo', status:'pending', appliedDate:'5 days ago', note:'Application under review.',gi:4},
+  {id:4, job:'Babysitter — Daily Cover', company:'Uwimana Family · Kicukiro', type:'Daily', pay:'RWF 8,000/day', status:'hired', appliedDate:'2 weeks ago', note:'You were hired for this job! 🎉',gi:1},
+  {id:5, job:'Childcare Assistant', company:'Little Stars Nursery · Gasabo', type:'Permanent', pay:'RWF 85,000/mo', status:'rejected', appliedDate:'3 weeks ago', note:'Employer selected another candidate.',gi:5},
+]
+
+const WAITLIST = [
+  {id:1, job:'Live-in Nanny', company:'Kagabo Family · Gasabo', type:'Monthly', pay:'RWF 90,000/mo', position:1, note:'You are #1 on the waitlist — slot may open soon.', gi:3},
+  {id:2, job:'Babysitter — Weekends', company:'Private Client · Kicukiro', type:'Weekly', pay:'RWF 15,000/wk', position:3, note:'You are #3 on the waitlist.', gi:0},
+]
+
+const TRANSACTIONS = [
+  {id:1, label:'Application — Live-in Babysitter', date:'2 days ago', amount:-500, type:'out'},
+  {id:2, label:'Application — House Cleaner', date:'3 days ago', amount:-500, type:'out'},
+  {id:3, label:'Application — Domestic Cook', date:'5 days ago', amount:-500, type:'out'},
+  {id:4, label:'Application — Babysitter Daily', date:'2 weeks ago', amount:-500, type:'out'},
+  {id:5, label:'Application — Childcare Assistant', date:'3 weeks ago', amount:-500, type:'out'},
+]
+
+// ══ STATE ══════════════════════════════════════════════
+let availNow = false
+let availNowExpiry = null
+let availTimer = null
+
+// ══ NAVIGATION ══════════════════════════════════════════
+const PAGE_TITLES = {
+  overview:'Overview', applications:'My Applications', waitlist:'My Waitlist',
+  profile:'Edit Profile', availability:'My Availability',
+  verify:'Get Verified', payments:'Payment History'
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'))
+  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('on'))
+  document.getElementById('page-' + id)?.classList.add('on')
+  document.getElementById('lnk-' + id)?.classList.add('on')
+  document.getElementById('topbarTitle').textContent = PAGE_TITLES[id] || id
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open')
+  document.body.style.overflow = ''
+  window.scrollTo(0, 0)
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar')
+  sb.classList.toggle('open')
+  document.body.style.overflow = sb.classList.contains('open') ? 'hidden' : ''
+}
+
+// ══ TOAST ══════════════════════════════════════════════
+let tt
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast')
+  t.style.borderLeftColor = type==='ok'?'var(--g)':type==='gold'?'var(--gold)':'#DC2626'
+  t.textContent = msg
+  t.classList.add('show')
+  clearTimeout(tt)
+  tt = setTimeout(() => t.classList.remove('show'), 3500)
+}
+
+function openM(id) { const el=document.getElementById(id); if(el){ el.classList.add('open'); document.body.style.overflow='hidden' } }
+function closeM(id) { const el=document.getElementById(id); if(el){ el.classList.remove('open'); document.body.style.overflow='' } }
+document.addEventListener('click', e => { if(e.target.classList.contains('overlay')){ e.target.classList.remove('open'); document.body.style.overflow='' } })
+
+// ══ AVAILABLE NOW ══════════════════════════════════════
+function toggleAvailNow() {
+  availNow = !availNow
+  if (availNow) {
+    availNowExpiry = new Date(Date.now() + 8 * 60 * 60 * 1000)
+    startAvailTimer()
+    toast('✓ You\'re now visible in nearby searches!', 'ok')
+  } else {
+    availNowExpiry = null
+    clearInterval(availTimer)
+    toast('Available Now turned off')
+  }
+  updateAvailUI()
+}
+
+function startAvailTimer() {
+  clearInterval(availTimer)
+  availTimer = setInterval(updateTimerDisplay, 1000)
+  updateTimerDisplay()
+}
+
+function updateTimerDisplay() {
+  if (!availNowExpiry) return
+  const remaining = availNowExpiry - Date.now()
+  if (remaining <= 0) {
+    availNow = false
+    clearInterval(availTimer)
+    updateAvailUI()
+    toast('Available Now expired — turn it on again when ready')
+    return
+  }
+  const h = Math.floor(remaining / 3600000)
+  const m = Math.floor((remaining % 3600000) / 60000)
+  const s = Math.floor((remaining % 60000) / 1000)
+  const txt = `Expires in ${h}h ${m}m ${s}s`
+  ;['ancTimer','ancTimer2'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = txt })
+}
+
+function updateAvailUI() {
+  // Sidebar toggle
+  const sbToggle = document.getElementById('availToggle')
+  sbToggle.className = 'avail-toggle ' + (availNow ? 'on' : 'off')
+  document.getElementById('availTxt').textContent = 'Available Now: ' + (availNow ? 'ON' : 'Off')
+  document.getElementById('availSub').textContent = availNow ? 'You appear in nearby searches' : 'Toggle to appear in nearby searches'
+
+  // Overview card
+  ;['','2'].forEach(suffix => {
+    const card = document.getElementById('availNowCard' + suffix)
+    const dot  = document.getElementById('ancDot' + suffix)
+    const title = document.getElementById('ancTitle' + suffix)
+    const btn   = document.getElementById('ancBtn' + suffix)
+    const timer = document.getElementById('ancTimer' + suffix)
+    if (!card) return
+    card.classList.toggle('on', availNow)
+    dot.classList.toggle('on', availNow)
+    if (title) title.textContent = availNow ? 'Available Now — ON ✓' : 'Available Now — Off'
+    if (btn) btn.textContent = availNow ? 'Turn Off' : 'Turn On'
+    if (timer && !availNow) timer.textContent = ''
+  })
+}
+
+// ══ RENDER APPLICATIONS ══════════════════════════════
+const STATUS_BADGE = {
+  pending:   '<span class="badge bg-muted">⏳ Pending</span>',
+  contacted: '<span class="badge bg-blue">📞 Employer Contacted You</span>',
+  hired:     '<span class="badge bg-green">✅ Hired</span>',
+  rejected:  '<span class="badge bg-red">✕ Not Selected</span>',
+}
+const G = ['#1A7A4A,#0F5C30','#2563EB,#7C3AED','#B45309,#D97706','#DC2626,#B91C1C','#0891B2,#0E7490','#7C3AED,#6D28D9','#D97706,#B45309','#059669,#047857']
+const g = i => G[i % G.length]
+
+function renderApp(app, compact=false) {
+  return `<div class="app-item status-${app.status}" onclick="${app.status==='contacted'?'toast(\"Check your phone — the employer has your number!\")':''}">
+    <div class="ai-top">
+      <div>
+        <div class="ai-title">${app.job}</div>
+        <div class="ai-company">${app.company}</div>
+      </div>
+      ${STATUS_BADGE[app.status]||''}
+    </div>
+    <div style="font-size:.78rem;color:var(--muted);background:var(--light);border:1px solid var(--border);border-radius:8px;padding:8px 11px;margin:4px 0">${app.note}</div>
+    <div class="ai-meta">
+      <span class="ai-m">📋 ${app.type}</span>
+      <span class="ai-m">💰 ${app.pay}</span>
+      <span class="ai-m">🕐 Applied ${app.appliedDate}</span>
+    </div>
+    ${!compact && app.status==='hired' ? `<div class="ai-actions"><button class="btn btn-soft btn-sm" onclick="toast('Review feature coming soon')">Leave a Review</button></div>` : ''}
+  </div>`
+}
+
+function renderApplications(list) {
+  const el = document.getElementById('fullAppsList')
+  el.innerHTML = list.length
+    ? list.map(a => renderApp(a)).join('')
+    : '<div class="card-empty"><div class="ce-ico">📋</div><div class="ce-h">No applications yet</div><div class="ce-p">Browse jobs and apply — your applications will appear here.</div><button class="btn btn-primary" style="margin-top:14px" onclick="window.location.href=\'shinga.html\'">Browse Jobs</button></div>'
+}
+
+function renderRecentApps() {
+  const recent = APPLICATIONS.slice(0, 3)
+  document.getElementById('recentAppsList').innerHTML = recent.map(a => renderApp(a, true)).join('')
+}
+
+function filterApps(status, btn) {
+  document.querySelectorAll('#appFilterBtns .btn').forEach(b => {
+    b.className = 'btn btn-sm'
+    b.style.background = 'var(--light)'; b.style.color = 'var(--mid)'; b.style.border = '1.5px solid var(--border)'
+  })
+  btn.className = 'btn btn-soft btn-sm'
+  const list = status === 'all' ? APPLICATIONS : APPLICATIONS.filter(a => a.status === status)
+  renderApplications(list)
+}
+
+function renderWaitlist() {
+  const el = document.getElementById('waitlistList')
+  if (!WAITLIST.length) {
+    el.innerHTML = '<div class="card-empty"><div class="ce-ico">⏳</div><div class="ce-h">No waitlist positions</div><div class="ce-p">When a job\'s queue is full, you can join the waitlist for free. You\'ll appear here.</div></div>'
+    return
+  }
+  el.innerHTML = WAITLIST.map(w => `
+    <div class="app-item waitlist-item">
+      <div class="ai-top">
+        <div><div class="ai-title">${w.job}</div><div class="ai-company">${w.company}</div></div>
+        <span class="badge bg-gold">⏳ Position #${w.position}</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--goldd);background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:8px 11px;margin:4px 0">${w.note}</div>
+      <div class="ai-meta">
+        <span class="ai-m">📋 ${w.type}</span>
+        <span class="ai-m">💰 ${w.pay}</span>
+      </div>
+      <div class="ai-actions">
+        <button class="btn btn-danger btn-sm" onclick="removeWaitlist(${w.id})">Leave Waitlist</button>
+      </div>
+    </div>
+  `).join('')
+}
+
+function removeWaitlist(id) {
+  const idx = WAITLIST.findIndex(w => w.id === id)
+  if (idx > -1) WAITLIST.splice(idx, 1)
+  renderWaitlist()
+  document.getElementById('wlBadge').textContent = WAITLIST.length
+  toast('Removed from waitlist')
+}
+
+function renderTransactions() {
+  document.getElementById('txList').innerHTML = TRANSACTIONS.map(tx => `
+    <div class="tx-item">
+      <div class="tx-ico ${tx.type==='in'?'tx-ico-in':'tx-ico-out'}">${tx.type==='in'?'💰':'📋'}</div>
+      <div><div class="tx-label">${tx.label}</div><div class="tx-date">${tx.date}</div></div>
+      <div class="tx-amt ${tx.type}">${tx.type==='out'?'-':'+'} RWF ${Math.abs(tx.amount).toLocaleString()}</div>
+    </div>
+  `).join('')
+}
+
+// ══ PROFILE ══════════════════════════════════════════
+function addTag(e) {
+  if (e.key !== 'Enter') return
+  const inp = document.getElementById('tagInput')
+  const val = inp.value.trim()
+  if (!val) return
+  const chip = document.createElement('div')
+  chip.className = 'tag-chip'
+  chip.innerHTML = `${val}<button onclick="removeTag(this,'${val}')">✕</button>`
+  document.getElementById('tagWrap').insertBefore(chip, inp)
+  inp.value = ''
+}
+function removeTag(btn, tag) {
+  btn.parentElement.remove()
+}
+
+function saveProfile() {
+  const name = document.getElementById('pfName').value.trim()
+  if (!name) { toast('Enter your full name', 'err'); return }
+  WORKER.name = name
+  WORKER.firstName = name.split(' ')[0]
+  document.getElementById('sbName').textContent = name
+  document.getElementById('sbRole').textContent = document.getElementById('pfSkill').value + ' · ' + document.getElementById('pfDistrict').value
+  document.getElementById('workerFirstName').textContent = WORKER.firstName
+  toast('✓ Profile saved!')
+  goPage('overview')
+}
+
+// ══ AVAILABILITY ═════════════════════════════════════
+function setAvail(el, type) {
+  document.querySelectorAll('#availGrid .avail-opt').forEach(o => o.classList.remove('on'))
+  el.classList.add('on')
+}
+
+function saveAvailability() {
+  toast('✓ Availability saved!')
+}
+
+// ══ VERIFY ═══════════════════════════════════════════
+function submitVerify() {
+  const idNum = document.getElementById('verifyIdNum').value.trim()
+  const momo  = document.getElementById('verifyMoMo').value.replace(/\D/g,'')
+  if (!idNum) { toast('Enter your National ID number', 'err'); return }
+  if (momo.length < 9) { toast('Enter your MoMo number', 'err'); return }
+  openM('verifySuccessM')
+}
+
+function signOut() {
+  toast('Signing out…')
+  setTimeout(() => window.location.href = 'shinga.html', 1200)
+}
+
+// ══ INIT ═════════════════════════════════════════════
+function init() {
+  document.getElementById('sbName').textContent = WORKER.name
+  document.getElementById('sbAvi').innerHTML = WORKER.name.split(' ').map(w=>w[0]).join('').slice(0,2) + (WORKER.verified ? '<div class="sb-vbadge">✓</div>' : '')
+  document.getElementById('sbRole').textContent = WORKER.role + ' · ' + WORKER.district
+  document.getElementById('workerFirstName').textContent = WORKER.firstName
+  document.getElementById('kpi-apps').textContent = APPLICATIONS.length
+  document.getElementById('kpi-hired').textContent = APPLICATIONS.filter(a=>a.status==='hired').length
+  document.getElementById('appBadge').textContent = APPLICATIONS.filter(a=>a.status==='pending'||a.status==='contacted').length
+  document.getElementById('wlBadge').textContent = WAITLIST.length
+  document.getElementById('notifBadge').textContent = APPLICATIONS.filter(a=>a.status==='contacted').length
+  document.getElementById('verifyBanner').style.display = WORKER.verified ? 'none' : 'flex'
+  if (WORKER.verified) document.getElementById('sbVbadge').style.display = 'flex'
+  updateAvailUI()
+  renderRecentApps()
+  renderApplications(APPLICATIONS)
+  renderWaitlist()
+  renderTransactions()
+}
+init()
+</script>
+</body>
+</html>

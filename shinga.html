@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SHINGA — Rwanda's national work platform. Find jobs or hire workers across all 30 districts.">
+<title>SHINGA — Rwanda's Work Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1A7A4A;--gh:#25A865;--gd:#145E38;--gp:#E8F5EE;
+  --gold:#F5A623;--goldd:#C8841A;
+  --dark:#0F1F15;--mid:#3D5C48;--muted:#6B7C73;
+  --light:#F7FAF8;--white:#fff;--border:#D0E6DA;--bord:#B8D9C8;
+  --r:12px;--rl:18px;--rx:26px;
+  --shadow:0 2px 16px rgba(15,31,21,.08);
+  --shadow-lg:0 8px 40px rgba(15,31,21,.14);
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+button,input,select,textarea{font-family:inherit}
+
+/* ── TYPOGRAPHY ── */
+.serif{font-family:'Playfair Display',serif}
+.mono{font-family:'DM Mono',monospace}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:var(--r);font-weight:700;font-size:.92rem;cursor:pointer;border:none;text-decoration:none;transition:all .18s ease;white-space:nowrap;letter-spacing:.1px;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .18s}
+.btn:active::after{background:rgba(0,0,0,.08)}
+.btn-primary{background:var(--g);color:#fff;box-shadow:0 2px 8px rgba(26,122,74,.25)}
+.btn-primary:hover{background:var(--gh);transform:translateY(-1px);box-shadow:0 6px 20px rgba(26,122,74,.35)}
+.btn-gold{background:var(--gold);color:var(--dark);box-shadow:0 2px 8px rgba(245,166,35,.25)}
+.btn-gold:hover{background:#F7B830;transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,166,35,.35)}
+.btn-outline{background:transparent;color:var(--g);border:2px solid var(--g)}
+.btn-outline:hover{background:var(--gp)}
+.btn-ghost{background:rgba(255,255,255,.1);color:#F7FAF8;border:1px solid rgba(255,255,255,.18)}
+.btn-ghost:hover{background:rgba(255,255,255,.18)}
+.btn-soft{background:var(--gp);color:var(--g);border:1px solid rgba(26,122,74,.15)}
+.btn-soft:hover{background:var(--bord)}
+.btn-danger-soft{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}
+.btn-sm{padding:9px 18px;font-size:.82rem;border-radius:10px}
+.btn-lg{padding:16px 32px;font-size:1rem;border-radius:var(--rl)}
+.btn-full{width:100%}
+.btn-icon{width:44px;height:44px;padding:0;border-radius:50%}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:100px;font-size:.71rem;font-weight:700;letter-spacing:.4px}
+.badge-green{background:var(--gp);color:var(--g);border:1px solid rgba(26,122,74,.18)}
+.badge-gold{background:rgba(245,166,35,.1);color:var(--goldd);border:1px solid rgba(245,166,35,.22)}
+.badge-muted{background:rgba(107,124,115,.08);color:var(--mid);border:1px solid rgba(107,124,115,.15)}
+.badge-red{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}
+.badge-blue{background:rgba(37,99,235,.07);color:#1D4ED8;border:1px solid rgba(37,99,235,.15)}
+.badge-live{background:rgba(26,122,74,.12);color:#16A34A;border:1px solid rgba(26,122,74,.2)}
+
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:400;height:62px;display:flex;align-items:center;padding:0 24px;transition:all .3s}
+.nav.solid{background:rgba(15,31,21,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 1px 0 rgba(255,255,255,.06)}
+.nav-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:#F7FAF8;letter-spacing:4px;text-decoration:none;flex-shrink:0}
+.nav-logo span{color:var(--gh)}
+.nav-links{display:flex;gap:4px;list-style:none;margin-left:32px}
+.nav-links a{color:rgba(247,250,248,.55);text-decoration:none;font-size:.86rem;font-weight:500;padding:7px 13px;border-radius:8px;transition:all .18s}
+.nav-links a:hover{color:#F7FAF8;background:rgba(255,255,255,.07)}
+.nav-right{display:flex;gap:8px;align-items:center;margin-left:auto}
+.wallet-chip{display:flex;align-items:center;gap:7px;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.22);border-radius:100px;padding:7px 15px;cursor:pointer;transition:all .2s}
+.wallet-chip:hover{background:rgba(245,166,35,.2)}
+.wallet-amt{font-family:'DM Mono',monospace;font-size:.84rem;font-weight:700;color:var(--gold)}
+.wallet-lbl{font-size:.68rem;color:rgba(247,250,248,.4)}
+.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;margin-left:8px}
+.nav-burger span{width:22px;height:2px;background:#F7FAF8;border-radius:2px;display:block;transition:all .2s}
+@media(max-width:768px){
+  .nav-links{display:none}
+  .nav-right .btn-outline,.nav-right .btn-ghost{display:none}
+  .nav-burger{display:flex}
+  .wallet-chip .wallet-lbl{display:none}
+}
+
+/* mobile menu */
+.mobile-menu{display:none;position:fixed;inset:0;top:62px;background:var(--dark);z-index:390;flex-direction:column;padding:20px 24px;gap:4px;overflow-y:auto}
+.mobile-menu.open{display:flex}
+.mm-link{color:rgba(247,250,248,.7);text-decoration:none;font-size:1rem;font-weight:600;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06);transition:color .15s}
+.mm-link:hover{color:#F7FAF8}
+.mm-acts{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+
+/* ── HERO ── */
+.hero{min-height:100svh;background:var(--dark);display:flex;flex-direction:column;justify-content:center;padding:80px 24px 48px;position:relative;overflow:hidden}
+.hero-bg-text{position:absolute;font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(120px,22vw,280px);color:rgba(26,122,74,.04);bottom:-4%;right:-2%;pointer-events:none;user-select:none;line-height:1;letter-spacing:-8px}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,black 30%,transparent 100%)}
+.hero-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(26,122,74,.15) 0%,transparent 70%);top:-15%;left:-10%;pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;width:100%;position:relative;z-index:1}
+.hero-kicker{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.hero-kicker-line{width:32px;height:2px;background:linear-gradient(90deg,var(--gh),transparent)}
+.hero-kicker-txt{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(247,250,248,.45)}
+.hero-h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2.6rem,7vw,5rem);line-height:1.07;letter-spacing:-2px;color:#F7FAF8;margin-bottom:20px;max-width:750px}
+.hero-h1 em{font-style:italic;color:var(--gh)}
+.hero-h1 strong{color:var(--gold);font-style:normal}
+.hero-sub{font-size:clamp(.92rem,2vw,1.05rem);color:rgba(247,250,248,.52);line-height:1.8;max-width:520px;margin-bottom:36px}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:52px}
+.hero-stats{display:flex;gap:clamp(20px,4vw,48px);flex-wrap:wrap;padding-top:28px;border-top:1px solid rgba(255,255,255,.08)}
+.hstat-n{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:900;color:#F7FAF8;line-height:1}
+.hstat-l{font-size:.72rem;color:rgba(247,250,248,.38);margin-top:4px;text-transform:uppercase;letter-spacing:.8px;font-family:'DM Mono',monospace}
+
+/* ── SEARCH BAR ── */
+.search-bar{background:var(--white);border-bottom:1px solid var(--border);padding:16px 24px;position:sticky;top:62px;z-index:300}
+.search-tabs{display:flex;gap:4px;background:var(--light);border-radius:10px;padding:3px;width:fit-content;margin:0 auto 14px;border:1px solid var(--border)}
+.stab{padding:8px 20px;border-radius:8px;font-weight:700;font-size:.82rem;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .18s;font-family:'DM Sans',sans-serif}
+.stab.on-jobs{background:var(--dark);color:#F7FAF8}
+.stab.on-workers{background:var(--g);color:#fff}
+.stab.on-nearby{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff}
+.search-form{display:flex;gap:8px;max-width:860px;margin:0 auto;flex-wrap:wrap}
+.sf{flex:1;min-width:140px}
+.sf input,.sf select{width:100%;padding:12px 15px;border:1.5px solid var(--border);border-radius:var(--r);font-size:.9rem;color:var(--dark);background:var(--light);outline:none;transition:border-color .2s,background .2s;appearance:none;-webkit-appearance:none}
+.sf input:focus,.sf select:focus{border-color:var(--g);background:#fff}
+.sf.wide{flex:2;min-width:200px}
+.search-nearby-opts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:860px;margin:10px auto 0}
+.radius-wrap{display:flex;align-items:center;gap:8px;background:var(--light);border:1.5px solid var(--border);border-radius:var(--r);padding:8px 14px}
+.radius-wrap label{font-size:.8rem;color:var(--muted);white-space:nowrap}
+.radius-wrap input[type=range]{width:100px;accent-color:var(--g);cursor:pointer}
+.radius-wrap .rv{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--g);font-weight:700;min-width:36px}
+.avail-check{display:flex;align-items:center;gap:7px;font-size:.82rem;color:var(--mid);cursor:pointer;padding:9px 14px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--light);user-select:none}
+.avail-check input{accent-color:var(--g);width:15px;height:15px;cursor:pointer}
+
+/* ── STATS BAND ── */
+.stats-band{display:grid;grid-template-columns:repeat(5,1fr);background:var(--dark)}
+.sb-item{padding:20px 16px;text-align:center;border-right:1px solid rgba(255,255,255,.05)}
+.sb-item:last-child{border-right:none}
+.sb-n{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;color:var(--gh);line-height:1}
+.sb-l{font-size:.67rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(247,250,248,.3);margin-top:4px;font-family:'DM Mono',monospace}
+@media(max-width:600px){.stats-band{grid-template-columns:repeat(2,1fr)}.sb-item:nth-child(5){display:none}.sb-item:nth-child(2){border-right:none}}
+
+/* ── SECTION ── */
+.section{padding:clamp(40px,6vw,72px) 24px;max-width:1200px;margin:0 auto}
+.sec-eye{font-family:'DM Mono',monospace;font-size:.67rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--g);margin-bottom:8px}
+.sec-h{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,3vw,2rem);font-weight:700;color:var(--dark);line-height:1.2}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;gap:12px;flex-wrap:wrap}
+
+/* ── PILLS ── */
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.pill{padding:7px 16px;border-radius:100px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--mid);transition:all .15s;font-family:'DM Sans',sans-serif}
+.pill:hover{border-color:var(--g);color:var(--g)}
+.pill.on{background:var(--g);color:#fff;border-color:var(--g)}
+
+/* ── JOB CARDS ── */
+.jobs-list{display:flex;flex-direction:column;gap:12px}
+.jcard{background:var(--white);border:1.5px solid var(--border);border-radius:var(--rl);padding:20px 22px;display:flex;gap:16px;cursor:pointer;transition:all .2s;position:relative}
+.jcard:hover{border-color:var(--g);box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.jcard.feat{border-color:rgba(245,166,35,.35);background:linear-gradient(135deg,#FFFDF5,var(--white))}
+.jcard.filled{opacity:.62;cursor:default}
+.jcard.filled:hover{transform:none;box-shadow:none;border-color:var(--border)}
+.jc-logo{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:900;font-size:.92rem;color:#fff;flex-shrink:0}
+.jc-body{flex:1;min-width:0}
+.jc-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:2px;line-height:1.3}
+.jc-company{font-size:.78rem;color:var(--mid);margin-bottom:8px;font-weight:500}
+.jc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.jc-desc{font-size:.8rem;color:var(--muted);line-height:1.65;max-width:600px;margin-bottom:12px}
+/* slot bar */
+.slot-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.slot-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;max-width:180px}
+.slot-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.sf-open{background:var(--g)}
+.sf-warn{background:var(--gold)}
+.sf-full{background:#DC2626}
+.slot-txt{font-size:.72rem;font-weight:600;font-family:'DM Mono',monospace}
+.st-open{color:var(--g)}.st-warn{color:var(--goldd)}.st-full{color:#DC2626}
+.jc-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.jc-meta{display:flex;gap:14px;flex-wrap:wrap}
+.jc-m{font-size:.74rem;color:var(--muted);display:flex;align-items:center;gap:3px}
+.jc-pay{font-family:'DM Mono',monospace;font-size:.9rem;color:var(--dark);font-weight:500}
+.feat-rib{position:absolute;top:14px;right:16px}
+@media(max-width:520px){.jcard{padding:16px;gap:12px}.jc-logo{width:40px;height:40px;font-size:.8rem}.jc-desc{display:none}}
+
+/* ── WORKER CARDS ── */
+.workers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.wcard{background:var(--white);border:1.5px solid var(--border);border-radius:var(--rl);overflow:hidden;cursor:pointer;transition:all .2s}
+.wcard:hover{border-color:var(--g);box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.wc-top{padding:18px 18px 14px;display:flex;gap:12px;align-items:flex-start}
+.wc-avi{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0;position:relative}
+.wc-vbadge{position:absolute;bottom:0;right:0;width:15px;height:15px;background:var(--g);border-radius:50%;border:2.5px solid #fff;font-size:7px;display:flex;align-items:center;justify-content:center;color:#fff}
+.wc-name{font-family:'Playfair Display',serif;font-size:.96rem;font-weight:700;color:var(--dark);margin-bottom:1px}
+.wc-role{font-size:.77rem;font-weight:600;color:var(--g);margin-bottom:4px}
+.wc-stars{display:flex;align-items:center;gap:4px;font-size:.72rem}
+.stars-ico{color:var(--gold);letter-spacing:.5px}
+.stars-ct{color:var(--muted);font-family:'DM Mono',monospace}
+.wc-mid{padding:0 18px 14px;display:flex;flex-wrap:wrap;gap:6px}
+.wc-hr{height:1px;background:var(--border);margin:0 18px}
+.wc-foot{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wc-rate{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--dark)}
+.wc-rate small{font-size:.68rem;color:var(--muted);font-family:'DM Sans',sans-serif}
+.contact-note{font-size:.68rem;color:var(--muted)}
+.contact-note strong{color:var(--g);font-family:'DM Mono',monospace}
+
+/* ── NEARBY SECTION ── */
+.nearby-wrap{background:var(--dark);border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);padding:clamp(40px,6vw,72px) 24px}
+.nearby-inner{max-width:1200px;margin:0 auto}
+.nearby-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.nearby-eye{font-family:'DM Mono',monospace;font-size:.67rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gh);margin-bottom:6px}
+.nearby-h{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,2.5vw,1.9rem);font-weight:700;color:#F7FAF8;line-height:1.2}
+.loc-status{display:flex;align-items:center;gap:7px;font-size:.78rem;color:rgba(247,250,248,.45);margin-top:8px}
+.loc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ld-idle{background:rgba(255,255,255,.18)}
+.ld-busy{background:var(--gold);animation:blink 1s infinite}
+.ld-ok{background:var(--gh)}
+.ld-err{background:#F87171}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.urgent-card{background:linear-gradient(135deg,#7C1D0A,#B84010);border-radius:var(--rl);padding:18px 22px;margin-bottom:18px;cursor:pointer;transition:transform .2s,box-shadow .2s;border:1px solid rgba(245,166,35,.25)}
+.urgent-card:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.uc-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold);color:var(--dark);border-radius:100px;padding:3px 11px;font-size:.7rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin-bottom:9px}
+.uc-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#F7FAF8;margin-bottom:4px}
+.uc-sub{font-size:.8rem;color:rgba(247,250,248,.6);line-height:1.6}
+.nearby-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.ncard{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--rl);padding:18px;cursor:pointer;transition:all .2s;position:relative}
+.ncard:hover{border-color:rgba(26,122,74,.4);background:rgba(255,255,255,.065)}
+.ncard-dist{position:absolute;top:13px;right:13px;background:rgba(26,122,74,.15);border:1px solid rgba(26,122,74,.25);border-radius:100px;padding:3px 9px;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--gh);font-weight:600}
+.ncard-avi{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:.98rem;color:#fff;margin-bottom:11px;position:relative;flex-shrink:0}
+.ncard-vb{position:absolute;bottom:0;right:0;width:14px;height:14px;background:var(--gh);border-radius:50%;border:2px solid var(--dark);font-size:7px;display:flex;align-items:center;justify-content:center;color:#fff}
+.avail-now-pill{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:700;color:#5EE89A;background:rgba(26,122,74,.12);border:1px solid rgba(26,122,74,.22);border-radius:100px;padding:3px 9px;margin-bottom:8px}
+.avail-now-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:#5EE89A;animation:blink 1.3s infinite;flex-shrink:0}
+.ncard-name{font-weight:700;font-size:.9rem;color:#F7FAF8;margin-bottom:1px}
+.ncard-role{font-size:.76rem;color:var(--gh);font-weight:600;margin-bottom:8px}
+.ncard-rate{font-family:'DM Mono',monospace;font-size:.82rem;color:rgba(247,250,248,.65);margin-bottom:12px}
+.ncard-foot{display:flex;justify-content:space-between;align-items:center}
+.ncard-stars{display:flex;align-items:center;gap:4px;font-size:.74rem;color:rgba(247,250,248,.5)}
+.nearby-empty{text-align:center;padding:52px 20px}
+.ne-ico{font-size:2.5rem;margin-bottom:14px}
+.ne-h{font-family:'Playfair Display',serif;font-size:1.05rem;color:rgba(247,250,248,.6);margin-bottom:6px}
+.ne-p{font-size:.82rem;color:rgba(247,250,248,.35);line-height:1.7;max-width:320px;margin:0 auto}
+
+/* ── JOB TYPE CARDS ── */
+.type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:28px}
+.tcard{border:1.5px solid var(--border);border-radius:var(--rl);padding:18px;background:var(--white);cursor:pointer;transition:all .18s}
+.tcard:hover,.tcard.on{border-color:var(--g);background:var(--gp)}
+.tcard.on .tc-n{color:var(--g)}
+.tc-ico{font-size:1.5rem;margin-bottom:8px}
+.tc-title{font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;color:var(--dark);margin-bottom:2px}
+.tc-desc{font-size:.72rem;color:var(--mid);line-height:1.5}
+.tc-fee{margin-top:8px;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--g);font-weight:600}
+.tc-n{font-size:.7rem;color:var(--muted);margin-top:3px;font-family:'DM Mono',monospace}
+
+/* ── CAT STRIP ── */
+.cat-strip{background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.cat-inner{max-width:1200px;margin:0 auto;display:flex;overflow-x:auto;scrollbar-width:none;padding:0 24px}
+.cat-inner::-webkit-scrollbar{display:none}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 20px;border-bottom:3px solid transparent;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0}
+.cat-item:hover{background:var(--light)}
+.cat-item.on{border-bottom-color:var(--g)}
+.cat-ico{font-size:1.3rem}
+.cat-lbl{font-size:.7rem;font-weight:700;color:var(--mid)}
+.cat-item.on .cat-lbl{color:var(--g)}
+.cat-ct{font-size:.63rem;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* ── HOW IT WORKS ── */
+.how-wrap{background:var(--dark);padding:clamp(48px,7vw,80px) 24px}
+.how-inner{max-width:1100px;margin:0 auto}
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:40px}
+.how-col-head{padding:16px 20px;border-radius:var(--rl) var(--rl) 0 0}
+.hch-emp{background:rgba(26,122,74,.18);border:1px solid rgba(26,122,74,.22)}
+.hch-wrk{background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.18)}
+.hch-title{font-family:'Playfair Display',serif;font-size:.98rem;font-weight:700;color:#F7FAF8}
+.hch-sub{font-size:.74rem;color:rgba(247,250,248,.4);margin-top:2px}
+.how-steps{border:1px solid rgba(255,255,255,.07);border-top:none;border-radius:0 0 var(--rl) var(--rl)}
+.how-step{display:flex;gap:14px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);transition:background .15s}
+.how-step:last-child{border-bottom:none;border-radius:0 0 var(--rl) var(--rl)}
+.how-step:hover{background:rgba(255,255,255,.04)}
+.step-n{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.74rem;flex-shrink:0;margin-top:1px}
+.sn-g{background:var(--g);color:#fff}
+.sn-y{background:var(--gold);color:var(--dark)}
+.step-h{font-weight:700;color:#F7FAF8;font-size:.86rem;margin-bottom:2px}
+.step-p{font-size:.77rem;color:rgba(247,250,248,.45);line-height:1.6}
+.step-fee{display:inline-flex;margin-top:5px;padding:2px 9px;background:rgba(26,122,74,.15);border:1px solid rgba(26,122,74,.22);border-radius:100px;font-size:.68rem;font-weight:700;color:var(--gh);font-family:'DM Mono',monospace}
+@media(max-width:680px){.how-grid{grid-template-columns:1fr}}
+
+/* ── PRICING STRIP ── */
+.pricing-strip{background:var(--gp);border-top:1px solid var(--bord);border-bottom:1px solid var(--bord)}
+.ps-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.ps-item{padding:22px 18px;text-align:center;border-right:1px solid var(--bord);cursor:pointer;transition:background .15s}
+.ps-item:last-child{border-right:none}
+.ps-item:hover{background:rgba(26,122,74,.06)}
+.ps-ico{font-size:1.3rem;margin-bottom:6px}
+.ps-lbl{font-size:.72rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.ps-price{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:900;color:var(--g)}
+.ps-unit{font-size:.68rem;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace}
+@media(max-width:600px){.ps-inner{grid-template-columns:1fr 1fr}.ps-item:nth-child(2){border-right:none}}
+
+/* ── CTA BAND ── */
+.cta-band{background:linear-gradient(118deg,var(--g) 0%,var(--gd) 100%);padding:clamp(48px,7vw,80px) 24px;text-align:center;position:relative;overflow:hidden}
+.cta-band::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 50%,rgba(255,255,255,.06) 0%,transparent 60%)}
+.cta-h{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,3.5vw,2.5rem);font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:10px;position:relative}
+.cta-p{color:rgba(255,255,255,.72);font-size:.95rem;max-width:440px;margin:0 auto 32px;line-height:1.75;position:relative}
+.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.05);padding:52px 24px 28px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px}
+.f-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.25rem;color:#F7FAF8;letter-spacing:3px;display:block;margin-bottom:10px;text-decoration:none}
+.f-logo span{color:var(--gh)}
+.f-p{font-size:.8rem;color:rgba(247,250,248,.35);line-height:1.75;max-width:240px}
+.f-contact{margin-top:12px;font-size:.74rem;color:rgba(247,250,248,.25)}
+.f-col h4{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(247,250,248,.3);margin-bottom:13px}
+.f-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.f-col ul a{color:rgba(247,250,248,.45);text-decoration:none;font-size:.82rem;transition:color .2s}
+.f-col ul a:hover{color:#F7FAF8}
+.f-bottom{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.05);padding-top:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.f-bottom p{font-size:.72rem;color:rgba(255,255,255,.2)}
+@media(max-width:720px){footer{grid-template-columns:1fr 1fr;padding:36px 24px 24px}.f-col:first-child{grid-column:1/-1}}
+
+/* ══════════════════════════════════════════
+   MODALS & OVERLAYS
+══════════════════════════════════════════ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,31,21,.78);z-index:600;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.overlay.open{display:flex}
+/* desktop: center modal */
+@media(min-width:600px){
+  .overlay{align-items:center;padding:20px}
+  .modal{border-radius:var(--rx)!important;max-height:92vh}
+}
+.modal{background:#fff;width:100%;max-width:480px;border-radius:var(--rx) var(--rx) 0 0;max-height:96svh;overflow-y:auto;position:relative;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(min-width:600px){@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}}
+/* drag handle */
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0}
+.modal-head{padding:20px 24px 0}
+.modal-head h2{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--dark);margin-bottom:3px}
+.modal-head p{font-size:.8rem;color:var(--muted);padding-bottom:16px;border-bottom:1px solid var(--border)}
+.modal-body{padding:18px 24px}
+.modal-foot{padding:14px 24px 24px;display:flex;gap:8px}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:var(--light);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:var(--muted);transition:all .15s;z-index:2}
+.modal-close:hover{background:var(--border);color:var(--dark)}
+
+/* form fields */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:.74rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--dark);background:var(--light);outline:none;transition:border-color .2s,background .2s;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g);background:#fff}
+.field input.err{border-color:#DC2626}
+.field small{font-size:.72rem;color:var(--muted);margin-top:4px;display:block}
+.field small.err-msg{color:#DC2626}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.phone-wrap{display:flex}
+.phone-pre{padding:12px 13px;background:var(--light);border:1.5px solid var(--border);border-right:none;border-radius:var(--r) 0 0 var(--r);font-family:'DM Mono',monospace;font-size:.86rem;color:var(--mid);display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0}
+.phone-inp{border-radius:0 var(--r) var(--r) 0!important;border-left:none!important}
+.phone-inp:focus{border-left:1.5px solid var(--g)!important}
+
+/* OTP */
+.otp-wrap{display:flex;gap:8px;justify-content:center;margin:16px 0 8px}
+.otp-d{width:48px;height:58px;border:2px solid var(--border);border-radius:var(--rl);text-align:center;font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--dark);background:var(--light);outline:none;transition:all .18s;-webkit-appearance:none;appearance:none}
+.otp-d:focus{border-color:var(--g);background:#fff;transform:scale(1.05)}
+.otp-d.filled{border-color:var(--gd);background:var(--gp)}
+.otp-resend{text-align:center;font-size:.78rem;color:var(--muted);margin-top:10px}
+.otp-resend a{color:var(--g);cursor:pointer;font-weight:700}
+.otp-timer{font-family:'DM Mono',monospace;color:var(--g)}
+
+/* fee box */
+.fee-box{background:var(--gp);border:1px solid rgba(26,122,74,.18);border-radius:var(--r);padding:13px 15px;margin-bottom:14px}
+.fee-box-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--g);margin-bottom:9px;font-family:'DM Mono',monospace}
+.fee-row{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;margin-bottom:5px}
+.fee-row:last-child{margin-bottom:0;padding-top:7px;border-top:1px solid rgba(26,122,74,.14);font-weight:700}
+.fee-row span{color:var(--mid)}
+.fee-row strong{font-family:'DM Mono',monospace;color:var(--g)}
+
+/* info box */
+.info-box{border-radius:var(--r);padding:12px 14px;margin-bottom:14px;font-size:.8rem;line-height:1.65}
+.info-green{background:var(--gp);border:1px solid rgba(26,122,74,.18);color:var(--g)}
+.info-gold{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.22);color:var(--goldd)}
+.info-blue{background:rgba(37,99,235,.05);border:1px solid rgba(37,99,235,.15);color:#1D4ED8}
+
+/* auth steps */
+.auth-step{display:none}.auth-step.on{display:block}
+.step-indicator{display:flex;align-items:center;gap:6px;margin-bottom:18px}
+.si-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .2s}
+.si-dot.on{background:var(--g)}
+.si-dot.done{background:var(--gd)}
+.si-line{flex:1;height:2px;background:var(--border);transition:background .2s}
+.si-line.done{background:var(--g)}
+
+/* role cards */
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.role-card{border:2px solid var(--border);border-radius:var(--rl);padding:16px 14px;cursor:pointer;transition:all .18s;text-align:center;background:var(--white);user-select:none}
+.role-card:hover{border-color:var(--g);background:var(--gp)}
+.role-card.on{border-color:var(--g);background:var(--gp)}
+.role-card.on .rc-title{color:var(--g)}
+.rc-ico{font-size:1.8rem;margin-bottom:7px}
+.rc-title{font-weight:700;font-size:.88rem;color:var(--dark);margin-bottom:2px}
+.rc-desc{font-size:.72rem;color:var(--muted);line-height:1.5}
+
+/* payment pending */
+.pay-pending{text-align:center;padding:28px 0}
+.pp-spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--g);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pp-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:6px}
+.pp-sub{font-size:.8rem;color:var(--muted);line-height:1.65;max-width:280px;margin:0 auto 14px}
+.pp-phone{font-family:'DM Mono',monospace;font-size:.98rem;color:var(--g);font-weight:600}
+
+/* success */
+.modal-success{padding:44px 24px;text-align:center}
+.ms-ico{font-size:3rem;margin-bottom:12px}
+.ms-h{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark);margin-bottom:8px}
+.ms-p{color:var(--muted);font-size:.84rem;line-height:1.75;max-width:300px;margin:0 auto 22px}
+
+/* credit packs */
+.pack-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.pack{border:2px solid var(--border);border-radius:var(--rl);padding:14px 10px;text-align:center;cursor:pointer;transition:all .18s;position:relative}
+.pack:hover,.pack.on{border-color:var(--g);background:var(--gp)}
+.pack-amt{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--dark)}
+.pack-bonus{font-size:.68rem;color:var(--g);font-weight:700;margin:2px 0}
+.pack-price{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted)}
+.pack-popular{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--dark);font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:100px;white-space:nowrap}
+
+/* waitlist */
+.wl-info{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.22);border-radius:var(--r);padding:13px 15px;margin-bottom:14px}
+.wl-info-title{font-weight:700;font-size:.82rem;color:var(--goldd);margin-bottom:4px}
+.wl-info-body{font-size:.78rem;color:var(--mid);line-height:1.65}
+
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--dark);color:#F7FAF8;padding:13px 18px;border-radius:var(--rl);font-size:.84rem;font-weight:500;z-index:1000;transform:translateY(80px);opacity:0;transition:all .3s ease;border-left:3px solid var(--g);max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.35)}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:520px){.toast{left:16px;right:16px;bottom:16px}}
+
+/* loading skeleton */
+.skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--bord) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:var(--r)}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav class="nav" id="nav">
+  <a class="nav-logo" href="#">SH<span>I</span>NGA</a>
+  <ul class="nav-links">
+    <li><a href="#jobs">Find Jobs</a></li>
+    <li><a href="#workers">Find Workers</a></li>
+    <li><a href="#nearby">Near Me</a></li>
+    <li><a href="#how">How it Works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="wallet-chip" onclick="openM('walletM')" id="walletChip" style="display:none">
+      <span>💰</span>
+      <div><div class="wallet-amt" id="navWallet">RWF 0</div><div class="wallet-lbl">Wallet</div></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="openM('authM')">Sign In</button>
+    <button class="btn btn-primary btn-sm" onclick="openPostJob()">Post a Job</button>
+    <button class="nav-burger" onclick="toggleMenu()" id="burger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a class="mm-link" href="#jobs" onclick="closeMenu()">🔍 Find Jobs</a>
+  <a class="mm-link" href="#workers" onclick="closeMenu()">👤 Find Workers</a>
+  <a class="mm-link" href="#nearby" onclick="closeMenu()">📍 Near Me</a>
+  <a class="mm-link" href="#how" onclick="closeMenu()">❓ How it Works</a>
+  <a class="mm-link" href="#pricing" onclick="closeMenu()">💰 Pricing</a>
+  <div class="mm-acts">
+    <button class="btn btn-outline btn-full" onclick="closeMenu();openM('authM')">Sign In</button>
+    <button class="btn btn-primary btn-full" onclick="closeMenu();openPostJob()">Post a Job</button>
+  </div>
+</div>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-bg-text">SHINGA</div>
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-kicker">
+      <div class="hero-kicker-line"></div>
+      <div class="hero-kicker-txt">Rwanda's National Work Platform · All 30 Districts</div>
+    </div>
+    <h1 class="hero-h1">Find work.<br><em>Find workers.</em><br><strong>Get paid.</strong></h1>
+    <p class="hero-sub">From daily casual labour to permanent careers — SHINGA connects every type of worker with every type of employer across Rwanda. Simple. Fair. Fast.</p>
+    <div class="hero-ctas">
+      <button class="btn btn-primary btn-lg" onclick="document.getElementById('jobs').scrollIntoView({behavior:'smooth'})">Find a Job →</button>
+      <button class="btn btn-ghost btn-lg" onclick="openPostJob()">Post a Job</button>
+      <button class="btn btn-gold btn-lg" onclick="requestLocation()">📍 Workers Near Me</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hstat-n" id="hs1">3,240+</div><div class="hstat-l">Verified Workers</div></div>
+      <div><div class="hstat-n" id="hs2">890+</div><div class="hstat-l">Jobs Posted</div></div>
+      <div><div class="hstat-n">30</div><div class="hstat-l">Districts Covered</div></div>
+      <div><div class="hstat-n">7</div><div class="hstat-l">Job Types</div></div>
+      <div><div class="hstat-n" id="hs4">RWF 0</div><div class="hstat-l">Platform Discount</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SEARCH BAR ══ -->
+<div class="search-bar" id="searchBar">
+  <div class="search-tabs">
+    <button class="stab on-jobs" id="stJ" onclick="switchTab('jobs')">🔍 Find Jobs</button>
+    <button class="stab" id="stW" onclick="switchTab('workers')">👤 Find Workers</button>
+    <button class="stab" id="stN" onclick="switchTab('nearby')">📍 Near Me</button>
+  </div>
+  <div class="search-form" id="sfJobs">
+    <div class="sf wide"><input type="text" id="jobKeyword" placeholder="Job title, skill, keyword…" oninput="filterJobs()"></div>
+    <div class="sf"><select id="jobCat" onchange="filterJobs()">
+      <option value="">All Categories</option>
+      <option value="domestic">🏠 Domestic</option><option value="trades">🔧 Trades</option>
+      <option value="health">👶 Health & Care</option><option value="education">📚 Education</option>
+      <option value="technology">💻 Technology</option><option value="casual">⚡ Casual</option>
+    </select></div>
+    <div class="sf"><select id="jobDistrict" onchange="filterJobs()">
+      <option value="">All Districts</option>
+      <option>Gasabo</option><option>Kicukiro</option><option>Nyarugenge</option>
+      <option>Musanze</option><option>Rubavu</option><option>Huye</option><option>Rwamagana</option>
+    </select></div>
+    <button class="btn btn-primary" onclick="filterJobs()">Search</button>
+  </div>
+  <div class="search-form" id="sfWorkers" style="display:none">
+    <div class="sf wide"><input type="text" id="wKeyword" placeholder="Skill, trade, or profession…" oninput="filterWorkers()"></div>
+    <div class="sf"><select id="wCat" onchange="filterWorkers()">
+      <option value="">All Categories</option>
+      <option value="domestic">🏠 Domestic</option><option value="trades">🔧 Trades</option>
+      <option value="health">👶 Health & Care</option><option value="education">📚 Education</option>
+      <option value="technology">💻 Technology</option><option value="casual">⚡ Casual</option>
+    </select></div>
+    <div class="sf"><select id="wDistrict" onchange="filterWorkers()">
+      <option value="">All Districts</option>
+      <option>Gasabo</option><option>Kicukiro</option><option>Nyarugenge</option>
+      <option>Musanze</option><option>Rubavu</option><option>Huye</option>
+    </select></div>
+    <button class="btn btn-primary" onclick="filterWorkers()">Search</button>
+  </div>
+  <div id="sfNearby" style="display:none;flex-direction:column;gap:10px;max-width:860px;margin:0 auto">
+    <div class="search-nearby-opts">
+      <div class="sf"><select id="nbCat" onchange="nearbySearch()">
+        <option value="">All Categories</option>
+        <option value="domestic">🏠 Domestic</option><option value="trades">🔧 Trades</option>
+        <option value="health">👶 Health & Care</option><option value="casual">⚡ Casual</option>
+        <option value="technology">💻 Technology</option>
+      </select></div>
+      <div class="radius-wrap">
+        <label>Within</label>
+        <input type="range" min="1" max="20" value="5" id="radiusSlider" oninput="updateRadius(this.value)">
+        <span class="rv" id="radiusVal">5 km</span>
+      </div>
+      <label class="avail-check"><input type="checkbox" id="availNowCb" onchange="nearbySearch()"> Available Now only</label>
+      <button class="btn btn-primary btn-sm" onclick="requestLocation()">📍 Use My Location</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ STATS BAND ══ -->
+<div class="stats-band">
+  <div class="sb-item"><div class="sb-n">3,240+</div><div class="sb-l">Active Workers</div></div>
+  <div class="sb-item"><div class="sb-n">890+</div><div class="sb-l">Live Jobs</div></div>
+  <div class="sb-item"><div class="sb-n">30</div><div class="sb-l">Districts</div></div>
+  <div class="sb-item"><div class="sb-n">7</div><div class="sb-l">Job Types</div></div>
+  <div class="sb-item"><div class="sb-n">98%</div><div class="sb-l">Hire Success</div></div>
+</div>
+
+<!-- ══ NEARBY SECTION ══ -->
+<div class="nearby-wrap" id="nearby">
+  <div class="nearby-inner">
+    <div class="nearby-head">
+      <div>
+        <div class="nearby-eye">📍 Location-Based Search</div>
+        <div class="nearby-h">Workers Near You — <em style="font-style:italic;color:var(--gh)">Right Now</em></div>
+        <div class="loc-status">
+          <div class="loc-dot ld-idle" id="locDot"></div>
+          <span id="locTxt">Share your location to see nearby workers</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="locBtn" onclick="requestLocation()">
+        <span id="locBtnIco">📍</span> <span id="locBtnTxt">Find Workers Near Me</span>
+      </button>
+    </div>
+    <div class="urgent-card" onclick="openUrgentPost()">
+      <div class="uc-badge">⚡ Urgent Hire</div>
+      <div class="uc-title">Need someone today? Post urgently — notify workers within 5km via SMS instantly.</div>
+      <div class="uc-sub">Load lifters, babysitters, cleaners, drivers — workers nearby get an SMS the moment you post. Fast, direct, fair.</div>
+    </div>
+    <div id="nearbyControls" style="display:none;margin-bottom:18px">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+        <div class="radius-wrap" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)">
+          <label style="color:rgba(247,250,248,.5)">Within</label>
+          <input type="range" min="1" max="20" value="5" id="rSlider2" oninput="updateRadius2(this.value)">
+          <span class="rv" id="rVal2" style="color:var(--gh)">5 km</span>
+        </div>
+        <label class="avail-check" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:rgba(247,250,248,.6)">
+          <input type="checkbox" id="availOnlyCb" onchange="nearbySearch()"> Available Now only
+        </label>
+      </div>
+      <div class="pills" id="nearbyPills" style="margin-bottom:0">
+        <button class="pill on" onclick="setNbPill(this,'')" style="background:var(--g);color:#fff;border-color:var(--g)">All</button>
+        <button class="pill" onclick="setNbPill(this,'domestic')" style="border-color:rgba(255,255,255,.15);color:rgba(247,250,248,.6);background:rgba(255,255,255,.04)">🏠 Domestic</button>
+        <button class="pill" onclick="setNbPill(this,'trades')" style="border-color:rgba(255,255,255,.15);color:rgba(247,250,248,.6);background:rgba(255,255,255,.04)">🔧 Trades</button>
+        <button class="pill" onclick="setNbPill(this,'health')" style="border-color:rgba(255,255,255,.15);color:rgba(247,250,248,.6);background:rgba(255,255,255,.04)">👶 Care</button>
+        <button class="pill" onclick="setNbPill(this,'casual')" style="border-color:rgba(255,255,255,.15);color:rgba(247,250,248,.6);background:rgba(255,255,255,.04)">⚡ Casual</button>
+        <button class="pill" onclick="setNbPill(this,'technology')" style="border-color:rgba(255,255,255,.15);color:rgba(247,250,248,.6);background:rgba(255,255,255,.04)">💻 Tech</button>
+      </div>
+    </div>
+    <div id="nearbyResults">
+      <div class="nearby-empty">
+        <div class="ne-ico">📍</div>
+        <div class="ne-h">Tap to find workers near you</div>
+        <div class="ne-p">We'll show available workers within your chosen radius — sorted by distance. Closest first, available now first.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ JOB TYPES ══ -->
+<div style="padding:clamp(40px,6vw,64px) 24px;max-width:1200px;margin:0 auto">
+  <div class="sec-head">
+    <div><div class="sec-eye">What are you hiring for?</div><div class="sec-h">7 ways to hire on SHINGA</div></div>
+  </div>
+  <div class="type-grid" id="typeGrid">
+    <div class="tcard on" onclick="setType(this,'')"><div class="tc-ico">📋</div><div class="tc-title">All Jobs</div><div class="tc-desc">Browse everything</div><div class="tc-fee" id="tf-all"></div></div>
+    <div class="tcard" onclick="setType(this,'daily')"><div class="tc-ico">☀️</div><div class="tc-title">Daily</div><div class="tc-desc">One day of work</div><div class="tc-fee" id="tf-daily"></div></div>
+    <div class="tcard" onclick="setType(this,'weekly')"><div class="tc-ico">📅</div><div class="tc-title">Weekly</div><div class="tc-desc">Week-long engagements</div><div class="tc-fee" id="tf-weekly"></div></div>
+    <div class="tcard" onclick="setType(this,'monthly')"><div class="tc-ico">🗓️</div><div class="tc-title">Monthly</div><div class="tc-desc">Month-by-month</div><div class="tc-fee" id="tf-monthly"></div></div>
+    <div class="tcard" onclick="setType(this,'contract')"><div class="tc-ico">📝</div><div class="tc-title">Contract</div><div class="tc-desc">Fixed-term projects</div><div class="tc-fee" id="tf-contract"></div></div>
+    <div class="tcard" onclick="setType(this,'permanent')"><div class="tc-ico">🏢</div><div class="tc-title">Permanent</div><div class="tc-desc">Full-time employment</div><div class="tc-fee" id="tf-permanent"></div></div>
+    <div class="tcard" onclick="setType(this,'task')"><div class="tc-ico">⚡</div><div class="tc-title">Per Task</div><div class="tc-desc">Pay per deliverable</div><div class="tc-fee" id="tf-task"></div></div>
+    <div class="tcard" onclick="setType(this,'bulk')"><div class="tc-ico">👥</div><div class="tc-title">Bulk Hire</div><div class="tc-desc">10 or more workers</div><div class="tc-fee" id="tf-bulk"></div></div>
+  </div>
+</div>
+
+<!-- ══ CAT STRIP ══ -->
+<div class="cat-strip">
+  <div class="cat-inner">
+    <div class="cat-item on" onclick="setCat(this,'')"><div class="cat-ico">🌍</div><div class="cat-lbl">All</div><div class="cat-ct" id="cc-all">Loading…</div></div>
+    <div class="cat-item" onclick="setCat(this,'domestic')"><div class="cat-ico">🏠</div><div class="cat-lbl">Domestic</div><div class="cat-ct" id="cc-dom">–</div></div>
+    <div class="cat-item" onclick="setCat(this,'trades')"><div class="cat-ico">🔧</div><div class="cat-lbl">Trades</div><div class="cat-ct" id="cc-tra">–</div></div>
+    <div class="cat-item" onclick="setCat(this,'health')"><div class="cat-ico">👶</div><div class="cat-lbl">Health & Care</div><div class="cat-ct" id="cc-hea">–</div></div>
+    <div class="cat-item" onclick="setCat(this,'education')"><div class="cat-ico">📚</div><div class="cat-lbl">Education</div><div class="cat-ct" id="cc-edu">–</div></div>
+    <div class="cat-item" onclick="setCat(this,'technology')"><div class="cat-ico">💻</div><div class="cat-lbl">Technology</div><div class="cat-ct" id="cc-tec">–</div></div>
+    <div class="cat-item" onclick="setCat(this,'casual')"><div class="cat-ico">⚡</div><div class="cat-lbl">Casual</div><div class="cat-ct" id="cc-cas">–</div></div>
+  </div>
+</div>
+
+<!-- ══ JOBS LIST ══ -->
+<div class="section" id="jobs">
+  <div class="sec-head">
+    <div><div class="sec-eye">Live Opportunities</div><div class="sec-h">Open Jobs</div></div>
+    <button class="btn btn-soft btn-sm" onclick="openPostJob()">+ Post a Job</button>
+  </div>
+  <div class="jobs-list" id="jobsList"></div>
+  <div style="text-align:center;margin-top:24px" id="jobsMore" style="display:none">
+    <button class="btn btn-soft">Load More Jobs</button>
+  </div>
+</div>
+
+<!-- ══ WORKERS GRID ══ -->
+<div style="background:var(--light);border-top:1px solid var(--border);padding:clamp(40px,6vw,64px) 24px" id="workers">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="sec-head">
+      <div><div class="sec-eye">Worker Directory</div><div class="sec-h">Browse Available Workers</div></div>
+      <button class="btn btn-soft btn-sm" onclick="openM('joinWorkerM')">Join as Worker</button>
+    </div>
+    <div class="pills" id="workerPills">
+      <button class="pill on" onclick="setWPill(this,'')">All</button>
+      <button class="pill" onclick="setWPill(this,'domestic')">🏠 Domestic</button>
+      <button class="pill" onclick="setWPill(this,'trades')">🔧 Trades</button>
+      <button class="pill" onclick="setWPill(this,'health')">👶 Health & Care</button>
+      <button class="pill" onclick="setWPill(this,'education')">📚 Education</button>
+      <button class="pill" onclick="setWPill(this,'technology')">💻 Technology</button>
+      <button class="pill" onclick="setWPill(this,'casual')">⚡ Casual</button>
+    </div>
+    <div class="workers-grid" id="workersList"></div>
+  </div>
+</div>
+
+<!-- ══ PRICING STRIP ══ -->
+<div class="pricing-strip" id="pricing">
+  <div class="ps-inner">
+    <div class="ps-item" onclick="openPostJob()">
+      <div class="ps-ico">📋</div><div class="ps-lbl">Post a Job</div>
+      <div class="ps-price" id="ps-post">from RWF 2,000</div>
+      <div class="ps-unit">per listing</div>
+    </div>
+    <div class="ps-item" onclick="openM('applyM')">
+      <div class="ps-ico">✋</div><div class="ps-lbl">Apply to Job</div>
+      <div class="ps-price" id="ps-apply">RWF 500</div>
+      <div class="ps-unit">per application</div>
+    </div>
+    <div class="ps-item">
+      <div class="ps-ico">📞</div><div class="ps-lbl">Contact Worker</div>
+      <div class="ps-price" id="ps-contact">RWF 1,500</div>
+      <div class="ps-unit">single contact</div>
+    </div>
+    <div class="ps-item" onclick="openM('verifyM')">
+      <div class="ps-ico">✅</div><div class="ps-lbl">Get Verified</div>
+      <div class="ps-price" id="ps-verify">RWF 10,000</div>
+      <div class="ps-unit">per year</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOW IT WORKS ══ -->
+<div class="how-wrap" id="how">
+  <div class="how-inner">
+    <div style="text-align:center;margin-bottom:0">
+      <div class="sec-eye" style="color:var(--gh)">Simple by design</div>
+      <div class="sec-h" style="color:#F7FAF8;font-size:clamp(1.5rem,3vw,2.1rem);margin-top:6px">How SHINGA works</div>
+    </div>
+    <div class="how-grid">
+      <!-- Employer -->
+      <div>
+        <div class="how-col-head hch-emp"><div class="hch-title">🏢 For Employers</div><div class="hch-sub">Post jobs, find workers, hire fast</div></div>
+        <div class="how-steps">
+          <div class="how-step"><div class="step-n sn-g">1</div><div><div class="step-h">Post your job</div><div class="step-p">Choose job type, set slots needed, describe the role. Takes 2 minutes.</div><div class="step-fee" id="hw-post">RWF 2,000 – 15,000</div></div></div>
+          <div class="how-step"><div class="step-n sn-g">2</div><div><div class="step-h">Receive applications</div><div class="step-p">Workers apply (up to 3× your slot count). You review profiles — all in your dashboard.</div></div></div>
+          <div class="how-step"><div class="step-n sn-g">3</div><div><div class="step-h">Contact your pick</div><div class="step-p">Found the right person? Pay to reveal their number and connect directly.</div><div class="step-fee" id="hw-contact">RWF 1,500 per contact</div></div></div>
+          <div class="how-step"><div class="step-n sn-g">4</div><div><div class="step-h">Mark as hired — done</div><div class="step-p">Click hired. Slot fills. Other applicants are notified. Job closes automatically when full.</div></div></div>
+        </div>
+      </div>
+      <!-- Worker -->
+      <div>
+        <div class="how-col-head hch-wrk"><div class="hch-title">👷 For Workers</div><div class="hch-sub">Find work, get hired, get paid</div></div>
+        <div class="how-steps">
+          <div class="how-step"><div class="step-n sn-y">1</div><div><div class="step-h">Create your profile</div><div class="step-p">Phone number + OTP. Takes 60 seconds. Free. Your profile goes live immediately.</div></div></div>
+          <div class="how-step"><div class="step-n sn-y">2</div><div><div class="step-h">Browse & apply</div><div class="step-p">Find a job that fits. Check the slot bar — only apply when slots are open. Never pay into a filled position.</div><div class="step-fee" id="hw-apply">RWF 500 per application</div></div></div>
+          <div class="how-step"><div class="step-n sn-y">3</div><div><div class="step-h">Get contacted</div><div class="step-p">Employer contacts you directly. Negotiate wages and terms — SHINGA doesn't interfere.</div></div></div>
+          <div class="how-step"><div class="step-n sn-y">4</div><div><div class="step-h">Get Verified — stand out</div><div class="step-p">Pay once per year. Verified badge appears on your profile. Verified workers are hired 3× faster.</div><div class="step-fee" id="hw-verify">RWF 10,000 / year</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CTA ══ -->
+<div class="cta-band">
+  <div class="cta-h">Rwanda's workforce is on SHINGA.</div>
+  <div class="cta-p">3,240+ verified workers. 890+ live jobs. All 30 districts. Free to browse — pay only when you act.</div>
+  <div class="cta-row">
+    <button class="btn btn-ghost btn-lg" onclick="openM('joinWorkerM')">Join as Worker — Free</button>
+    <button class="btn btn-gold btn-lg" onclick="openPostJob()">Post a Job Now</button>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div>
+    <a class="f-logo" href="#">SH<span>I</span>NGA</a>
+    <div class="f-p">Rwanda's national platform for every type of work — from daily casual labour to permanent careers. Connecting workers and employers across all 30 districts.</div>
+    <div class="f-contact">📧 hello@shinga.rw &nbsp;·&nbsp; 📞 +250 700 000 000</div>
+  </div>
+  <div class="f-col">
+    <h4>For Workers</h4>
+    <ul>
+      <li><a href="#jobs">Browse Jobs</a></li>
+      <li><a href="#" onclick="openM('joinWorkerM')">Create Profile</a></li>
+      <li><a href="#" onclick="openM('verifyM')">Get Verified</a></li>
+      <li><a href="#nearby">Near Me Jobs</a></li>
+    </ul>
+  </div>
+  <div class="f-col">
+    <h4>For Employers</h4>
+    <ul>
+      <li><a href="#workers">Browse Workers</a></li>
+      <li><a href="#" onclick="openPostJob()">Post a Job</a></li>
+      <li><a href="#" onclick="openM('walletM')">Top Up Wallet</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+    </ul>
+  </div>
+  <div class="f-col">
+    <h4>Company</h4>
+    <ul>
+      <li><a href="#">About SHINGA</a></li>
+      <li><a href="#">Bestie Companies</a></li>
+      <li><a href="#">Privacy Policy</a></li>
+      <li><a href="#">Terms of Use</a></li>
+    </ul>
+  </div>
+  <div class="f-bottom">
+    <p>© 2025 SHINGA Rwanda · Bestie Companies Ltd · All rights reserved</p>
+    <p>🇷🇼 Made in Rwanda</p>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+
+<!-- AUTH MODAL (inline — appears on Apply click if not logged in) -->
+<div class="overlay" id="authM">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeM('authM')">✕</button>
+    <!-- Step 1: role + phone -->
+    <div class="auth-step on" id="as1">
+      <div class="modal-head">
+        <h2>Sign in to continue</h2>
+        <p id="authContext">Enter your phone — we'll send a quick code. Takes 30 seconds.</p>
+      </div>
+      <div class="modal-body">
+        <div class="role-grid" id="authRoleGrid">
+          <div class="role-card on" id="roleW" onclick="pickRole('worker')"><div class="rc-ico">👷</div><div class="rc-title">I'm a Worker</div><div class="rc-desc">I want to find jobs</div></div>
+          <div class="role-card" id="roleE" onclick="pickRole('employer')"><div class="rc-ico">🏢</div><div class="rc-title">I'm an Employer</div><div class="rc-desc">I want to hire</div></div>
+        </div>
+        <div class="field" id="authNameField" style="display:none">
+          <label>Full Name</label>
+          <input type="text" id="authName" placeholder="e.g. Solange Ingabire">
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <div class="phone-wrap">
+            <div class="phone-pre">🇷🇼 +250</div>
+            <input class="phone-inp" type="tel" id="authPhone" placeholder="7XX XXX XXX" maxlength="9" inputmode="numeric">
+          </div>
+          <small>You'll receive a 6-digit code via SMS.</small>
+        </div>
+        <div class="field" id="authDistrictField" style="display:none">
+          <label>Your District</label>
+          <select id="authDistrict">
+            <option value="">Select district</option>
+            <optgroup label="Kigali City"><option>Gasabo</option><option>Kicukiro</option><option>Nyarugenge</option></optgroup>
+            <optgroup label="Northern Province"><option>Burera</option><option>Gakenke</option><option>Gicumbi</option><option>Musanze</option><option>Rulindo</option></optgroup>
+            <optgroup label="Southern Province"><option>Gisagara</option><option>Huye</option><option>Kamonyi</option><option>Muhanga</option><option>Nyamagabe</option><option>Nyanza</option><option>Nyaruguru</option><option>Ruhango</option></optgroup>
+            <optgroup label="Eastern Province"><option>Bugesera</option><option>Gatsibo</option><option>Kayonza</option><option>Kirehe</option><option>Ngoma</option><option>Nyagatare</option><option>Rwamagana</option></optgroup>
+            <optgroup label="Western Province"><option>Karongi</option><option>Ngororero</option><option>Nyabihu</option><option>Nyamasheke</option><option>Rubavu</option><option>Rutsiro</option><option>Rusizi</option></optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot" style="flex-direction:column;gap:8px">
+        <button class="btn btn-primary btn-full" id="authSendBtn" onclick="sendAuthOtp()">Send Code</button>
+        <p style="text-align:center;font-size:.76rem;color:var(--muted)">By continuing you agree to our <a href="#" style="color:var(--g)">Terms of Use</a></p>
+      </div>
+    </div>
+    <!-- Step 2: OTP -->
+    <div class="auth-step" id="as2">
+      <div class="modal-head">
+        <h2>Enter your code</h2>
+        <p>We sent a 6-digit code to <strong id="authPhoneDisplay">+250 7XX…</strong></p>
+      </div>
+      <div class="modal-body">
+        <div class="step-indicator">
+          <div class="si-dot done"></div><div class="si-line done"></div>
+          <div class="si-dot on"></div><div class="si-line"></div>
+          <div class="si-dot"></div>
+        </div>
+        <div class="otp-wrap" id="otpInputs">
+          <input class="otp-d" type="text" maxlength="1" inputmode="numeric" oninput="otpNext(this,0)" onkeydown="otpBack(event,this,0)">
+          <input class="otp-d" type="text" maxlength="1" inputmode="numeric" oninput="otpNext(this,1)" onkeydown="otpBack(event,this,1)">
+          <input class="otp-d" type="text" maxlength="1" inputmode="numeric" oninput="otpNext(this,2)" onkeydown="otpBack(event,this,2)">
+          <input class="otp-d" type="text" maxlength="1" inputmode="numeric" oninput="otpNext(this,3)" onkeydown="otpBack(event,this,3)">
+          <input class="otp-d" type="text" maxlength="1" inputmode="numeric" oninput="otpNext(this,4)" onkeydown="otpBack(event,this,4)">
+          <input class="otp-d" type="text" maxlength="1" inputmode="numeric" oninput="otpNext(this,5)" onkeydown="otpBack(event,this,5)">
+        </div>
+        <div class="otp-resend">No code? <a id="resendLink" onclick="resendOtp()">Resend in <span class="otp-timer" id="otpCd">60s</span></a></div>
+      </div>
+      <div class="modal-foot" style="flex-direction:column;gap:8px">
+        <button class="btn btn-primary btn-full" id="otpVerifyBtn" onclick="verifyOtp()">Verify Code</button>
+        <button class="btn btn-soft btn-full" onclick="goAuthStep(1)">← Change number</button>
+      </div>
+    </div>
+    <!-- Step 3: quick profile (new users) -->
+    <div class="auth-step" id="as3">
+      <div class="modal-head">
+        <h2 id="as3Title">Almost done</h2>
+        <p id="as3Sub">Tell us one thing about yourself so employers can find you.</p>
+      </div>
+      <div class="modal-body">
+        <div class="step-indicator">
+          <div class="si-dot done"></div><div class="si-line done"></div>
+          <div class="si-dot done"></div><div class="si-line done"></div>
+          <div class="si-dot on"></div>
+        </div>
+        <div id="workerQuickFields">
+          <div class="field"><label>What is your skill?</label><input type="text" id="quickSkill" placeholder="e.g. Babysitter, Electrician, Cook…"></div>
+          <div class="field"><label>Your Rate (RWF)</label>
+            <div style="display:flex;gap:8px">
+              <input type="number" id="quickRate" placeholder="e.g. 8000" style="flex:1;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:.92rem;background:var(--light);outline:none">
+              <select id="quickUnit" style="padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:.88rem;background:var(--light);outline:none;color:var(--dark)">
+                <option value="day">/ day</option><option value="week">/ week</option><option value="month">/ month</option><option value="hour">/ hour</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div id="employerQuickFields" style="display:none">
+          <div class="field"><label>Business / Organisation Name</label><input type="text" id="quickBiz" placeholder="e.g. BuildRight Co., Private Household…"><small>Enter "Private" if hiring for home use.</small></div>
+        </div>
+        <div class="info-box info-green">✓ Your profile will go live immediately after this step. You can add more details from your dashboard.</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-primary btn-full" onclick="completeProfile()">Complete & Continue →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APPLY TO JOB MODAL -->
+<div class="overlay" id="applyM">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeM('applyM')">✕</button>
+    <div class="modal-head">
+      <h2>Apply for this Job</h2>
+      <p id="applyJobTitle">Loading…</p>
+    </div>
+    <div class="modal-body">
+      <div id="applySlotBanner"></div>
+      <div class="field"><label>Cover Note <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <textarea id="applyNote" placeholder="Briefly introduce yourself — why are you the right person for this job?" rows="3" style="resize:none"></textarea>
+        <small>A short, honest note gets 2× more responses than no note.</small>
+      </div>
+      <div class="fee-box">
+        <div class="fee-box-title">Application Fee</div>
+        <div class="fee-row"><span>Application fee</span><strong id="applyFeeAmt">RWF 500</strong></div>
+        <div class="fee-row" id="applyDiscRow" style="display:none"><span id="applyDiscLabel">Discount</span><strong id="applyDiscAmt" style="color:var(--goldd)">-RWF 0</strong></div>
+        <div class="fee-row"><span>Total to pay</span><strong id="applyFeeTotal">RWF 500</strong></div>
+      </div>
+      <div class="info-box info-blue">💡 Your application includes your full profile — skills, rate, district, and any reviews. Make sure your profile is complete.</div>
+      <!-- MoMo payment -->
+      <div class="field"><label>Pay from (MoMo Number)</label>
+        <div class="phone-wrap">
+          <div class="phone-pre">🇷🇼 +250</div>
+          <input class="phone-inp" type="tel" id="applyMoMo" placeholder="7XX XXX XXX" maxlength="9" inputmode="numeric">
+        </div>
+        <small>MTN MoMo or Airtel Money. You'll get a push notification to approve.</small>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" style="flex:1" id="applySubmitBtn" onclick="submitApplication()">Pay & Apply — RWF <span id="applyBtnAmt">500</span></button>
+      <button class="btn btn-soft" onclick="closeM('applyM')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- APPLY PAYING (MoMo pending) -->
+<div class="overlay" id="applyPayingM">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-body" style="padding:36px 24px">
+      <div class="pay-pending">
+        <div class="pp-spinner"></div>
+        <div class="pp-title">Approve on your phone</div>
+        <div class="pp-sub">Check your MTN MoMo app or Airtel Money for a payment request of</div>
+        <div class="pp-phone" id="payAmt">RWF 500</div>
+        <div style="margin-top:14px;font-size:.76rem;color:var(--muted)">This screen closes automatically once approved. Do not close it.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APPLY SUCCESS -->
+<div class="overlay" id="applySuccessM">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-success">
+      <div class="ms-ico">🎉</div>
+      <div class="ms-h">Application Sent!</div>
+      <div class="ms-p">Your application is with the employer. You'll receive an SMS if they want to contact you. Good luck!</div>
+      <button class="btn btn-primary btn-full" onclick="closeM('applySuccessM')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- WAITLIST MODAL -->
+<div class="overlay" id="waitlistM">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeM('waitlistM')">✕</button>
+    <div class="modal-head"><h2>Join the Waitlist</h2><p id="wlJobTitle">This job's application queue is full.</p></div>
+    <div class="modal-body">
+      <div class="wl-info">
+        <div class="wl-info-title">⏳ Queue is full — but you can still get this job</div>
+        <div class="wl-info-body">Join the waitlist <strong>for free</strong>. If a slot reopens, you'll get an SMS first and can choose to apply then. You only pay RWF 500 if you decide to apply.</div>
+      </div>
+      <div class="info-box info-green">✓ Joining the waitlist is <strong>completely free</strong>. No payment until you choose to apply.</div>
+      <div class="field"><label>Your Name</label><input type="text" id="wlName" placeholder="Full name"></div>
+      <div class="field"><label>Phone (for SMS notification)</label>
+        <div class="phone-wrap"><div class="phone-pre">🇷🇼 +250</div><input class="phone-inp" type="tel" id="wlPhone" placeholder="7XX XXX XXX" maxlength="9" inputmode="numeric"></div>
+        <small>We'll SMS you the moment a slot opens — no spam.</small>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-gold" style="flex:1" onclick="joinWaitlist()">Join Waitlist (Free)</button>
+      <button class="btn btn-soft" onclick="closeM('waitlistM')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- WAITLIST SUCCESS -->
+<div class="overlay" id="wlSuccessM">
+  <div class="modal"><div class="modal-success">
+    <div class="ms-ico">⏳</div>
+    <div class="ms-h">You're on the waitlist!</div>
+    <div class="ms-p">We'll SMS you at +250 <span id="wlPhoneDisplay">–</span> the moment a slot opens. You decide then — no payment until you do.</div>
+    <button class="btn btn-primary btn-full" onclick="closeM('wlSuccessM')">Done</button>
+  </div></div>
+</div>
+
+<!-- POST JOB MODAL -->
+<div class="overlay" id="postJobM">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeM('postJobM')">✕</button>
+    <div class="modal-head"><h2>Post a Job</h2><p>Tell us about the position. Your listing goes live once payment is confirmed.</p></div>
+    <div class="modal-body">
+      <div class="field"><label>Job Title</label><input type="text" id="pjTitle" placeholder="e.g. House Cleaner, Electrician, Babysitter…"></div>
+      <div class="form-row">
+        <div class="field"><label>Job Type</label><select id="pjType" onchange="calcPostFee()">
+          <option value="daily">Daily — RWF 2,000</option>
+          <option value="weekly">Weekly — RWF 4,000</option>
+          <option value="monthly">Monthly — RWF 8,000</option>
+          <option value="contract">Contract — RWF 8,000</option>
+          <option value="permanent">Permanent — RWF 8,000</option>
+          <option value="task">Per Task — RWF 4,000</option>
+          <option value="bulk">Bulk Hire — RWF 15,000</option>
+        </select></div>
+        <div class="field"><label>Slots Needed</label><input type="number" id="pjSlots" min="1" max="500" value="1" oninput="calcPostFee()" placeholder="How many workers?"><small>How many workers do you need?</small></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Category</label><select id="pjCat">
+          <option value="domestic">🏠 Domestic</option><option value="trades">🔧 Trades</option>
+          <option value="health">👶 Health & Care</option><option value="education">📚 Education</option>
+          <option value="technology">💻 Technology</option><option value="casual">⚡ Casual</option>
+        </select></div>
+        <div class="field"><label>District</label><select id="pjDist">
+          <option>Gasabo</option><option>Kicukiro</option><option>Nyarugenge</option><option>Musanze</option><option>Rubavu</option><option>Huye</option><option>Rwamagana</option>
+        </select></div>
+      </div>
+      <div class="field"><label>Job Description</label><textarea id="pjDesc" rows="3" placeholder="Describe the role, requirements, hours, any conditions…" style="resize:none"></textarea></div>
+      <div class="form-row">
+        <div class="field"><label>Pay Amount (RWF)</label><input type="number" id="pjPay" placeholder="e.g. 8000"></div>
+        <div class="field"><label>Pay Period</label><select id="pjPayUnit"><option value="day">/ Day</option><option value="week">/ Week</option><option value="month">/ Month</option><option value="task">/ Task</option></select></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <input type="checkbox" id="pjUrgent" style="accent-color:var(--gold);width:16px;height:16px;cursor:pointer">
+        <label for="pjUrgent" style="font-size:.84rem;color:var(--mid);cursor:pointer">⚡ <strong>Mark as Urgent</strong> — notifies nearby workers via SMS instantly (+RWF 0)</label>
+      </div>
+      <div class="fee-box">
+        <div class="fee-box-title">Listing Fee</div>
+        <div class="fee-row"><span id="pjFeeLabel">Daily listing</span><strong id="pjFeeBase">RWF 2,000</strong></div>
+        <div class="fee-row" id="pjDiscRow" style="display:none"><span id="pjDiscLabel">Discount</span><strong id="pjDiscAmt" style="color:var(--goldd)">-RWF 0</strong></div>
+        <div class="fee-row"><span>Total</span><strong id="pjFeeTotal">RWF 2,000</strong></div>
+      </div>
+      <div class="field"><label>Pay from (MoMo Number)</label>
+        <div class="phone-wrap"><div class="phone-pre">🇷🇼 +250</div><input class="phone-inp" type="tel" id="pjMoMo" placeholder="7XX XXX XXX" maxlength="9" inputmode="numeric"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" style="flex:1" id="pjSubmitBtn" onclick="submitPostJob()">Post Job — RWF <span id="pjBtnAmt">2,000</span></button>
+      <button class="btn btn-soft" onclick="closeM('postJobM')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST JOB SUCCESS -->
+<div class="overlay" id="postSuccessM">
+  <div class="modal"><div class="modal-success">
+    <div class="ms-ico">🚀</div>
+    <div class="ms-h">Job posted!</div>
+    <div class="ms-p">Your listing is live. Workers across Rwanda can now find and apply for it. You'll get SMS notifications when applications arrive.</div>
+    <button class="btn btn-primary btn-full" onclick="closeM('postSuccessM')">View My Jobs</button>
+  </div></div>
+</div>
+
+<!-- CONTACT WORKER MODAL -->
+<div class="overlay" id="contactM">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeM('contactM')">✕</button>
+    <div class="modal-head"><h2>Contact Worker</h2><p id="contactWorkerName">Reveal phone number to connect directly.</p></div>
+    <div class="modal-body">
+      <div id="contactRevealState">
+        <div class="fee-box">
+          <div class="fee-box-title">Contact Fee</div>
+          <div class="fee-row"><span>Single contact</span><strong id="contactFeeAmt">RWF 1,500</strong></div>
+          <div class="fee-row" id="contactDiscRow" style="display:none"><span>Discount</span><strong id="contactDiscAmt" style="color:var(--goldd)"></strong></div>
+          <div class="fee-row"><span>Total</span><strong id="contactFeeTotal">RWF 1,500</strong></div>
+        </div>
+        <div class="info-box info-blue">💡 Save with bundles: 5 contacts for RWF 6,000 · 15 contacts for RWF 15,000</div>
+        <div class="field"><label>Your MoMo Number</label>
+          <div class="phone-wrap"><div class="phone-pre">🇷🇼 +250</div><input class="phone-inp" type="tel" id="contactMoMo" placeholder="7XX XXX XXX" maxlength="9" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div id="contactRevealedState" style="display:none">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:2rem;margin-bottom:10px">📞</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:4px">Phone number for <strong id="contactRevealName"></strong></div>
+          <a id="contactPhoneLink" href="tel:" style="font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--g);text-decoration:none;display:block;margin:8px 0"></a>
+          <div style="font-size:.74rem;color:var(--muted)">Tap to call directly · Also valid for WhatsApp</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot" id="contactFoot">
+      <button class="btn btn-primary" style="flex:1" onclick="submitContact()">Pay & Reveal — RWF <span id="contactBtnAmt">1,500</span></button>
+      <button class="btn btn-soft" onclick="closeM('contactM')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- VERIFY MODAL -->
+<div class="overlay" id="verifyM">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeM('verifyM')">✕</button>
+    <div class="modal-head"><h2>Get SHINGA Verified ✅</h2><p>Verified workers are hired 3× faster. Your badge stays active for 1 year.</p></div>
+    <div class="modal-body">
+      <div class="info-box info-green">✓ Verified badge appears on your profile and all search results · Employers filter for verified workers first</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        <div style="display:flex;gap:10px;align-items:center;font-size:.82rem;color:var(--mid)"><span style="color:var(--g);font-size:.9rem">✓</span> ID verification via National ID</div>
+        <div style="display:flex;gap:10px;align-items:center;font-size:.82rem;color:var(--mid)"><span style="color:var(--g);font-size:.9rem">✓</span> Skills assessment review</div>
+        <div style="display:flex;gap:10px;align-items:center;font-size:.82rem;color:var(--mid)"><span style="color:var(--g);font-size:.9rem">✓</span> Background check (optional)</div>
+        <div style="display:flex;gap:10px;align-items:center;font-size:.82rem;color:var(--mid)"><span style="color:var(--g);font-size:.9rem">✓</span> Green ✅ badge on your profile</div>
+      </div>
+      <div class="fee-box">
+        <div class="fee-box-title">Verification Fee</div>
+        <div class="fee-row"><span>Annual fee</span><strong id="verifyFeeAmt">RWF 10,000</strong></div>
+        <div class="fee-row"><span>Valid for</span><strong>1 year</strong></div>
+      </div>
+      <div class="field"><label>National ID Number</label><input type="text" id="verifyId" placeholder="1 XXXX X XXXXXXX X XX"></div>
+      <div class="field"><label>MoMo Number</label>
+        <div class="phone-wrap"><div class="phone-pre">🇷🇼 +250</div><input class="phone-inp" type="tel" id="verifyMoMo" placeholder="7XX XXX XXX" maxlength="9" inputmode="numeric"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" style="flex:1" onclick="submitVerify()">Pay & Apply for Verification — RWF <span id="verifyBtnAmt">10,000</span></button>
+      <button class="btn btn-soft" onclick="closeM('verifyM')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- WALLET MODAL -->
+<div class="overlay" id="walletM">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeM('walletM')">✕</button>
+    <div class="modal-head"><h2>My Wallet</h2><p>Top up your SHINGA credit wallet for faster payments.</p></div>
+    <div class="modal-body">
+      <div style="background:var(--dark);border-radius:var(--rl);padding:20px;margin-bottom:16px;text-align:center">
+        <div style="font-size:.7rem;color:rgba(247,250,248,.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-family:'DM Mono',monospace">Current Balance</div>
+        <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--gh)" id="walletBalance">RWF 0</div>
+      </div>
+      <div style="font-size:.78rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Top Up</div>
+      <div class="pack-grid">
+        <div class="pack on" onclick="selectPack(this,8500,10000)">
+          <div class="pack-amt">RWF 10,000</div>
+          <div class="pack-bonus">+RWF 1,500 bonus</div>
+          <div class="pack-price">Pay RWF 8,500</div>
+        </div>
+        <div class="pack" onclick="selectPack(this,20000,25000)" style="position:relative">
+          <div class="pack-popular">Most Popular</div>
+          <div class="pack-amt">RWF 25,000</div>
+          <div class="pack-bonus">+RWF 5,000 bonus</div>
+          <div class="pack-price">Pay RWF 20,000</div>
+        </div>
+        <div class="pack" onclick="selectPack(this,45000,60000)">
+          <div class="pack-amt">RWF 60,000</div>
+          <div class="pack-bonus">+RWF 15,000 bonus</div>
+          <div class="pack-price">Pay RWF 45,000</div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:10px"><label>MoMo Number</label>
+        <div class="phone-wrap"><div class="phone-pre">🇷🇼 +250</div><input class="phone-inp" type="tel" id="walletMoMo" placeholder="7XX XXX XXX" maxlength="9" inputmode="numeric"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" style="flex:1" id="walletPayBtn" onclick="topUpWallet()">Top Up — RWF 8,500</button>
+      <button class="btn btn-soft" onclick="closeM('walletM')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- JOIN AS WORKER MODAL -->
+<div class="overlay" id="joinWorkerM">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeM('joinWorkerM')">✕</button>
+    <div class="modal-head"><h2>Join as a Worker 🌱</h2><p>Create your free profile in 60 seconds. Phone number only — no passwords.</p></div>
+    <div class="modal-body">
+      <div class="info-box info-green">✓ Free to join · Employers pay to contact you · You keep 100% of your wages</div>
+      <button class="btn btn-primary btn-full" onclick="closeM('joinWorkerM');pickRole('worker');openM('authM')">Create Worker Profile — Free →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// SHINGA PLATFORM — FULL JAVASCRIPT
+// ══════════════════════════════════════════════════════
+
+// ── PRICING (loaded from admin settings in production) ──
+const PRICES = {
+  job_daily:2000, job_weekly:4000, job_monthly:8000,
+  job_contract:8000, job_permanent:8000, job_task:4000, job_bulk:15000,
+  application_fee:500, contact_single:1500, contact_5:6000, contact_15:15000,
+  verify_annual:10000,
+}
+const DISCOUNT = { active:false, pct:0, label:'Discount' }
+
+// ── STATE ──
+let currentUser = null  // null = not logged in
+let walletBal = 0
+let authRole = 'worker'
+let authPendingAction = null  // what to do after auth completes
+let authPendingJobIdx = null
+let otpTimerInt = null
+let otpSecs = 60
+let activeJobIdx = null
+let activeWorkerIdx = null
+let nbCatFilter = ''
+let nbRadius = 5
+let userLat = null, userLng = null
+let selectedPackPay = 8500
+let selectedPackGet = 10000
+
+// ── PALETTE ──
+const G = ['#1A7A4A,#0F5C30','#2563EB,#7C3AED','#B45309,#D97706','#DC2626,#B91C1C','#0891B2,#0E7490','#7C3AED,#6D28D9','#D97706,#B45309','#059669,#047857']
+const g = i => G[i % G.length]
+
+// ── JOBS DATA ──
+const JOBS = [
+  {id:1,title:'Live-in Babysitter',company:'Private Family',type:'monthly',cat:'health',district:'Kicukiro',pay:'RWF 80,000/mo',posted:'2h ago',feat:true,slots:1,filled:0,desc:'Trustworthy babysitter for 2 children aged 3 and 6. Mon–Sat. Accommodation provided.',gi:0,urgent:false},
+  {id:2,title:'40 Brick Lifters — Construction Site',company:'BuildRight Co.',type:'bulk',cat:'trades',district:'Gasabo',pay:'RWF 8,000/day',posted:'Today',feat:true,slots:40,filled:12,desc:'Need 40 strong workers for brick lifting and site clearing. Start Monday 6AM, 6-day week.',gi:2,urgent:true},
+  {id:3,title:'House Cleaner 3× per week',company:'Private Client',type:'weekly',cat:'domestic',district:'Gasabo',pay:'RWF 21,000/wk',posted:'3h ago',feat:false,slots:1,filled:0,desc:'Clean a 4-bedroom house Mon/Wed/Fri. 4 hours per visit. Supplies provided.',gi:0,urgent:false},
+  {id:4,title:'Domestic Cook — Full-time',company:'Private Household',type:'monthly',cat:'domestic',district:'Nyarugenge',pay:'RWF 120,000/mo',posted:'1 day ago',feat:false,slots:1,filled:1,desc:'Cook 3 meals daily for family of 5. Rwandan and continental cuisine. Live-in optional.',gi:4,urgent:false},
+  {id:5,title:'Electrician — 3-Month Contract',company:'BuildRight Co.',type:'contract',cat:'trades',district:'Kicukiro',pay:'RWF 22,000/day',posted:'5h ago',feat:false,slots:2,filled:1,desc:'Electrical installation for commercial building. Certified electricians with 3+ years.',gi:2,urgent:false},
+  {id:6,title:'Shoe Cleaner — Daily Boutique',company:'Fashion Boutique',type:'daily',cat:'domestic',district:'Gasabo',pay:'RWF 8,000/day',posted:'Just now',feat:false,slots:1,filled:0,desc:'Daily shoe cleaning and polishing. Leather, suede, and sports shoes. Materials provided.',gi:6,urgent:true},
+  {id:7,title:'Secondary Math Teacher',company:'Green Hills School',type:'permanent',cat:'education',district:'Musanze',pay:'RWF 180,000/mo',posted:'2 days ago',feat:true,slots:1,filled:0,desc:'Full-time math teacher, secondary level. Teaching certificate required. Housing available.',gi:1,urgent:false},
+  {id:8,title:'Gardener — Weekly Maintenance',company:'Private Villa',type:'weekly',cat:'domestic',district:'Kicukiro',pay:'RWF 15,000/wk',posted:'1h ago',feat:false,slots:1,filled:0,desc:'Maintain a large garden once weekly. Mowing, trimming, planting. Tools provided.',gi:5,urgent:false},
+]
+
+// ── WORKERS DATA ──
+const WORKERS = [
+  {id:'W1',name:'Aline Uwimana',role:'Software Developer',cat:'technology',district:'Gasabo',rate:45000,unit:'day',rating:4.9,rev:23,verified:true,tags:['React','Node.js','Mobile'],gi:1,bio:'Full-stack developer with 5 years experience.'},
+  {id:'W2',name:'Jean-Paul Nkusi',role:'Babysitter / Nanny',cat:'health',district:'Gasabo',rate:8000,unit:'day',rating:4.8,rev:52,verified:true,tags:['Childcare','First Aid','Cooking'],gi:3,bio:'5 years caring for children aged 1–12.'},
+  {id:'W3',name:'Alice Kayitesi',role:'House Cleaner',cat:'domestic',district:'Kicukiro',rate:7000,unit:'day',rating:4.9,rev:88,verified:true,tags:['Deep Clean','Laundry','Ironing'],gi:5,bio:'Professional cleaner — thorough and reliable.'},
+  {id:'W4',name:'Solange Ingabire',role:'Domestic Cook',cat:'domestic',district:'Nyarugenge',rate:10000,unit:'day',rating:4.9,rev:67,verified:false,tags:['Rwandan Cuisine','Continental','Baking'],gi:4,bio:'Cook with 8 years of household cooking experience.'},
+  {id:'W5',name:'Claude Bizimana',role:'Mechanic',cat:'trades',district:'Kicukiro',rate:18000,unit:'day',rating:5.0,rev:29,verified:true,tags:['Auto Repair','Welding','Electrical'],gi:2,bio:'Certified mechanic. All vehicle types.'},
+  {id:'W6',name:'Grace Mukamana',role:'Casual Labourer',cat:'casual',district:'Gasabo',rate:6000,unit:'day',rating:4.7,rev:41,verified:false,tags:['Lifting','Loading','Site Work'],gi:6,bio:'Strong, reliable, punctual. Available daily.'},
+  {id:'W7',name:'Théo Ndayisenga',role:'Electrician',cat:'trades',district:'Kicukiro',rate:20000,unit:'day',rating:4.6,rev:55,verified:true,tags:['Wiring','Solar','Industrial'],gi:7,bio:'Licensed electrician. 7 years commercial experience.'},
+  {id:'W8',name:'Marie Mukandori',role:'Laundry & Ironing',cat:'domestic',district:'Gasabo',rate:5000,unit:'day',rating:4.8,rev:76,verified:false,tags:['Hand Wash','Machine','Ironing'],gi:0,bio:'Fast and careful laundry service. Pickup available.'},
+]
+
+// ── NEARBY WORKERS ──
+const NEARBY = [
+  {id:'N1',name:'Jean-Paul Nkusi',role:'Babysitter / Nanny',cat:'health',dist:'Gasabo',rate:8000,unit:'day',rating:4.8,rev:52,verified:true,availNow:true,km:0.8,gi:3,init:'JN'},
+  {id:'N2',name:'Grace Mukamana',role:'Casual Labourer',cat:'casual',dist:'Gasabo',rate:6000,unit:'day',rating:4.7,rev:41,verified:false,availNow:true,km:0.5,gi:6,init:'GM'},
+  {id:'N3',name:'Alice Kayitesi',role:'House Cleaner',cat:'domestic',dist:'Kicukiro',rate:7000,unit:'day',rating:4.9,rev:88,verified:true,availNow:false,km:1.5,gi:5,init:'AK'},
+  {id:'N4',name:'Claude Bizimana',role:'Mechanic',cat:'trades',dist:'Kicukiro',rate:18000,unit:'day',rating:5.0,rev:29,verified:true,availNow:true,km:2.1,gi:2,init:'CB'},
+  {id:'N5',name:'Marie Mukandori',role:'Laundry & Ironing',cat:'domestic',dist:'Gasabo',rate:5000,unit:'day',rating:4.8,rev:76,verified:false,availNow:true,km:1.9,gi:0,init:'MM'},
+  {id:'N6',name:'Théo Ndayisenga',role:'Electrician',cat:'trades',dist:'Kicukiro',rate:20000,unit:'day',rating:4.6,rev:55,verified:true,availNow:false,km:4.8,gi:7,init:'TN'},
+]
+
+// ── FILTERS ──
+let activeType = '', activeCat = '', activeWCat = ''
+
+// ── HELPERS ──
+const fmt = n => 'RWF ' + Number(n).toLocaleString()
+const disc = p => DISCOUNT.active ? Math.round(p * (1 - DISCOUNT.pct/100)) : p
+const initials = name => name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
+const stars = r => '★'.repeat(Math.round(r)) + '☆'.repeat(5-Math.round(r))
+
+// ── SLOT STATUS ──
+function slotStatus(j) {
+  const max = j.slots * 3
+  const apps = Math.min(j.filled * 2 + (j.id % 2), max)
+  if (j.filled >= j.slots) return {state:'filled', pct:100, txt:'Position Filled', apps, max}
+  if (apps >= max) return {state:'waitlist', pct:Math.round(j.filled/j.slots*100), txt:`${j.slots-j.filled} slot${j.slots-j.filled>1?'s':''} open — queue full`, apps, max}
+  return {state:'open', pct:Math.round(j.filled/j.slots*100), txt:`${j.slots-j.filled} of ${j.slots} slot${j.slots>1?'s':''} available`, apps, max}
+}
+
+function slotBarHtml(j) {
+  const s = slotStatus(j)
+  const cls = {filled:'sf-full',waitlist:'sf-warn',open:'sf-open'}[s.state]
+  const tcls = {filled:'st-full',waitlist:'st-warn',open:'st-open'}[s.state]
+  return `<div class="slot-bar"><div class="slot-track"><div class="slot-fill ${cls}" style="width:${Math.max(3,s.pct)}%"></div></div><span class="slot-txt ${tcls}">${s.txt}</span></div>`
+}
+
+function applyBtn(j, idx) {
+  const s = slotStatus(j)
+  if (s.state === 'filled') return `<button class="btn btn-sm" style="background:var(--border);color:var(--muted);cursor:not-allowed" disabled>Filled</button>`
+  if (s.state === 'waitlist') return `<button class="btn btn-gold btn-sm" onclick="event.stopPropagation();onWaitlist(${idx})">Waitlist (Free)</button>`
+  return `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();onApply(${idx})">Apply — ${fmt(disc(PRICES.application_fee))}</button>`
+}
+
+// ── RENDER JOBS ──
+function renderJobs(list) {
+  const TL={daily:'Daily',weekly:'Weekly',monthly:'Monthly',contract:'Contract',permanent:'Permanent',task:'Per Task',bulk:'Bulk Hire'}
+  document.getElementById('jobsList').innerHTML = list.length ? list.map((j,i) => {
+    const s = slotStatus(j)
+    return `<div class="jcard ${j.feat?'feat':''} ${s.state==='filled'?'filled':''}" onclick="${s.state!=='filled'?`onApply(${JOBS.indexOf(j)})`:''}">
+      ${j.feat?`<div class="feat-rib"><span class="badge badge-gold">⭐ Featured</span></div>`:''}
+      ${j.urgent?`<div style="position:absolute;top:${j.feat?'36px':'14px'};right:16px"><span class="badge badge-gold">⚡ Urgent</span></div>`:''}
+      <div class="jc-logo" style="background:linear-gradient(135deg,${g(j.gi)})">${initials(j.title)}</div>
+      <div class="jc-body">
+        <div class="jc-title">${j.title}</div>
+        <div class="jc-company">${j.company} · 📍 ${j.district}</div>
+        <div class="jc-tags">
+          <span class="badge badge-green">${TL[j.type]||j.type}</span>
+          ${j.slots>1?`<span class="badge badge-muted">👥 ${j.slots} needed</span>`:''}
+          <span class="badge badge-muted">${j.cat}</span>
+          ${s.state==='filled'?`<span class="badge badge-red">✕ Filled</span>`:''}
+        </div>
+        <div class="jc-desc">${j.desc}</div>
+        ${slotBarHtml(j)}
+        <div class="jc-foot">
+          <div class="jc-meta">
+            <span class="jc-m">🕐 ${j.posted}</span>
+            <span class="jc-m">📍 ${j.district}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="jc-pay">${j.pay}</div>
+            ${applyBtn(j, JOBS.indexOf(j))}
+          </div>
+        </div>
+      </div>
+    </div>`
+  }).join('') : '<div style="padding:40px;text-align:center;color:var(--muted)">No jobs match this filter.</div>'
+}
+
+// ── RENDER WORKERS ──
+function renderWorkers(list) {
+  document.getElementById('workersList').innerHTML = list.map((w,i) => `
+    <div class="wcard" onclick="onContactWorker(${WORKERS.indexOf(w)})">
+      <div class="wc-top">
+        <div class="wc-avi" style="background:linear-gradient(135deg,${g(w.gi)})">
+          ${initials(w.name)}${w.verified?`<div class="wc-vbadge">✓</div>`:''}
+        </div>
+        <div>
+          <div class="wc-name">${w.name}</div>
+          <div class="wc-role">${w.role}</div>
+          <div class="wc-stars"><span class="stars-ico">★</span><span>${w.rating}</span><span class="stars-ct">(${w.rev})</span></div>
+        </div>
+      </div>
+      <div class="wc-mid">${w.tags.map(t=>`<span class="badge badge-green">${t}</span>`).join('')}</div>
+      <div class="wc-hr"></div>
+      <div class="wc-foot">
+        <div class="wc-rate">${fmt(w.rate)} <small>/ ${w.unit}</small></div>
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();onContactWorker(${WORKERS.indexOf(w)})">Contact</button>
+      </div>
+    </div>
+  `).join('')
+}
+
+// ── FILTER LOGIC ──
+function filterJobs() {
+  const kw = (document.getElementById('jobKeyword')?.value||'').toLowerCase()
+  const cat = document.getElementById('jobCat')?.value||''
+  const dist = document.getElementById('jobDistrict')?.value||''
+  const list = JOBS.filter(j =>
+    (!activeType || j.type===activeType) &&
+    (!activeCat || j.cat===activeCat) &&
+    (!cat || j.cat===cat) &&
+    (!dist || j.district.toLowerCase().includes(dist.toLowerCase())) &&
+    (!kw || j.title.toLowerCase().includes(kw) || j.desc.toLowerCase().includes(kw))
+  )
+  renderJobs(list)
+}
+
+function filterWorkers() {
+  const kw = (document.getElementById('wKeyword')?.value||'').toLowerCase()
+  const cat = document.getElementById('wCat')?.value||''
+  const dist = document.getElementById('wDistrict')?.value||''
+  const list = WORKERS.filter(w =>
+    (!activeWCat || w.cat===activeWCat) &&
+    (!cat || w.cat===cat) &&
+    (!dist || w.district.toLowerCase().includes(dist.toLowerCase())) &&
+    (!kw || w.role.toLowerCase().includes(kw) || w.name.toLowerCase().includes(kw))
+  )
+  renderWorkers(list)
+}
+
+function setType(el, type) {
+  activeType = type
+  document.querySelectorAll('.tcard').forEach(c=>c.classList.remove('on'))
+  el.classList.add('on')
+  filterJobs()
+}
+function setCat(el, cat) {
+  activeCat = cat
+  document.querySelectorAll('.cat-item').forEach(c=>c.classList.remove('on'))
+  el.classList.add('on')
+  filterJobs()
+}
+function setWPill(el, cat) {
+  activeWCat = cat
+  document.querySelectorAll('#workerPills .pill').forEach(p=>p.classList.remove('on'))
+  el.classList.add('on')
+  filterWorkers()
+}
+
+// ── SEARCH TABS ──
+function switchTab(t) {
+  ['J','W','N'].forEach(x => {
+    const btn = document.getElementById('st'+x)
+    btn.className = 'stab'
+    if((x==='J'&&t==='jobs')||(x==='W'&&t==='workers')||(x==='N'&&t==='nearby'))
+      btn.className = 'stab on-'+{J:'jobs',W:'workers',N:'nearby'}[x]
+  })
+  document.getElementById('sfJobs').style.display = t==='jobs' ? 'flex' : 'none'
+  document.getElementById('sfWorkers').style.display = t==='workers' ? 'flex' : 'none'
+  document.getElementById('sfNearby').style.display = t==='nearby' ? 'flex' : 'none'
+  if(t==='nearby') {
+    document.getElementById('nearby').scrollIntoView({behavior:'smooth'})
+    if(!userLat) requestLocation()
+  }
+  if(t==='jobs') document.getElementById('jobs').scrollIntoView({behavior:'smooth'})
+  if(t==='workers') document.getElementById('workers').scrollIntoView({behavior:'smooth'})
+}
+
+// ── MODAL SYSTEM ──
+function openM(id) {
+  const el = document.getElementById(id)
+  if(!el) return
+  el.classList.add('open')
+  document.body.style.overflow='hidden'
+}
+function closeM(id) {
+  const el = document.getElementById(id)
+  if(!el) return
+  el.classList.remove('open')
+  if(!document.querySelector('.overlay.open')) document.body.style.overflow=''
+}
+document.addEventListener('click', e => {
+  if(e.target.classList.contains('overlay')) {
+    e.target.classList.remove('open')
+    if(!document.querySelector('.overlay.open')) document.body.style.overflow=''
+  }
+})
+
+// ── NAV ──
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('solid', scrollY > 40)
+})
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open')
+  document.body.style.overflow = document.getElementById('mobileMenu').classList.contains('open') ? 'hidden' : ''
+}
+function closeMenu() {
+  document.getElementById('mobileMenu').classList.remove('open')
+  document.body.style.overflow=''
+}
+
+// ── TOAST ──
+let toastTimer
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast')
+  t.style.borderLeftColor = type==='ok' ? 'var(--g)' : type==='gold' ? 'var(--gold)' : '#DC2626'
+  t.textContent = msg
+  t.classList.add('show')
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500)
+}
+
+// ══ AUTH FLOW ══════════════════════════════════════════
+function goAuthStep(n) {
+  document.querySelectorAll('.auth-step').forEach(s=>s.classList.remove('on'))
+  document.getElementById('as'+n)?.classList.add('on')
+}
+function pickRole(role) {
+  authRole = role
+  document.getElementById('roleW').classList.toggle('on', role==='worker')
+  document.getElementById('roleE').classList.toggle('on', role==='employer')
+  document.getElementById('authNameField').style.display = 'block'
+  document.getElementById('authDistrictField').style.display = 'block'
+  document.getElementById('workerQuickFields').style.display = role==='worker' ? 'block' : 'none'
+  document.getElementById('employerQuickFields').style.display = role==='employer' ? 'block' : 'none'
+}
+
+function sendAuthOtp() {
+  const phone = document.getElementById('authPhone').value.replace(/\D/g,'')
+  if(phone.length < 9) { toast('Enter a valid 9-digit phone number','err'); return }
+  const btn = document.getElementById('authSendBtn')
+  btn.textContent = 'Sending…'
+  btn.disabled = true
+  // In production: POST /api/auth/send-otp
+  setTimeout(() => {
+    btn.textContent = 'Send Code'
+    btn.disabled = false
+    document.getElementById('authPhoneDisplay').textContent = '+250 ' + phone.slice(0,3) + ' ' + phone.slice(3,6) + ' ' + phone.slice(6)
+    goAuthStep(2)
+    startOtpTimer()
+    document.querySelectorAll('.otp-d').forEach(d=>{d.value='';d.classList.remove('filled')})
+    setTimeout(() => document.querySelector('.otp-d')?.focus(), 200)
+  }, 1200)
+}
+
+function startOtpTimer() {
+  clearInterval(otpTimerInt)
+  otpSecs = 60
+  const link = document.getElementById('resendLink')
+  const cd = document.getElementById('otpCd')
+  link.style.pointerEvents='none'; link.style.opacity='.6'
+  otpTimerInt = setInterval(() => {
+    otpSecs--
+    if(cd) cd.textContent = otpSecs + 's'
+    if(otpSecs<=0) {
+      clearInterval(otpTimerInt)
+      if(link){link.style.pointerEvents='';link.style.opacity='1';link.innerHTML='<a onclick="resendOtp()">Resend code</a>'}
+    }
+  }, 1000)
+}
+function resendOtp() { toast('New code sent'); startOtpTimer() }
+
+function otpNext(inp, idx) {
+  const digits = document.querySelectorAll('.otp-d')
+  inp.value = inp.value.replace(/\D/g,'')
+  if(inp.value) {
+    inp.classList.add('filled')
+    if(idx < 5) digits[idx+1].focus()
+    else verifyOtp()
+  }
+}
+function otpBack(e, inp, idx) {
+  if(e.key==='Backspace' && !inp.value && idx>0) {
+    const digits = document.querySelectorAll('.otp-d')
+    digits[idx-1].focus()
+    digits[idx-1].value=''
+    digits[idx-1].classList.remove('filled')
+  }
+}
+function getOtp() { return [...document.querySelectorAll('.otp-d')].map(d=>d.value).join('') }
+
+function verifyOtp() {
+  const otp = getOtp()
+  if(otp.length<6) { toast('Enter all 6 digits','err'); return }
+  const btn = document.getElementById('otpVerifyBtn')
+  btn.textContent = 'Verifying…'; btn.disabled=true
+  // In production: POST /api/auth/verify-otp
+  setTimeout(() => {
+    btn.textContent = 'Verify Code'; btn.disabled=false
+    // Simulate: check if new user
+    const isNew = true
+    if(isNew) {
+      goAuthStep(3)
+      document.getElementById('as3Title').textContent = authRole==='worker' ? 'Your work, quickly' : 'Your business, quickly'
+      document.getElementById('workerQuickFields').style.display = authRole==='worker' ? 'block' : 'none'
+      document.getElementById('employerQuickFields').style.display = authRole==='employer' ? 'block' : 'none'
+    } else {
+      finishAuth()
+    }
+  }, 1400)
+}
+
+function completeProfile() {
+  const btn = event.target
+  btn.textContent = 'Saving…'; btn.disabled=true
+  // In production: POST /api/auth/complete-worker or complete-employer
+  setTimeout(() => {
+    btn.textContent = 'Complete & Continue →'; btn.disabled=false
+    finishAuth()
+  }, 1200)
+}
+
+function finishAuth() {
+  currentUser = { role: authRole, name: document.getElementById('authName')?.value || 'User', wallet: 15000 }
+  walletBal = currentUser.wallet
+  closeM('authM')
+  updateWalletUI()
+  // Show dashboard link in nav
+  const right = document.querySelector('.nav-right')
+  if(right && !document.getElementById('dashLink')) {
+    const dash = document.createElement('a')
+    dash.id = 'dashLink'
+    dash.className = 'btn btn-soft btn-sm'
+    dash.textContent = authRole === 'worker' ? 'My Dashboard' : 'Employer Dashboard'
+    dash.href = authRole === 'worker' ? 'shinga-worker.html' : 'shinga-employer.html'
+    right.insertBefore(dash, right.querySelector('.btn-primary'))
+  }
+  toast('✓ Welcome to SHINGA, ' + (currentUser.name.split(' ')[0] || 'there') + '!')
+  goAuthStep(1)
+  if(authPendingAction === 'apply' && authPendingJobIdx !== null) {
+    openApplyModal(authPendingJobIdx)
+    authPendingAction = null; authPendingJobIdx = null
+  } else if(authPendingAction === 'contact' && authPendingJobIdx !== null) {
+    openContactModal(authPendingJobIdx)
+    authPendingAction = null; authPendingJobIdx = null
+  } else if(authPendingAction === 'postjob') {
+    openM('postJobM')
+    authPendingAction = null
+  }
+}
+
+function requireAuth(action, idx=null) {
+  if(currentUser) return true
+  authPendingAction = action
+  authPendingJobIdx = idx
+  // Set context message
+  const msgs = {
+    apply: "Sign in to apply — takes 30 seconds. Free to join.",
+    contact: "Sign in to contact workers.",
+    postjob: "Sign in to post a job."
+  }
+  document.getElementById('authContext').textContent = msgs[action] || 'Sign in to continue.'
+  pickRole(action==='apply' ? 'worker' : 'employer')
+  // Show/hide role selector based on action
+  document.getElementById('authRoleGrid').style.display = action==='apply' ? 'grid' : action==='contact'||action==='postjob' ? 'none' : 'grid'
+  openM('authM')
+  return false
+}
+
+// ══ APPLY FLOW ══════════════════════════════════════════
+function onApply(idx) {
+  if(!requireAuth('apply', idx)) return
+  openApplyModal(idx)
+}
+
+function openApplyModal(idx) {
+  activeJobIdx = idx
+  const j = JOBS[idx]
+  const s = slotStatus(j)
+  const fee = disc(PRICES.application_fee)
+  document.getElementById('applyJobTitle').textContent = j.title + ' · ' + j.company
+  document.getElementById('applyFeeAmt').textContent = fmt(PRICES.application_fee)
+  document.getElementById('applyFeeTotal').textContent = fmt(fee)
+  document.getElementById('applyBtnAmt').textContent = fee.toLocaleString()
+  // Discount row
+  if(DISCOUNT.active) {
+    document.getElementById('applyDiscRow').style.display='flex'
+    document.getElementById('applyDiscLabel').textContent = DISCOUNT.label
+    document.getElementById('applyDiscAmt').textContent = '-'+fmt(PRICES.application_fee - fee)
+  }
+  // Slot banner
+  const banners = {
+    open: `<div class="info-box info-green" style="margin-bottom:12px">✓ ${s.txt} — you can apply now</div>`,
+    waitlist: `<div class="info-box info-gold" style="margin-bottom:12px">⏳ Queue filling — ${s.max-s.apps} application slot${s.max-s.apps!==1?'s':''} left before waitlist</div>`,
+    filled: `<div class="info-box" style="background:#FEE2E2;border-color:#FECACA;color:#DC2626;margin-bottom:12px">✕ This position is filled</div>`,
+  }
+  document.getElementById('applySlotBanner').innerHTML = banners[s.state]||''
+  openM('applyM')
+}
+
+function onWaitlist(idx) {
+  if(!requireAuth('apply', idx)) return
+  activeJobIdx = idx
+  const j = JOBS[idx]
+  document.getElementById('wlJobTitle').textContent = j.title + ' · ' + j.company
+  openM('waitlistM')
+}
+
+function submitApplication() {
+  const moMo = document.getElementById('applyMoMo').value.replace(/\D/g,'')
+  if(moMo.length < 9) { toast('Enter your MoMo number','err'); return }
+  const fee = disc(PRICES.application_fee)
+  document.getElementById('payAmt').textContent = fmt(fee)
+  closeM('applyM')
+  openM('applyPayingM')
+  // Simulate MoMo approval (in production: poll /api/payments/status)
+  setTimeout(() => {
+    closeM('applyPayingM')
+    walletBal = Math.max(0, walletBal - fee)
+    updateWalletUI()
+    openM('applySuccessM')
+    toast('✓ Application submitted!')
+  }, 2800)
+}
+
+function joinWaitlist() {
+  const phone = document.getElementById('wlPhone').value.replace(/\D/g,'')
+  if(phone.length < 9) { toast('Enter your phone number','err'); return }
+  document.getElementById('wlPhoneDisplay').textContent = phone.slice(0,3) + ' ' + phone.slice(3,6) + ' ' + phone.slice(6)
+  closeM('waitlistM')
+  openM('wlSuccessM')
+  toast('✓ You\'re on the waitlist!','gold')
+}
+
+// ══ CONTACT WORKER ═════════════════════════════════════
+function onContactWorker(idx) {
+  if(!requireAuth('contact', idx)) return
+  openContactModal(idx)
+}
+
+function openContactModal(idx) {
+  activeWorkerIdx = idx
+  const w = WORKERS[idx]
+  const fee = disc(PRICES.contact_single)
+  document.getElementById('contactWorkerName').textContent = w.name + ' · ' + w.role
+  document.getElementById('contactFeeAmt').textContent = fmt(PRICES.contact_single)
+  document.getElementById('contactFeeTotal').textContent = fmt(fee)
+  document.getElementById('contactBtnAmt').textContent = fee.toLocaleString()
+  document.getElementById('contactRevealState').style.display='block'
+  document.getElementById('contactRevealedState').style.display='none'
+  document.getElementById('contactFoot').innerHTML = `<button class="btn btn-primary" style="flex:1" onclick="submitContact()">Pay & Reveal — RWF ${fee.toLocaleString()}</button><button class="btn btn-soft" onclick="closeM('contactM')">Cancel</button>`
+  openM('contactM')
+}
+
+function submitContact() {
+  const moMo = document.getElementById('contactMoMo').value.replace(/\D/g,'')
+  if(moMo.length < 9) { toast('Enter your MoMo number','err'); return }
+  const w = WORKERS[activeWorkerIdx]
+  const fee = disc(PRICES.contact_single)
+  // Simulate payment
+  document.getElementById('contactFoot').innerHTML = '<div class="pay-pending"><div class="pp-spinner"></div><div class="pp-title">Approve payment…</div></div>'
+  setTimeout(() => {
+    walletBal = Math.max(0, walletBal - fee)
+    updateWalletUI()
+    // Reveal phone
+    const phones = ['+250 788 123 456','+250 722 456 789','+250 782 654 321','+250 733 111 222','+250 785 999 000','+250 720 444 555','+250 788 777 888','+250 722 333 444']
+    const phone = phones[activeWorkerIdx % phones.length]
+    document.getElementById('contactRevealState').style.display='none'
+    document.getElementById('contactRevealedState').style.display='block'
+    document.getElementById('contactRevealName').textContent = w.name
+    const link = document.getElementById('contactPhoneLink')
+    link.textContent = phone; link.href = 'tel:' + phone.replace(/\s/g,'')
+    document.getElementById('contactFoot').innerHTML = `<a href="tel:${phone.replace(/\s/g,'')}" class="btn btn-primary" style="flex:1;text-decoration:none">📞 Call ${w.name.split(' ')[0]}</a><button class="btn btn-soft" onclick="closeM('contactM')">Done</button>`
+    toast('📞 Phone number revealed!')
+  }, 2400)
+}
+
+// ══ POST JOB ═══════════════════════════════════════════
+function openPostJob() {
+  if(!requireAuth('postjob')) return
+  calcPostFee()
+  openM('postJobM')
+}
+function openUrgentPost() {
+  if(!requireAuth('postjob')) return
+  document.getElementById('pjType').value = 'daily'
+  document.getElementById('pjUrgent').checked = true
+  calcPostFee()
+  openM('postJobM')
+  toast('⚡ Mark as Urgent to SMS nearby workers instantly','gold')
+}
+
+const JOB_FEES = {daily:2000,weekly:4000,monthly:8000,contract:8000,permanent:8000,task:4000,bulk:15000}
+const JOB_LABELS = {daily:'Daily listing',weekly:'Weekly listing',monthly:'Monthly listing',contract:'Contract listing',permanent:'Permanent listing',task:'Per Task listing',bulk:'Bulk Hire listing'}
+function calcPostFee() {
+  const type = document.getElementById('pjType')?.value || 'daily'
+  const base = JOB_FEES[type] || 2000
+  const total = disc(base)
+  document.getElementById('pjFeeLabel').textContent = JOB_LABELS[type] || 'Listing'
+  document.getElementById('pjFeeBase').textContent = fmt(base)
+  document.getElementById('pjFeeTotal').textContent = fmt(total)
+  document.getElementById('pjBtnAmt').textContent = total.toLocaleString()
+  if(DISCOUNT.active) {
+    document.getElementById('pjDiscRow').style.display='flex'
+    document.getElementById('pjDiscLabel').textContent = DISCOUNT.label
+    document.getElementById('pjDiscAmt').textContent = '-'+fmt(base-total)
+  }
+}
+
+function submitPostJob() {
+  const title = document.getElementById('pjTitle').value.trim()
+  const momo = document.getElementById('pjMoMo').value.replace(/\D/g,'')
+  if(!title) { toast('Enter a job title','err'); return }
+  if(momo.length < 9) { toast('Enter your MoMo number','err'); return }
+  const btn = document.getElementById('pjSubmitBtn')
+  btn.textContent = 'Processing…'; btn.disabled=true
+  setTimeout(() => {
+    btn.textContent = 'Post Job — RWF ' + document.getElementById('pjBtnAmt').textContent
+    btn.disabled=false
+    closeM('postJobM')
+    openM('postSuccessM')
+    toast('🚀 Job posted live!')
+  }, 2600)
+}
+
+// ══ VERIFY ═════════════════════════════════════════════
+function submitVerify() {
+  const idNum = document.getElementById('verifyId').value.trim()
+  const momo = document.getElementById('verifyMoMo').value.replace(/\D/g,'')
+  if(!idNum) { toast('Enter your National ID number','err'); return }
+  if(momo.length < 9) { toast('Enter your MoMo number','err'); return }
+  toast('✓ Verification application submitted — you\'ll hear back within 24 hours','gold')
+  closeM('verifyM')
+}
+
+// ══ WALLET ════════════════════════════════════════════
+function updateWalletUI() {
+  document.getElementById('walletBalance').textContent = fmt(walletBal)
+  document.getElementById('navWallet').textContent = fmt(walletBal)
+  if(currentUser) document.getElementById('walletChip').style.display='flex'
+}
+function selectPack(el, pay, get) {
+  document.querySelectorAll('.pack').forEach(p=>p.classList.remove('on'))
+  el.classList.add('on')
+  selectedPackPay = pay; selectedPackGet = get
+  document.getElementById('walletPayBtn').textContent = `Top Up — ${fmt(pay)}`
+}
+function topUpWallet() {
+  const momo = document.getElementById('walletMoMo').value.replace(/\D/g,'')
+  if(momo.length<9) { toast('Enter your MoMo number','err'); return }
+  toast('Approve MoMo payment of ' + fmt(selectedPackPay))
+  setTimeout(() => {
+    walletBal += selectedPackGet
+    updateWalletUI()
+    closeM('walletM')
+    toast('✓ Wallet topped up — ' + fmt(selectedPackGet) + ' added!','gold')
+  }, 2500)
+}
+
+// ══ NEARBY / GPS ════════════════════════════════════════
+function requestLocation() {
+  setLocState('busy','Finding your location…')
+  const btn = document.getElementById('locBtn')
+  btn.textContent = '⏳ Finding you…'; btn.disabled=true
+  if(!navigator.geolocation) {
+    fallbackLocation()
+    return
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      userLat = pos.coords.latitude; userLng = pos.coords.longitude
+      setLocState('ok', `Location active · workers within ${nbRadius}km`)
+      btn.innerHTML = '✓ Location Active'; btn.disabled=false
+      document.getElementById('nearbyControls').style.display='block'
+      nearbySearch()
+      document.getElementById('nearby').scrollIntoView({behavior:'smooth'})
+    },
+    () => fallbackLocation(),
+    {timeout:7000, maximumAge:300000}
+  )
+}
+function fallbackLocation() {
+  userLat = -1.9441; userLng = 30.0619 // Kigali centre
+  setLocState('ok','Using Kigali city centre (GPS access denied)')
+  const btn = document.getElementById('locBtn')
+  btn.textContent = '📍 Location Active'; btn.disabled=false
+  document.getElementById('nearbyControls').style.display='block'
+  nearbySearch()
+  document.getElementById('nearby').scrollIntoView({behavior:'smooth'})
+}
+function setLocState(state, msg) {
+  const dot = document.getElementById('locDot')
+  dot.className = 'loc-dot ' + {busy:'ld-busy',ok:'ld-ok',err:'ld-err',idle:'ld-idle'}[state]
+  document.getElementById('locTxt').textContent = msg
+}
+function updateRadius(v) { document.getElementById('radiusVal').textContent=v+' km'; nbRadius=+v }
+function updateRadius2(v) {
+  document.getElementById('rVal2').textContent=v+' km'; nbRadius=+v
+  setLocState('ok',`Location active · workers within ${v}km`)
+  nearbySearch()
+}
+function setNbPill(el,cat) {
+  nbCatFilter=cat
+  document.querySelectorAll('#nearbyPills .pill').forEach(p=>{
+    p.style.background='rgba(255,255,255,.04)';p.style.color='rgba(247,250,248,.6)';p.style.borderColor='rgba(255,255,255,.15)'
+  })
+  el.style.background='var(--g)';el.style.color='#fff';el.style.borderColor='var(--g)'
+  nearbySearch()
+}
+function nearbySearch() {
+  const availOnly = document.getElementById('availOnlyCb')?.checked||false
+  let list = [...NEARBY]
+  if(nbCatFilter) list = list.filter(w=>w.cat===nbCatFilter)
+  if(availOnly) list = list.filter(w=>w.availNow)
+  list = list.filter(w=>w.km<=nbRadius)
+  list.sort((a,b)=>{if(a.availNow&&!b.availNow)return -1;if(!a.availNow&&b.availNow)return 1;return a.km-b.km})
+  renderNearby(list)
+}
+function renderNearby(list) {
+  const el = document.getElementById('nearbyResults')
+  if(!list.length) {
+    el.innerHTML=`<div class="nearby-empty"><div class="ne-ico">🔍</div><div class="ne-h">No workers found within ${nbRadius}km</div><div class="ne-p">Try increasing your radius or removing filters.</div></div>`
+    return
+  }
+  el.innerHTML = `
+    <div style="font-size:.72rem;color:rgba(247,250,248,.35);margin-bottom:12px;font-family:'DM Mono',monospace">${list.filter(w=>w.availNow).length} available now · ${list.length} within ${nbRadius}km</div>
+    <div class="nearby-grid">
+      ${list.map((w,i)=>`
+        <div class="ncard" onclick="onContactWorker(${WORKERS.findIndex(x=>x.id===w.id)>=0?WORKERS.findIndex(x=>x.id===w.id):0})">
+          <div class="ncard-dist">📍 ${w.km}km</div>
+          <div class="ncard-avi" style="background:linear-gradient(135deg,${g(w.gi)})">${w.init}${w.verified?`<div class="ncard-vb">✓</div>`:''}</div>
+          ${w.availNow?`<div class="avail-now-pill">Available Now</div>`:''}
+          <div class="ncard-name">${w.name}</div>
+          <div class="ncard-role">${w.role}</div>
+          <div class="ncard-rate">${fmt(w.rate)} / ${w.unit}</div>
+          <div class="ncard-foot">
+            <div class="ncard-stars"><span style="color:var(--gold)">★</span> ${w.rating} (${w.rev})</div>
+            <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();onContactWorker(${WORKERS.findIndex(x=>x.id===w.id)>=0?WORKERS.findIndex(x=>x.id===w.id):0})">Contact</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>`
+}
+
+// ── INIT ────────────────────────────────────────────────
+function init() {
+  // Prices in type cards
+  const fees = {daily:2000,weekly:4000,monthly:8000,contract:8000,permanent:8000,task:4000,bulk:15000}
+  Object.entries(fees).forEach(([k,v])=>{
+    const el = document.getElementById('tf-'+k)
+    if(el) el.textContent = 'From ' + fmt(disc(v))
+  })
+  const el = document.getElementById('tf-all'); if(el) el.textContent='All job types'
+  // Pricing strip
+  const ps = {post:'from '+fmt(disc(PRICES.job_daily)),apply:fmt(disc(PRICES.application_fee)),contact:fmt(disc(PRICES.contact_single)),verify:fmt(disc(PRICES.verify_annual))}
+  Object.entries(ps).forEach(([k,v])=>{ const el=document.getElementById('ps-'+k); if(el) el.textContent=v })
+  // How it works fees
+  const hw = {post:`${fmt(disc(2000))} – ${fmt(disc(15000))}`,contact:`${fmt(disc(PRICES.contact_single))} per contact`,apply:`${fmt(disc(PRICES.application_fee))} per application`,verify:`${fmt(disc(PRICES.verify_annual))} / year`}
+  Object.entries(hw).forEach(([k,v])=>{ const el=document.getElementById('hw-'+k); if(el) el.textContent=v })
+  // Hero discount stat
+  const el2 = document.getElementById('hs4'); if(el2) el2.textContent = DISCOUNT.active ? DISCOUNT.pct+'% OFF' : 'Fair Fees'
+  // Category counts
+  const cats = {all:JOBS.length,dom:JOBS.filter(j=>j.cat==='domestic').length,tra:JOBS.filter(j=>j.cat==='trades').length,hea:JOBS.filter(j=>j.cat==='health').length,edu:JOBS.filter(j=>j.cat==='education').length,tec:JOBS.filter(j=>j.cat==='technology').length,cas:JOBS.filter(j=>j.cat==='casual').length}
+  Object.entries(cats).forEach(([k,v])=>{ const el=document.getElementById('cc-'+k); if(el) el.textContent=v+' job'+(v!==1?'s':'') })
+  renderJobs(JOBS)
+  renderWorkers(WORKERS)
+}
+init()
+</script>
+</body>
+</html>

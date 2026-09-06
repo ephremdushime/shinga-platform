@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHINGA — Dynamic Data Layer & Worker Profile Routing</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1A7A4A;--green-h:#25A865;--green-dim:#145E38;--green-pale:#E8F5EE;
+  --gold:#F5A623;--gold-dim:#C8841A;
+  --dark:#0F1F15;--mid:#3D5C48;--muted:#6B7C73;
+  --light:#F7FAF8;--white:#FFFFFF;--border:#D0E6DA;
+  --r:10px;--r-lg:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);line-height:1.6}
+.wrap{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{background:var(--dark);padding:28px 20px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:3px}.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+.s-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.3rem;color:#F7FAF8;letter-spacing:3px;margin-bottom:4px}
+.s-logo span{color:var(--green-h)}
+.s-sub{font-size:.68rem;color:rgba(247,250,248,.28);font-family:'DM Mono',monospace;letter-spacing:1px;margin-bottom:24px}
+.s-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(247,250,248,.22);margin-bottom:7px;margin-top:18px}
+.s-link{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r);color:rgba(247,250,248,.52);font-size:.8rem;text-decoration:none;transition:all .15s;cursor:pointer;margin-bottom:2px}
+.s-link:hover{background:rgba(255,255,255,.05);color:#F7FAF8}
+.s-link.on{background:rgba(26,122,74,.2);color:var(--green-h)}
+
+/* CONTENT */
+.content{padding:44px 56px;max-width:900px}
+.page-eye{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--green);margin-bottom:8px}
+.page-h1{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;color:var(--dark);line-height:1.15;margin-bottom:12px;letter-spacing:-.5px}
+.page-sub{font-size:.98rem;color:var(--muted);line-height:1.78;max-width:620px;margin-bottom:40px}
+h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark);margin:40px 0 14px}
+h3{font-size:.98rem;font-weight:700;color:var(--dark);margin:22px 0 9px}
+p{color:var(--mid);font-size:.88rem;line-height:1.78;margin-bottom:13px}
+ul,ol{color:var(--mid);font-size:.86rem;line-height:1.8;padding-left:20px;margin-bottom:13px}
+li{margin-bottom:3px}
+strong{color:var(--dark)}
+code{font-family:'DM Mono',monospace;font-size:.8rem;background:var(--green-pale);color:var(--green);padding:2px 7px;border-radius:5px}
+
+/* CODE BLOCKS */
+.cw{position:relative;margin:16px 0}
+.cl{font-size:.63rem;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(247,250,248,.38);background:var(--dark);padding:8px 16px 0;border-radius:var(--r-lg) var(--r-lg) 0 0;display:flex;justify-content:space-between;align-items:center}
+.cb{background:rgba(255,255,255,.07);border:none;color:rgba(247,250,248,.45);font-size:.68rem;padding:3px 10px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s}
+.cb:hover{background:rgba(255,255,255,.14);color:#F7FAF8}
+pre{background:var(--dark);padding:20px 20px 22px;border-radius:0 0 var(--r-lg) var(--r-lg);overflow-x:auto;font-family:'DM Mono',monospace;font-size:.78rem;line-height:1.75;color:#E8F5EE;white-space:pre}
+.c{color:rgba(247,250,248,.28)}.k{color:var(--green-h)}.s{color:var(--gold)}.n{color:#7DD3FC}.fn{color:#F472B6}
+
+/* CARDS */
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px 24px;margin:16px 0}
+.card.ok{border-color:rgba(26,122,74,.25);background:var(--green-pale)}
+.card.warn{border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.05)}
+.card.note{border-color:rgba(59,130,246,.25);background:rgba(59,130,246,.04)}
+.card-title{font-weight:700;color:var(--dark);font-size:.87rem;margin-bottom:6px}
+.card-body{font-size:.82rem;color:var(--mid);line-height:1.72}
+
+/* FILE TREE */
+.file-tree{background:var(--dark);border-radius:var(--r-lg);padding:20px 24px;margin:16px 0;font-family:'DM Mono',monospace;font-size:.8rem;line-height:2}
+.ft-dir{color:var(--green-h)}
+.ft-file{color:#E8F5EE;padding-left:20px}
+.ft-file.new{color:var(--gold)}
+.ft-indent{padding-left:20px}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:36px 0}
+
+/* ARCH DIAGRAM */
+.arch{display:grid;grid-template-columns:1fr;gap:0;margin:20px 0}
+.arch-row{display:flex;align-items:center;gap:0}
+.arch-box{border:1.5px solid var(--border);border-radius:var(--r);padding:12px 18px;background:var(--white);flex:1;text-align:center}
+.arch-box.db{border-color:rgba(26,122,74,.3);background:var(--green-pale)}
+.arch-box.api{border-color:rgba(37,99,235,.25);background:rgba(37,99,235,.04)}
+.arch-box.ui{border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.05)}
+.arch-box-title{font-weight:700;font-size:.85rem;color:var(--dark);margin-bottom:3px}
+.arch-box-sub{font-size:.72rem;color:var(--muted)}
+.arch-arrow{padding:0 12px;color:var(--muted);font-size:.9rem;flex-shrink:0}
+
+@media(max-width:800px){.wrap{grid-template-columns:1fr}.sidebar{display:none}.content{padding:28px 20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="s-logo">SH<span>I</span>NGA</div>
+  <div class="s-sub">DYNAMIC DATA LAYER</div>
+  <div class="s-label">Overview</div>
+  <a class="s-link on" onclick="go('overview')">🗺️ Architecture</a>
+  <a class="s-link" onclick="go('filetree')">📁 File Structure</a>
+  <div class="s-label">Data Layer</div>
+  <a class="s-link" onclick="go('jobs-api')">💼 Jobs API</a>
+  <a class="s-link" onclick="go('workers-api')">👤 Workers API</a>
+  <a class="s-link" onclick="go('search-api')">🔍 Search API</a>
+  <a class="s-link" onclick="go('hooks')">⚛️ SWR Hooks</a>
+  <div class="s-label">Worker Profile</div>
+  <a class="s-link" onclick="go('profile-route')">🛤️ Dynamic Route</a>
+  <a class="s-link" onclick="go('profile-page')">📄 Profile Page</a>
+  <a class="s-link" onclick="go('profile-meta')">🔖 SEO & Metadata</a>
+  <div class="s-label">Dashboards</div>
+  <a class="s-link" onclick="go('employer-data')">🏢 Employer Data</a>
+  <a class="s-link" onclick="go('worker-data')">👷 Worker Data</a>
+  <div class="s-label">Production</div>
+  <a class="s-link" onclick="go('revalidation')">🔄 Revalidation</a>
+  <a class="s-link" onclick="go('rls')">🔒 Security & RLS</a>
+</aside>
+
+<!-- CONTENT -->
+<div class="content">
+
+<div id="overview">
+  <div class="page-eye">Implementation Guide</div>
+  <h1 class="page-h1">Dynamic Data Layer</h1>
+  <p class="page-sub">Replaces all hardcoded arrays in the HTML prototypes with live Supabase data. Covers jobs, workers, search, the worker profile dynamic route, and auth-gated dashboard data for both employers and workers.</p>
+
+  <div class="arch-row" style="margin-bottom:10px">
+    <div class="arch-box ui"><div class="arch-box-title">Next.js Page / Component</div><div class="arch-box-sub">React Server Component or Client with SWR</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box api"><div class="arch-box-title">API Route / Server Action</div><div class="arch-box-sub">app/api/shinga/… + lib/shinga/…</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box db"><div class="arch-box-title">Supabase (Postgres + RLS)</div><div class="arch-box-sub">All 12 tables, search functions, triggers</div></div>
+  </div>
+
+  <div class="card ok">
+    <div class="card-title">✅ What this replaces</div>
+    <div class="card-body">
+      Every <code>const JOBS = [...]</code> and <code>const WORKERS = [...]</code> hardcoded array in shinga.html, shinga-employer.html, and shinga-worker-profile.html gets replaced by a real Supabase query through these files. The UI components stay exactly the same — only the data source changes.
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="filetree">
+  <h2>File Structure</h2>
+  <div class="file-tree">
+    <div class="ft-dir">app/</div>
+    <div class="ft-indent">
+      <div class="ft-dir">api/shinga/</div>
+      <div class="ft-indent">
+        <div class="ft-file new">jobs/route.ts              ← GET list + POST create</div>
+        <div class="ft-file new">jobs/[id]/route.ts         ← GET single + PATCH + DELETE</div>
+        <div class="ft-file new">workers/route.ts           ← GET list</div>
+        <div class="ft-file new">workers/[id]/route.ts      ← GET single worker profile</div>
+        <div class="ft-file new">search/route.ts            ← unified search endpoint</div>
+        <div class="ft-file new">applications/route.ts      ← POST apply</div>
+        <div class="ft-file new">applications/[id]/hire/route.ts</div>
+      </div>
+      <div class="ft-dir">workers/</div>
+      <div class="ft-indent">
+        <div class="ft-file new">[id]/page.tsx              ← dynamic worker profile page</div>
+        <div class="ft-file new">[id]/loading.tsx           ← skeleton loader</div>
+        <div class="ft-file new">[id]/not-found.tsx         ← 404 page</div>
+      </div>
+      <div class="ft-dir">dashboard/</div>
+      <div class="ft-indent">
+        <div class="ft-dir">employer/</div>
+        <div class="ft-indent">
+          <div class="ft-file new">page.tsx                 ← employer overview</div>
+          <div class="ft-file new">jobs/page.tsx</div>
+          <div class="ft-file new">applications/page.tsx</div>
+        </div>
+        <div class="ft-dir">worker/</div>
+        <div class="ft-indent">
+          <div class="ft-file new">page.tsx                 ← worker overview</div>
+          <div class="ft-file new">profile/page.tsx</div>
+        </div>
+      </div>
+    </div>
+    <div class="ft-dir">lib/shinga/</div>
+    <div class="ft-indent">
+      <div class="ft-file">supabase.ts                    ← already built</div>
+      <div class="ft-file">auth.ts                        ← already built</div>
+      <div class="ft-file new">jobs.ts                    ← job queries</div>
+      <div class="ft-file new">workers.ts                 ← worker queries</div>
+      <div class="ft-file new">search.ts                  ← search function</div>
+    </div>
+    <div class="ft-dir">hooks/shinga/</div>
+    <div class="ft-indent">
+      <div class="ft-file new">useJobs.ts</div>
+      <div class="ft-file new">useWorkers.ts</div>
+      <div class="ft-file new">useSearch.ts</div>
+      <div class="ft-file new">useProfile.ts</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="jobs-api">
+  <h2>Jobs API</h2>
+  <div class="cw">
+    <div class="cl">lib/shinga/jobs.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="c">// ═══════════════════════════════════════════════════════
+// SHINGA — Jobs Data Layer
+// ═══════════════════════════════════════════════════════</span>
+<span class="k">import</span> { createServerClient } <span class="k">from</span> <span class="s">'./supabase'</span>
+
+<span class="k">export interface</span> Job {
+  id:                string
+  employer_id:       string
+  title:             string
+  company_name:      string | <span class="k">null</span>
+  description:       string
+  category:          string
+  job_type:          string
+  district_id:       number
+  district:          { name: string; province: string }
+  pay_amount:        number | <span class="k">null</span>
+  pay_unit:          string | <span class="k">null</span>
+  slots:             number
+  featured:          boolean
+  urgent:            boolean
+  status:            string
+  applications_count:number
+  views_count:       number
+  expires_at:        string
+  created_at:        string
+}
+
+<span class="k">export interface</span> JobFilters {
+  category?:  string
+  job_type?:  string
+  district?:  string
+  keyword?:   string
+  featured?:  boolean
+  page?:      number
+  limit?:     number
+}
+
+<span class="c">// ── LIST JOBS ─────────────────────────────────────────</span>
+<span class="k">export async function</span> <span class="fn">getJobs</span>(filters: JobFilters = {}) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { page = 1, limit = 20 } = filters
+  <span class="k">const</span> from = (page - 1) * limit
+  <span class="k">const</span> to   = from + limit - 1
+
+  <span class="k">let</span> query = supabase
+    .from(<span class="s">'jobs'</span>)
+    .select(<span class="s">`
+      *,
+      district:districts(name, province),
+      employer:profiles(full_name)
+    `</span>, { count: <span class="s">'exact'</span> })
+    .eq(<span class="s">'status'</span>, <span class="s">'active'</span>)
+    .order(<span class="s">'featured'</span>, { ascending: <span class="k">false</span> })
+    .order(<span class="s">'created_at'</span>, { ascending: <span class="k">false</span> })
+    .range(from, to)
+
+  <span class="k">if</span> (filters.category) query = query.eq(<span class="s">'category'</span>, filters.category)
+  <span class="k">if</span> (filters.job_type) query = query.eq(<span class="s">'job_type'</span>, filters.job_type)
+  <span class="k">if</span> (filters.featured) query = query.eq(<span class="s">'featured'</span>, <span class="k">true</span>)
+  <span class="k">if</span> (filters.district) {
+    <span class="c">// join filter on district name</span>
+    <span class="k">const</span> { data: dist } = <span class="k">await</span> supabase
+      .from(<span class="s">'districts'</span>).select(<span class="s">'id'</span>).ilike(<span class="s">'name'</span>, <span class="s">`%</span><span class="n">${filters.district}</span><span class="s">%`</span>).single()
+    <span class="k">if</span> (dist) query = query.eq(<span class="s">'district_id'</span>, dist.id)
+  }
+  <span class="k">if</span> (filters.keyword) {
+    query = query.or(
+      <span class="s">`title.ilike.%</span><span class="n">${filters.keyword}</span><span class="s">%,description.ilike.%</span><span class="n">${filters.keyword}</span><span class="s">%`</span>
+    )
+  }
+
+  <span class="k">const</span> { data, count, error } = <span class="k">await</span> query
+  <span class="k">return</span> { jobs: data ?? [], total: count ?? 0, error }
+}
+
+<span class="c">// ── SINGLE JOB ────────────────────────────────────────</span>
+<span class="k">export async function</span> <span class="fn">getJob</span>(id: string) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data, error } = <span class="k">await</span> supabase
+    .from(<span class="s">'jobs'</span>)
+    .select(<span class="s">`*, district:districts(name, province), employer:profiles(full_name, phone)`</span>)
+    .eq(<span class="s">'id'</span>, id)
+    .single()
+
+  <span class="c">// Increment view count (fire and forget)</span>
+  <span class="k">if</span> (data) {
+    supabase.from(<span class="s">'jobs'</span>)
+      .update({ views_count: (data.views_count ?? 0) + 1 })
+      .eq(<span class="s">'id'</span>, id).then(() => {})
+  }
+  <span class="k">return</span> { job: data, error }
+}
+
+<span class="c">// ── EMPLOYER'S JOBS ───────────────────────────────────</span>
+<span class="k">export async function</span> <span class="fn">getEmployerJobs</span>(employerId: string) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data, error } = <span class="k">await</span> supabase
+    .from(<span class="s">'jobs'</span>)
+    .select(<span class="s">`*, district:districts(name), applications:applications(count)`</span>)
+    .eq(<span class="s">'employer_id'</span>, employerId)
+    .order(<span class="s">'created_at'</span>, { ascending: <span class="k">false</span> })
+  <span class="k">return</span> { jobs: data ?? [], error }
+}
+
+<span class="c">// ── CREATE JOB (after payment confirmed) ──────────────</span>
+<span class="k">export async function</span> <span class="fn">createJob</span>(employerId: string, data: Partial&lt;Job&gt;) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data: job, error } = <span class="k">await</span> supabase
+    .from(<span class="s">'jobs'</span>)
+    .insert({ ...data, employer_id: employerId, status: <span class="s">'active'</span> })
+    .select()
+    .single()
+  <span class="k">return</span> { job, error }
+}
+
+<span class="c">// ── UPDATE JOB STATUS ─────────────────────────────────</span>
+<span class="k">export async function</span> <span class="fn">updateJobStatus</span>(
+  jobId: string, employerId: string,
+  status: <span class="s">'active'</span> | <span class="s">'paused'</span> | <span class="s">'filled'</span>
+) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { error } = <span class="k">await</span> supabase
+    .from(<span class="s">'jobs'</span>)
+    .update({ status })
+    .eq(<span class="s">'id'</span>, jobId)
+    .eq(<span class="s">'employer_id'</span>, employerId)  <span class="c">// RLS: only own jobs</span>
+  <span class="k">return</span> { error }
+}</pre>
+  </div>
+
+  <div class="cw">
+    <div class="cl">app/api/shinga/jobs/route.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">import</span> { NextRequest, NextResponse } <span class="k">from</span> <span class="s">'next/server'</span>
+<span class="k">import</span> { getJobs, createJob } <span class="k">from</span> <span class="s">'@/lib/shinga/jobs'</span>
+<span class="k">import</span> { getUser }            <span class="k">from</span> <span class="s">'@/lib/shinga/auth'</span>
+
+<span class="c">// GET /api/shinga/jobs?category=domestic&job_type=daily&keyword=cleaner&page=1</span>
+<span class="k">export async function</span> <span class="fn">GET</span>(req: NextRequest) {
+  <span class="k">const</span> p        = req.nextUrl.searchParams
+  <span class="k">const</span> { jobs, total, error } = <span class="k">await</span> <span class="fn">getJobs</span>({
+    category:  p.get(<span class="s">'category'</span>)  || undefined,
+    job_type:  p.get(<span class="s">'job_type'</span>)  || undefined,
+    district:  p.get(<span class="s">'district'</span>)  || undefined,
+    keyword:   p.get(<span class="s">'keyword'</span>)   || undefined,
+    featured:  p.get(<span class="s">'featured'</span>) === <span class="s">'true'</span>,
+    page:      parseInt(p.get(<span class="s">'page'</span>) || <span class="s">'1'</span>),
+    limit:     parseInt(p.get(<span class="s">'limit'</span>) || <span class="s">'20'</span>),
+  })
+  <span class="k">if</span> (error) <span class="k">return</span> NextResponse.json({ error: error.message }, { status: 400 })
+  <span class="k">return</span> NextResponse.json({ jobs, total }, {
+    headers: { <span class="s">'Cache-Control'</span>: <span class="s">'public, s-maxage=60, stale-while-revalidate=300'</span> }
+  })
+}
+
+<span class="c">// POST /api/shinga/jobs — create a job (after payment)</span>
+<span class="k">export async function</span> <span class="fn">POST</span>(req: NextRequest) {
+  <span class="k">const</span> user = <span class="k">await</span> <span class="fn">getUser</span>()
+  <span class="k">if</span> (!user) <span class="k">return</span> NextResponse.json({ error: <span class="s">'Unauthorized'</span> }, { status: 401 })
+  <span class="k">const</span> body = <span class="k">await</span> req.json()
+  <span class="k">const</span> { job, error } = <span class="k">await</span> <span class="fn">createJob</span>(user.id, body)
+  <span class="k">if</span> (error) <span class="k">return</span> NextResponse.json({ error: error.message }, { status: 400 })
+  <span class="k">return</span> NextResponse.json({ job }, { status: 201 })
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="workers-api">
+  <h2>Workers API</h2>
+  <div class="cw">
+    <div class="cl">lib/shinga/workers.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="c">// ═══════════════════════════════════════════════════════
+// SHINGA — Workers Data Layer
+// ═══════════════════════════════════════════════════════</span>
+<span class="k">import</span> { createServerClient } <span class="k">from</span> <span class="s">'./supabase'</span>
+
+<span class="k">export interface</span> Worker {
+  id:             string
+  profile_id:     string
+  full_name:      string
+  skill_title:    string
+  skill_tags:     string[]
+  category:       string
+  bio:            string | <span class="k">null</span>
+  district_id:    number
+  district:       { name: string; province: string }
+  sector:         string | <span class="k">null</span>
+  rate_amount:    number | <span class="k">null</span>
+  rate_unit:      string | <span class="k">null</span>
+  rate_negotiable:boolean
+  availability:   string
+  can_travel:     boolean
+  verified:       boolean
+  featured:       boolean
+  rating_avg:     number
+  rating_count:   number
+  jobs_completed: number
+  years_exp:      number
+  views_count:    number
+  status:         string
+  created_at:     string
+}
+
+<span class="k">export interface</span> WorkerFilters {
+  category?:  string
+  district?:  string
+  verified?:  boolean
+  keyword?:   string
+  page?:      number
+  limit?:     number
+}
+
+<span class="c">// ── LIST WORKERS ──────────────────────────────────────</span>
+<span class="k">export async function</span> <span class="fn">getWorkers</span>(filters: WorkerFilters = {}) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { page = 1, limit = 20 } = filters
+  <span class="k">const</span> from = (page - 1) * limit, to = from + limit - 1
+
+  <span class="k">let</span> query = supabase
+    .from(<span class="s">'workers'</span>)
+    .select(<span class="s">`*, district:districts(name, province)`</span>, { count: <span class="s">'exact'</span> })
+    .eq(<span class="s">'status'</span>, <span class="s">'active'</span>)
+    .order(<span class="s">'featured'</span>, { ascending: <span class="k">false</span> })
+    .order(<span class="s">'verified'</span>, { ascending: <span class="k">false</span> })
+    .order(<span class="s">'rating_avg'</span>, { ascending: <span class="k">false</span> })
+    .range(from, to)
+
+  <span class="k">if</span> (filters.category) query = query.eq(<span class="s">'category'</span>, filters.category)
+  <span class="k">if</span> (filters.verified) query = query.eq(<span class="s">'verified'</span>, <span class="k">true</span>)
+  <span class="k">if</span> (filters.district) {
+    <span class="k">const</span> { data: dist } = <span class="k">await</span> supabase
+      .from(<span class="s">'districts'</span>).select(<span class="s">'id'</span>).ilike(<span class="s">'name'</span>, <span class="s">`%</span><span class="n">${filters.district}</span><span class="s">%`</span>).single()
+    <span class="k">if</span> (dist) query = query.eq(<span class="s">'district_id'</span>, dist.id)
+  }
+  <span class="k">if</span> (filters.keyword) {
+    query = query.or(
+      <span class="s">`skill_title.ilike.%</span><span class="n">${filters.keyword}</span><span class="s">%,bio.ilike.%</span><span class="n">${filters.keyword}</span><span class="s">%`</span>
+    )
+  }
+
+  <span class="k">const</span> { data, count, error } = <span class="k">await</span> query
+  <span class="k">return</span> { workers: data ?? [], total: count ?? 0, error }
+}
+
+<span class="c">// ── SINGLE WORKER (public profile) ────────────────────</span>
+<span class="k">export async function</span> <span class="fn">getWorker</span>(id: string) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data: worker, error } = <span class="k">await</span> supabase
+    .from(<span class="s">'workers'</span>)
+    .select(<span class="s">`
+      *,
+      district:districts(name, province),
+      reviews:reviews(
+        id, rating, comment, created_at,
+        reviewer:profiles(full_name)
+      )
+    `</span>)
+    .eq(<span class="s">'id'</span>, id)
+    .eq(<span class="s">'status'</span>, <span class="s">'active'</span>)
+    .single()
+
+  <span class="c">// Increment view count</span>
+  <span class="k">if</span> (worker) {
+    supabase.from(<span class="s">'workers'</span>)
+      .update({ views_count: (worker.views_count ?? 0) + 1 })
+      .eq(<span class="s">'id'</span>, id).then(() => {})
+  }
+  <span class="k">return</span> { worker, error }
+}
+
+<span class="c">// ── WORKER BY PROFILE ID (for dashboard) ──────────────</span>
+<span class="k">export async function</span> <span class="fn">getWorkerByProfileId</span>(profileId: string) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data, error } = <span class="k">await</span> supabase
+    .from(<span class="s">'workers'</span>)
+    .select(<span class="s">`*, district:districts(name)`</span>)
+    .eq(<span class="s">'profile_id'</span>, profileId)
+    .single()
+  <span class="k">return</span> { worker: data, error }
+}
+
+<span class="c">// ── WORKER'S APPLICATIONS ─────────────────────────────</span>
+<span class="k">export async function</span> <span class="fn">getWorkerApplications</span>(workerId: string) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data, error } = <span class="k">await</span> supabase
+    .from(<span class="s">'applications'</span>)
+    .select(<span class="s">`
+      *,
+      job:jobs(title, job_type, pay_amount, pay_unit, status,
+        district:districts(name),
+        employer:profiles(full_name)
+      )
+    `</span>)
+    .eq(<span class="s">'worker_id'</span>, workerId)
+    .order(<span class="s">'created_at'</span>, { ascending: <span class="k">false</span> })
+  <span class="k">return</span> { applications: data ?? [], error }
+}
+
+<span class="c">// ── SUBMIT APPLICATION (after payment) ────────────────</span>
+<span class="k">export async function</span> <span class="fn">submitApplication</span>(data: {
+  jobId:    string
+  workerId: string
+  note?:    string
+}) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data: app, error } = <span class="k">await</span> supabase
+    .from(<span class="s">'applications'</span>)
+    .insert({
+      job_id:    data.jobId,
+      worker_id: data.workerId,
+      note:      data.note,
+      status:    <span class="s">'pending'</span>,
+    })
+    .select()
+    .single()
+  <span class="k">return</span> { application: app, error }
+}
+
+<span class="c">// ── SIMILAR WORKERS (same category, exclude self) ─────</span>
+<span class="k">export async function</span> <span class="fn">getSimilarWorkers</span>(workerId: string, category: string, districtId: number) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data } = <span class="k">await</span> supabase
+    .from(<span class="s">'workers'</span>)
+    .select(<span class="s">`id, full_name, skill_title, rate_amount, rate_unit, verified, rating_avg, district:districts(name)`</span>)
+    .eq(<span class="s">'category'</span>, category)
+    .eq(<span class="s">'status'</span>, <span class="s">'active'</span>)
+    .neq(<span class="s">'id'</span>, workerId)
+    .order(<span class="s">'verified'</span>, { ascending: <span class="k">false</span> })
+    .order(<span class="s">'rating_avg'</span>, { ascending: <span class="k">false</span> })
+    .limit(4)
+  <span class="k">return</span> data ?? []
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="search-api">
+  <h2>Search API</h2>
+  <div class="cw">
+    <div class="cl">app/api/shinga/search/route.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="c">// Unified search — hits Postgres full-text search functions from schema</span>
+<span class="k">import</span> { NextRequest, NextResponse } <span class="k">from</span> <span class="s">'next/server'</span>
+<span class="k">import</span> { createServerClient }        <span class="k">from</span> <span class="s">'@/lib/shinga/supabase'</span>
+
+<span class="k">export async function</span> <span class="fn">GET</span>(req: NextRequest) {
+  <span class="k">const</span> p       = req.nextUrl.searchParams
+  <span class="k">const</span> q       = p.get(<span class="s">'q'</span>) || <span class="s">''</span>
+  <span class="k">const</span> type    = p.get(<span class="s">'type'</span>) || <span class="s">'jobs'</span>   <span class="c">// 'jobs' | 'workers'</span>
+  <span class="k">const</span> districtId = p.get(<span class="s">'district_id'</span>) ? parseInt(p.get(<span class="s">'district_id'</span>)!) : <span class="k">null</span>
+  <span class="k">const</span> category   = p.get(<span class="s">'category'</span>) || <span class="k">null</span>
+
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+
+  <span class="k">if</span> (type === <span class="s">'jobs'</span>) {
+    <span class="c">// Uses search_jobs() Postgres function from shinga-schema.sql</span>
+    <span class="k">const</span> { data, error } = <span class="k">await</span> supabase
+      .rpc(<span class="s">'search_jobs'</span>, {
+        search_query: q,
+        p_category:   category,
+        p_district_id: districtId,
+        p_limit:      20,
+        p_offset:     0,
+      })
+    <span class="k">if</span> (error) <span class="k">return</span> NextResponse.json({ error: error.message }, { status: 400 })
+    <span class="k">return</span> NextResponse.json({ results: data })
+  }
+
+  <span class="k">if</span> (type === <span class="s">'workers'</span>) {
+    <span class="c">// Uses search_workers() Postgres function from shinga-schema.sql</span>
+    <span class="k">const</span> { data, error } = <span class="k">await</span> supabase
+      .rpc(<span class="s">'search_workers'</span>, {
+        search_query:  q,
+        p_category:    category,
+        p_district_id: districtId,
+        p_limit:       20,
+        p_offset:      0,
+      })
+    <span class="k">if</span> (error) <span class="k">return</span> NextResponse.json({ error: error.message }, { status: 400 })
+    <span class="k">return</span> NextResponse.json({ results: data })
+  }
+
+  <span class="k">return</span> NextResponse.json({ error: <span class="s">'Invalid type'</span> }, { status: 400 })
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="hooks">
+  <h2>SWR Client Hooks</h2>
+  <div class="cw">
+    <div class="cl">hooks/shinga/useJobs.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="s">'use client'</span>
+<span class="k">import</span> useSWR <span class="k">from</span> <span class="s">'swr'</span>
+
+<span class="k">const</span> fetcher = (url: string) => fetch(url).then(r => r.json())
+
+<span class="k">export function</span> <span class="fn">useJobs</span>(filters: Record&lt;string, string&gt; = {}) {
+  <span class="k">const</span> params = <span class="k">new</span> URLSearchParams(
+    Object.fromEntries(Object.entries(filters).filter(([,v]) => v))
+  )
+  <span class="k">const</span> { data, error, isLoading, mutate } = <span class="fn">useSWR</span>(
+    <span class="s">`/api/shinga/jobs?</span><span class="n">${params}</span><span class="s">`</span>,
+    fetcher,
+    { revalidateOnFocus: <span class="k">false</span> }
+  )
+  <span class="k">return</span> {
+    jobs:      (data?.jobs ?? []) <span class="k">as</span> Job[],
+    total:     data?.total ?? 0,
+    isLoading,
+    error,
+    mutate,
+  }
+}
+
+<span class="k">export function</span> <span class="fn">useJob</span>(id: string) {
+  <span class="k">const</span> { data, error, isLoading } = <span class="fn">useSWR</span>(
+    id ? <span class="s">`/api/shinga/jobs/</span><span class="n">${id}</span><span class="s">`</span> : <span class="k">null</span>,
+    fetcher
+  )
+  <span class="k">return</span> { job: data?.job ?? <span class="k">null</span>, isLoading, error }
+}</pre>
+  </div>
+
+  <div class="cw">
+    <div class="cl">hooks/shinga/useWorkers.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="s">'use client'</span>
+<span class="k">import</span> useSWR <span class="k">from</span> <span class="s">'swr'</span>
+
+<span class="k">const</span> fetcher = (url: string) => fetch(url).then(r => r.json())
+
+<span class="k">export function</span> <span class="fn">useWorkers</span>(filters: Record&lt;string, string&gt; = {}) {
+  <span class="k">const</span> params = <span class="k">new</span> URLSearchParams(
+    Object.fromEntries(Object.entries(filters).filter(([,v]) => v))
+  )
+  <span class="k">const</span> { data, error, isLoading } = <span class="fn">useSWR</span>(
+    <span class="s">`/api/shinga/workers?</span><span class="n">${params}</span><span class="s">`</span>,
+    fetcher,
+    { revalidateOnFocus: <span class="k">false</span> }
+  )
+  <span class="k">return</span> { workers: data?.workers ?? [], total: data?.total ?? 0, isLoading, error }
+}
+
+<span class="k">export function</span> <span class="fn">useSearch</span>(query: string, type: <span class="s">'jobs'</span> | <span class="s">'workers'</span>, filters = {}) {
+  <span class="k">const</span> params = <span class="k">new</span> URLSearchParams({ q: query, type, ...filters })
+  <span class="k">const</span> { data, error, isLoading } = <span class="fn">useSWR</span>(
+    query.length > 1 ? <span class="s">`/api/shinga/search?</span><span class="n">${params}</span><span class="s">`</span> : <span class="k">null</span>,
+    fetcher,
+    { dedupingInterval: 300 }
+  )
+  <span class="k">return</span> { results: data?.results ?? [], isLoading, error }
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="profile-route">
+  <h2>Worker Profile — Dynamic Route</h2>
+  <p>The worker profile page lives at <code>app/workers/[id]/page.tsx</code>. The <code>[id]</code> segment is the worker's UUID from the database. URLs look like <code>shinga.rw/workers/3f8a9b2c-...</code>.</p>
+
+  <div class="cw">
+    <div class="cl">app/workers/[id]/page.tsx — Server Component<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">import</span> { notFound }           <span class="k">from</span> <span class="s">'next/navigation'</span>
+<span class="k">import</span> { getWorker, getSimilarWorkers } <span class="k">from</span> <span class="s">'@/lib/shinga/workers'</span>
+<span class="k">import</span> { getProfile }         <span class="k">from</span> <span class="s">'@/lib/shinga/auth'</span>
+<span class="k">import</span> { WorkerProfileClient }<span class="k">from</span> <span class="s">'./WorkerProfileClient'</span>
+
+<span class="k">interface</span> Props { params: { id: string } }
+
+<span class="c">// Server Component — fetches data, passes to client</span>
+<span class="k">export default async function</span> <span class="fn">WorkerProfilePage</span>({ params }: Props) {
+  <span class="k">const</span> { worker, error } = <span class="k">await</span> <span class="fn">getWorker</span>(params.id)
+  <span class="k">if</span> (error || !worker) <span class="fn">notFound</span>()
+
+  <span class="k">const</span> [similar, viewer] = <span class="k">await</span> Promise.all([
+    <span class="fn">getSimilarWorkers</span>(worker.id, worker.category, worker.district_id),
+    <span class="fn">getProfile</span>(),
+  ])
+
+  <span class="k">return</span> (
+    &lt;WorkerProfileClient
+      worker={worker}
+      similar={similar}
+      viewerRole={viewer?.role ?? <span class="k">null</span>}
+      viewerId={viewer?.id ?? <span class="k">null</span>}
+    /&gt;
+  )
+}
+
+<span class="c">// Static params for ISR — pre-render top 100 workers</span>
+<span class="k">export async function</span> <span class="fn">generateStaticParams</span>() {
+  <span class="k">const</span> { createServerClient } = <span class="k">await</span> import(<span class="s">'@/lib/shinga/supabase'</span>)
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data } = <span class="k">await</span> supabase
+    .from(<span class="s">'workers'</span>)
+    .select(<span class="s">'id'</span>)
+    .eq(<span class="s">'status'</span>, <span class="s">'active'</span>)
+    .order(<span class="s">'rating_avg'</span>, { ascending: <span class="k">false</span> })
+    .limit(100)
+  <span class="k">return</span> (data ?? []).map(w => ({ id: w.id }))
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="profile-page">
+  <h2>Worker Profile Client Component</h2>
+  <div class="cw">
+    <div class="cl">app/workers/[id]/WorkerProfileClient.tsx<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="s">'use client'</span>
+<span class="k">import</span> { useState }       <span class="k">from</span> <span class="s">'react'</span>
+<span class="k">import</span> { usePayment }    <span class="k">from</span> <span class="s">'@/hooks/shinga/usePayment'</span>
+<span class="k">import</span> { Worker }        <span class="k">from</span> <span class="s">'@/lib/shinga/workers'</span>
+
+<span class="k">interface</span> Props {
+  worker:     Worker
+  similar:    Partial&lt;Worker&gt;[]
+  viewerRole: <span class="s">'employer'</span> | <span class="s">'worker'</span> | <span class="s">'admin'</span> | <span class="k">null</span>
+  viewerId:   string | <span class="k">null</span>
+}
+
+<span class="k">export function</span> <span class="fn">WorkerProfileClient</span>({ worker, similar, viewerRole, viewerId }: Props) {
+  <span class="k">const</span> [revealed,   setRevealed]   = useState(<span class="k">false</span>)
+  <span class="k">const</span> [phone,      setPhone]       = useState(<span class="s">''</span>)
+  <span class="k">const</span> [activeTab,  setActiveTab]   = useState(<span class="s">'about'</span>)
+  <span class="k">const</span> [showContact,setShowContact] = useState(<span class="k">false</span>)
+
+  <span class="k">const</span> { pay, status: payStatus } = <span class="fn">usePayment</span>({
+    onSuccess: <span class="k">async</span> (referenceId) => {
+      <span class="c">// Fetch revealed phone from API (phone only returned after payment verified)</span>
+      <span class="k">const</span> res  = <span class="k">await</span> fetch(<span class="s">`/api/shinga/workers/</span><span class="n">${worker.id}</span><span class="s">/contact?ref=</span><span class="n">${referenceId}</span><span class="s">`</span>)
+      <span class="k">const</span> data = <span class="k">await</span> res.json()
+      <span class="k">if</span> (data.phone) { setPhone(data.phone); setRevealed(<span class="k">true</span>) }
+    },
+    onFailure: (err) => console.error(err),
+  })
+
+  <span class="k">const</span> handleContact = (myPhone: string) => {
+    <span class="k">if</span> (!viewerId) { window.location.href = <span class="s">'/login'</span>; <span class="k">return</span> }
+    <span class="fn">pay</span>({
+      action:   <span class="s">'contact_worker'</span>,
+      phone:    myPhone,
+      metadata: { worker_id: worker.id, worker_name: worker.full_name },
+    })
+  }
+
+  <span class="k">const</span> fmt = (n: number) => <span class="s">`RWF </span><span class="n">${n.toLocaleString()}</span><span class="s">`</span>
+
+  <span class="k">return</span> (
+    &lt;div className=<span class="s">"worker-profile"</span>&gt;
+
+      {<span class="c">/* ── HERO ── */</span>}
+      &lt;div className=<span class="s">"profile-hero"</span>&gt;
+        &lt;div className=<span class="s">"ph-avi"</span> style={{ background: <span class="s">`linear-gradient(135deg,</span><span class="n">${avatarColor(worker.full_name)}</span><span class="s">)`</span> }}&gt;
+          {initials(worker.full_name)}
+          {worker.verified &amp;&amp; &lt;div className=<span class="s">"ph-verif-ring"</span>&gt;✓&lt;/div&gt;}
+        &lt;/div&gt;
+        &lt;div className=<span class="s">"ph-info"</span>&gt;
+          &lt;h1&gt;{worker.full_name}&lt;/h1&gt;
+          &lt;div className=<span class="s">"ph-role"</span>&gt;{worker.skill_title}&lt;/div&gt;
+          &lt;div className=<span class="s">"ph-meta"</span>&gt;
+            &lt;span&gt;📍 {worker.district?.name}&lt;/span&gt;
+            &lt;span&gt;★ {worker.rating_avg} ({worker.rating_count} reviews)&lt;/span&gt;
+            &lt;span&gt;{worker.jobs_completed} jobs done&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div className=<span class="s">"ph-actions"</span>&gt;
+          &lt;div className=<span class="s">"ph-rate"</span>&gt;
+            {worker.rate_amount ? <span class="s">`</span><span class="n">${fmt(worker.rate_amount)}</span><span class="s"> / </span><span class="n">${worker.rate_unit}</span><span class="s">`</span> : <span class="s">'Rate negotiable'</span>}
+          &lt;/div&gt;
+          {viewerRole === <span class="s">'employer'</span> || viewerRole === <span class="k">null</span> ? (
+            revealed ? (
+              &lt;a href={<span class="s">`tel:</span><span class="n">${phone}</span><span class="s">`</span>} className=<span class="s">"btn btn-green"</span>&gt;📞 {phone}&lt;/a&gt;
+            ) : payStatus === <span class="s">'pending'</span> ? (
+              &lt;div className=<span class="s">"payment-pending"</span>&gt;
+                &lt;div className=<span class="s">"spinner"</span> /&gt;
+                &lt;p&gt;Approve MoMo payment…&lt;/p&gt;
+              &lt;/div&gt;
+            ) : (
+              &lt;button className=<span class="s">"btn btn-green"</span> onClick={() => setShowContact(<span class="k">true</span>)}&gt;
+                Contact — RWF 1,500
+              &lt;/button&gt;
+            )
+          ) : <span class="k">null</span>}
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {<span class="c">/* ── TABS ── */</span>}
+      &lt;div className=<span class="s">"profile-tabs"</span>&gt;
+        {[<span class="s">'about'</span>, <span class="s">'reviews'</span>, <span class="s">'availability'</span>].map(tab =&gt; (
+          &lt;button key={tab} className={activeTab === tab ? <span class="s">'active'</span> : <span class="s">''</span>}
+            onClick={() =&gt; setActiveTab(tab)}&gt;{tab}&lt;/button&gt;
+        ))}
+      &lt;/div&gt;
+
+      {<span class="c">/* ── TAB CONTENT ── */</span>}
+      {activeTab === <span class="s">'about'</span> &amp;&amp; (
+        &lt;div&gt;
+          &lt;p&gt;{worker.bio}&lt;/p&gt;
+          &lt;div className=<span class="s">"skills-list"</span>&gt;
+            {worker.skill_tags?.map(tag =&gt; (
+              &lt;span key={tag} className=<span class="s">"skill-tag"</span>&gt;{tag}&lt;/span&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      )}
+
+      {activeTab === <span class="s">'reviews'</span> &amp;&amp; (
+        &lt;div className=<span class="s">"review-list"</span>&gt;
+          {(worker as any).reviews?.map((r: any) =&gt; (
+            &lt;div key={r.id} className=<span class="s">"review"</span>&gt;
+              &lt;div className=<span class="s">"review-top"</span>&gt;
+                &lt;strong&gt;{r.reviewer?.full_name}&lt;/strong&gt;
+                &lt;span&gt;{'★'.repeat(r.rating)}&lt;/span&gt;
+              &lt;/div&gt;
+              &lt;p&gt;{r.comment}&lt;/p&gt;
+            &lt;/div&gt;
+          ))}
+        &lt;/div&gt;
+      )}
+
+      {<span class="c">/* ── CONTACT MODAL ── */</span>}
+      {showContact &amp;&amp; (
+        &lt;ContactModal
+          workerName={worker.full_name}
+          onPay={(phone) =&gt; { setShowContact(<span class="k">false</span>); handleContact(phone) }}
+          onClose={() =&gt; setShowContact(<span class="k">false</span>)}
+        /&gt;
+      )}
+    &lt;/div&gt;
+  )
+}
+
+<span class="c">// ── HELPERS ───────────────────────────────────────────</span>
+<span class="k">function</span> <span class="fn">initials</span>(name: string) {
+  <span class="k">return</span> name.split(<span class="s">' '</span>).map(n => n[0]).join(<span class="s">''</span>).slice(0, 2).toUpperCase()
+}
+
+<span class="k">function</span> <span class="fn">avatarColor</span>(name: string) {
+  <span class="k">const</span> colors = [
+    <span class="s">'#1A7A4A,#145E38'</span>, <span class="s">'#2563EB,#7C3AED'</span>, <span class="s">'#B45309,#D97706'</span>,
+    <span class="s">'#DC2626,#C4541A'</span>, <span class="s">'#0891B2,#059669'</span>, <span class="s">'#7C3AED,#EC4899'</span>
+  ]
+  <span class="k">const</span> idx = name.charCodeAt(0) % colors.length
+  <span class="k">return</span> colors[idx]
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="profile-meta">
+  <h2>SEO & Metadata</h2>
+  <div class="cw">
+    <div class="cl">app/workers/[id]/page.tsx — add metadata export<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">import type</span> { Metadata } <span class="k">from</span> <span class="s">'next'</span>
+
+<span class="k">export async function</span> <span class="fn">generateMetadata</span>({ params }: Props): Promise&lt;Metadata&gt; {
+  <span class="k">const</span> { worker } = <span class="k">await</span> <span class="fn">getWorker</span>(params.id)
+  <span class="k">if</span> (!worker) <span class="k">return</span> { title: <span class="s">'Worker not found — SHINGA'</span> }
+
+  <span class="k">return</span> {
+    title:       <span class="s">`</span><span class="n">${worker.full_name}</span><span class="s"> — </span><span class="n">${worker.skill_title}</span><span class="s"> | SHINGA`</span>,
+    description: worker.bio?.slice(0, 160) ||
+      <span class="s">`Hire </span><span class="n">${worker.full_name}</span><span class="s">, a </span><span class="n">${worker.skill_title}</span><span class="s"> in </span><span class="n">${worker.district?.name}</span><span class="s">, Rwanda on SHINGA.`</span>,
+    openGraph: {
+      title:       <span class="s">`</span><span class="n">${worker.full_name}</span><span class="s"> — </span><span class="n">${worker.skill_title}</span><span class="s">`</span>,
+      description: <span class="s">`★ </span><span class="n">${worker.rating_avg}</span><span class="s"> · </span><span class="n">${worker.jobs_completed}</span><span class="s"> jobs done · </span><span class="n">${worker.district?.name}</span><span class="s">, Rwanda`</span>,
+      url:         <span class="s">`https://shinga.rw/workers/</span><span class="n">${worker.id}</span><span class="s">`</span>,
+    },
+    alternates: { canonical: <span class="s">`https://shinga.rw/workers/</span><span class="n">${worker.id}</span><span class="s">`</span> },
+  }
+}</pre>
+  </div>
+
+  <div class="cw">
+    <div class="cl">app/workers/[id]/not-found.tsx<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">export default function</span> <span class="fn">WorkerNotFound</span>() {
+  <span class="k">return</span> (
+    &lt;div style={{ textAlign: <span class="s">'center'</span>, padding: <span class="s">'80px 24px'</span> }}&gt;
+      &lt;div style={{ fontSize: <span class="s">'3rem'</span>, marginBottom: <span class="s">'16px'</span> }}&gt;🔍&lt;/div&gt;
+      &lt;h1&gt;Worker not found&lt;/h1&gt;
+      &lt;p&gt;This profile may have been removed or made unavailable.&lt;/p&gt;
+      &lt;a href=<span class="s">"/workers"</span>&gt;Browse all workers&lt;/a&gt;
+    &lt;/div&gt;
+  )
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="employer-data">
+  <h2>Employer Dashboard — Live Data</h2>
+  <div class="cw">
+    <div class="cl">app/dashboard/employer/page.tsx<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">import</span> { requireRole }        <span class="k">from</span> <span class="s">'@/lib/shinga/auth'</span>
+<span class="k">import</span> { getEmployerJobs }   <span class="k">from</span> <span class="s">'@/lib/shinga/jobs'</span>
+<span class="k">import</span> { createServerClient }<span class="k">from</span> <span class="s">'@/lib/shinga/supabase'</span>
+<span class="k">import</span> { EmployerDashboard } <span class="k">from</span> <span class="s">'@/components/shinga/EmployerDashboard'</span>
+
+<span class="k">export default async function</span> <span class="fn">EmployerPage</span>() {
+  <span class="c">// Guard — redirects to /login if not authenticated</span>
+  <span class="k">const</span> profile = <span class="k">await</span> <span class="fn">requireRole</span>(<span class="s">'employer'</span>)
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+
+  <span class="k">const</span> [jobsResult, applicationsResult, walletResult] = <span class="k">await</span> Promise.all([
+    <span class="fn">getEmployerJobs</span>(profile.id),
+
+    supabase.from(<span class="s">'applications'</span>)
+      .select(<span class="s">`
+        *,
+        worker:workers(full_name, skill_title, verified, rating_avg, rating_count,
+          district:districts(name)),
+        job:jobs(title, job_type)
+      `</span>)
+      .in(<span class="s">'job_id'</span>,
+        (await <span class="fn">getEmployerJobs</span>(profile.id)).jobs.map(j => j.id)
+      )
+      .order(<span class="s">'created_at'</span>, { ascending: <span class="k">false</span> }),
+
+    supabase.from(<span class="s">'wallets'</span>)
+      .select(<span class="s">'balance'</span>)
+      .eq(<span class="s">'user_id'</span>, profile.id)
+      .single(),
+  ])
+
+  <span class="k">return</span> (
+    &lt;EmployerDashboard
+      profile={profile}
+      jobs={jobsResult.jobs}
+      applications={applicationsResult.data ?? []}
+      walletBalance={walletResult.data?.balance ?? 0}
+    /&gt;
+  )
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="worker-data">
+  <h2>Worker Dashboard — Live Data</h2>
+  <div class="cw">
+    <div class="cl">app/dashboard/worker/page.tsx<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">import</span> { requireRole }              <span class="k">from</span> <span class="s">'@/lib/shinga/auth'</span>
+<span class="k">import</span> { getWorkerByProfileId,
+         getWorkerApplications }     <span class="k">from</span> <span class="s">'@/lib/shinga/workers'</span>
+<span class="k">import</span> { WorkerDashboard }          <span class="k">from</span> <span class="s">'@/components/shinga/WorkerDashboard'</span>
+
+<span class="k">export default async function</span> <span class="fn">WorkerPage</span>() {
+  <span class="k">const</span> profile = <span class="k">await</span> <span class="fn">requireRole</span>(<span class="s">'worker'</span>)
+
+  <span class="k">const</span> { worker }       = <span class="k">await</span> <span class="fn">getWorkerByProfileId</span>(profile.id)
+  <span class="k">if</span> (!worker) {
+    <span class="c">// Worker hasn't completed onboarding yet</span>
+    <span class="k">return</span> &lt;redirect to=<span class="s">"/onboarding/worker"</span> /&gt;
+  }
+
+  <span class="k">const</span> { applications } = <span class="k">await</span> <span class="fn">getWorkerApplications</span>(worker.id)
+
+  <span class="k">return</span> (
+    &lt;WorkerDashboard
+      profile={profile}
+      worker={worker}
+      applications={applications}
+    /&gt;
+  )
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="revalidation">
+  <h2>ISR Revalidation</h2>
+  <p>Worker profile pages are statically generated for the top 100 workers. New workers or profile updates trigger revalidation via the API.</p>
+  <div class="cw">
+    <div class="cl">app/api/shinga/revalidate/route.ts<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">import</span> { NextRequest, NextResponse } <span class="k">from</span> <span class="s">'next/server'</span>
+<span class="k">import</span> { revalidatePath }            <span class="k">from</span> <span class="s">'next/cache'</span>
+
+<span class="c">// Called from Supabase webhooks when a worker profile is updated</span>
+<span class="k">export async function</span> <span class="fn">POST</span>(req: NextRequest) {
+  <span class="k">const</span> secret = req.headers.get(<span class="s">'x-revalidate-secret'</span>)
+  <span class="k">if</span> (secret !== process.env.REVALIDATE_SECRET)
+    <span class="k">return</span> NextResponse.json({ error: <span class="s">'Invalid secret'</span> }, { status: 401 })
+
+  <span class="k">const</span> { workerId, type } = <span class="k">await</span> req.json()
+
+  <span class="k">if</span> (type === <span class="s">'worker'</span> && workerId) {
+    <span class="fn">revalidatePath</span>(<span class="s">`/workers/</span><span class="n">${workerId}</span><span class="s">`</span>)
+  }
+  <span class="k">if</span> (type === <span class="s">'jobs'</span>) {
+    <span class="fn">revalidatePath</span>(<span class="s">'/'</span>)
+    <span class="fn">revalidatePath</span>(<span class="s">'/jobs'</span>)
+  }
+
+  <span class="k">return</span> NextResponse.json({ revalidated: <span class="k">true</span> })
+}</pre>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div id="rls">
+  <h2>Security & RLS Summary</h2>
+  <div class="card ok">
+    <div class="card-title">✅ What Supabase RLS enforces automatically</div>
+    <div class="card-body">
+      <strong>Employers</strong> can only read/update their own jobs and see applications to their jobs.<br>
+      <strong>Workers</strong> can only read/update their own profile. Their phone number is <em>never</em> returned in any public query — only through the <code>/api/shinga/workers/[id]/contact</code> endpoint after a valid payment reference is verified.<br>
+      <strong>Applications</strong> are only visible to the job's employer or the applying worker.<br>
+      <strong>Payments</strong> are only visible to the user who made them.<br>
+      <strong>Wallets</strong> are only readable by their owner.<br>
+      <strong>Admin routes</strong> require <code>role = 'admin'</code> enforced in middleware.
+    </div>
+  </div>
+
+  <div class="card warn">
+    <div class="card-title">⚠️ Phone number protection — critical</div>
+    <div class="card-body">
+      The worker's <code>phone</code> column must be excluded from all public queries. Only the <code>/api/shinga/workers/[id]/contact</code> route returns it — and only after verifying the payment reference is <code>completed</code> and belongs to the requesting user. This is enforced both in RLS and in the API route logic.
+    </div>
+  </div>
+
+  <div class="cw">
+    <div class="cl">app/api/shinga/workers/[id]/contact/route.ts — phone reveal<button class="cb" onclick="cp(this)">Copy</button></div>
+    <pre><span class="k">import</span> { NextRequest, NextResponse } <span class="k">from</span> <span class="s">'next/server'</span>
+<span class="k">import</span> { getUser }            <span class="k">from</span> <span class="s">'@/lib/shinga/auth'</span>
+<span class="k">import</span> { createServerClient } <span class="k">from</span> <span class="s">'@/lib/shinga/supabase'</span>
+
+<span class="k">export async function</span> <span class="fn">GET</span>(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  <span class="k">const</span> user = <span class="k">await</span> <span class="fn">getUser</span>()
+  <span class="k">if</span> (!user) <span class="k">return</span> NextResponse.json({ error: <span class="s">'Unauthorized'</span> }, { status: 401 })
+
+  <span class="k">const</span> ref      = req.nextUrl.searchParams.get(<span class="s">'ref'</span>)
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+
+  <span class="c">// 1. Verify the payment exists, is completed, belongs to this user,
+  //    and was for this specific worker</span>
+  <span class="k">const</span> { data: payment } = <span class="k">await</span> supabase
+    .from(<span class="s">'payments'</span>)
+    .select(<span class="s">'status, user_id, metadata'</span>)
+    .eq(<span class="s">'reference_id'</span>, ref)
+    .single()
+
+  <span class="k">if</span> (!payment || payment.status !== <span class="s">'completed'</span>)
+    <span class="k">return</span> NextResponse.json({ error: <span class="s">'Payment not verified'</span> }, { status: 402 })
+  <span class="k">if</span> (payment.user_id !== user.id)
+    <span class="k">return</span> NextResponse.json({ error: <span class="s">'Forbidden'</span> }, { status: 403 })
+  <span class="k">if</span> (payment.metadata?.worker_id !== params.id)
+    <span class="k">return</span> NextResponse.json({ error: <span class="s">'Wrong worker'</span> }, { status: 403 })
+
+  <span class="c">// 2. Fetch phone — service role bypasses RLS for this one read</span>
+  <span class="k">const</span> { data: worker } = <span class="k">await</span> supabase
+    .from(<span class="s">'workers'</span>)
+    .select(<span class="s">'phone, full_name'</span>)
+    .eq(<span class="s">'id'</span>, params.id)
+    .single()
+
+  <span class="k">return</span> NextResponse.json({ phone: worker?.phone })
+}</pre>
+  </div>
+</div>
+
+</div><!-- end .content -->
+</div><!-- end .wrap -->
+
+<script>
+function go(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'})}
+function cp(btn){
+  const pre=btn.closest('.cw').querySelector('pre')
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)
+  })
+}
+document.querySelectorAll('.s-link').forEach(l=>l.addEventListener('click',function(){
+  document.querySelectorAll('.s-link').forEach(x=>x.classList.remove('on'))
+  this.classList.add('on')
+}))
+</script>
+</body>
+</html>

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHINGA — MoMo Payment Integration Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1A7A4A;--green-h:#25A865;--green-dim:#145E38;--green-pale:#E8F5EE;
+  --gold:#F5A623;--gold-dim:#C8841A;
+  --dark:#0F1F15;--mid:#3D5C48;--muted:#6B7C73;
+  --light:#F7FAF8;--white:#FFFFFF;--border:#D0E6DA;
+  --r:10px;--r-lg:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);line-height:1.6}
+
+/* ── LAYOUT ── */
+.wrap{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.sidebar{background:var(--dark);padding:28px 20px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:3px}.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+.s-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.3rem;color:#F7FAF8;letter-spacing:3px;margin-bottom:6px}
+.s-logo span{color:var(--green-h)}
+.s-sub{font-size:.7rem;color:rgba(247,250,248,.3);font-family:'DM Mono',monospace;letter-spacing:1px;margin-bottom:28px}
+.s-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(247,250,248,.25);margin-bottom:8px;margin-top:20px}
+.s-link{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r);color:rgba(247,250,248,.55);font-size:.82rem;text-decoration:none;transition:all .15s;margin-bottom:2px;cursor:pointer}
+.s-link:hover{background:rgba(255,255,255,.05);color:#F7FAF8}
+.s-link.on{background:rgba(26,122,74,.2);color:var(--green-h)}
+.s-ico{font-size:.88rem;width:16px;text-align:center}
+.content{padding:40px 52px;max-width:900px}
+
+/* ── TYPOGRAPHY ── */
+.page-eye{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--green);margin-bottom:8px}
+.page-h1{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;color:var(--dark);line-height:1.15;margin-bottom:12px;letter-spacing:-.5px}
+.page-sub{font-size:1rem;color:var(--muted);line-height:1.75;max-width:620px;margin-bottom:40px}
+h2{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--dark);margin:40px 0 14px}
+h3{font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:var(--dark);margin:24px 0 10px}
+p{color:var(--mid);font-size:.9rem;line-height:1.75;margin-bottom:14px}
+ul,ol{color:var(--mid);font-size:.88rem;line-height:1.8;padding-left:20px;margin-bottom:14px}
+li{margin-bottom:4px}
+strong{color:var(--dark);font-weight:700}
+
+/* ── CODE BLOCKS ── */
+.code-wrap{position:relative;margin:16px 0}
+.code-label{font-size:.65rem;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(247,250,248,.4);background:var(--dark);padding:8px 16px 0;border-radius:var(--r-lg) var(--r-lg) 0 0;display:flex;justify-content:space-between;align-items:center}
+.copy-btn{background:rgba(255,255,255,.08);border:none;color:rgba(247,250,248,.5);font-size:.7rem;padding:3px 10px;border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s}
+.copy-btn:hover{background:rgba(255,255,255,.15);color:#F7FAF8}
+pre{background:var(--dark);padding:20px 20px 22px;border-radius:0 0 var(--r-lg) var(--r-lg);overflow-x:auto;font-family:'DM Mono',monospace;font-size:.8rem;line-height:1.7;color:#E8F5EE}
+pre .c{color:rgba(247,250,248,.3)}
+pre .k{color:var(--green-h)}
+pre .s{color:var(--gold)}
+pre .n{color:#7DD3FC}
+pre .v{color:#C084FC}
+pre .fn{color:#F472B6}
+
+/* ── CARDS ── */
+.info-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px 24px;margin:16px 0}
+.info-card.warn{border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.04)}
+.info-card.ok{border-color:rgba(26,122,74,.25);background:var(--green-pale)}
+.info-card.note{border-color:rgba(59,130,246,.25);background:rgba(59,130,246,.04)}
+.ic-title{font-weight:700;color:var(--dark);font-size:.88rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.ic-body{font-size:.82rem;color:var(--mid);line-height:1.7}
+
+/* ── FLOW DIAGRAM ── */
+.flow{display:flex;flex-direction:column;gap:0;margin:20px 0}
+.flow-step{display:flex;gap:16px;position:relative}
+.flow-step::before{content:'';position:absolute;left:19px;top:38px;bottom:-2px;width:2px;background:var(--border)}
+.flow-step:last-child::before{display:none}
+.flow-n{width:38px;height:38px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:.82rem;font-weight:500;flex-shrink:0;position:relative;z-index:1}
+.flow-body{padding:8px 0 24px}
+.flow-title{font-weight:700;color:var(--dark);font-size:.9rem;margin-bottom:4px}
+.flow-desc{font-size:.8rem;color:var(--mid);line-height:1.6}
+.flow-tag{display:inline-flex;margin-top:6px;padding:3px 10px;background:var(--green-pale);border-radius:100px;font-size:.7rem;font-weight:700;color:var(--green);font-family:'DM Mono',monospace}
+
+/* ── ENV TABLE ── */
+.env-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--r-lg);overflow:hidden;border:1.5px solid var(--border);margin:16px 0}
+.env-table thead th{padding:10px 16px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);background:var(--light);border-bottom:1.5px solid var(--border)}
+.env-table tbody td{padding:11px 16px;font-size:.82rem;border-bottom:1px solid var(--border);vertical-align:top}
+.env-table tbody tr:last-child td{border-bottom:none}
+.env-var{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--green)}
+.env-req{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(220,38,38,.08);color:#DC2626;border:1px solid rgba(220,38,38,.15)}
+.env-opt{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--green-pale);color:var(--green);border:1px solid rgba(26,122,74,.2)}
+
+/* ── SECTION DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:36px 0}
+
+/* ── PROVIDER CARDS ── */
+.providers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.pcard{border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;background:var(--white)}
+.pcard-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.pcard-icon{font-size:1.8rem}
+.pcard-name{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--dark)}
+.pcard-tag{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--green-pale);color:var(--green)}
+.pcard-desc{font-size:.8rem;color:var(--mid);line-height:1.6}
+.pcard-note{margin-top:10px;font-size:.74rem;color:var(--muted);font-style:italic}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:#F7FAF8;padding:11px 18px;border-radius:var(--r);font-size:.82rem;font-weight:500;z-index:900;transform:translateY(80px);opacity:0;transition:all .3s;border-left:3px solid var(--green)}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:800px){.wrap{grid-template-columns:1fr}.sidebar{display:none}.content{padding:28px 20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="s-logo">SH<span>I</span>NGA</div>
+  <div class="s-sub">MOMO INTEGRATION GUIDE</div>
+
+  <div class="s-label">Overview</div>
+  <a class="s-link on" onclick="scrollTo('overview')"><span class="s-ico">📋</span> Overview</a>
+  <a class="s-link" onclick="scrollTo('providers')"><span class="s-ico">📱</span> Providers</a>
+  <a class="s-link" onclick="scrollTo('flow')"><span class="s-ico">🔄</span> Payment Flow</a>
+  <a class="s-link" onclick="scrollTo('env')"><span class="s-ico">🔑</span> Environment Setup</a>
+
+  <div class="s-label">Implementation</div>
+  <a class="s-link" onclick="scrollTo('lib')"><span class="s-ico">📦</span> momo.ts Library</a>
+  <a class="s-link" onclick="scrollTo('routes')"><span class="s-ico">🛤️</span> API Routes</a>
+  <a class="s-link" onclick="scrollTo('webhook')"><span class="s-ico">🪝</span> Webhooks</a>
+  <a class="s-link" onclick="scrollTo('frontend')"><span class="s-ico">⚛️</span> Frontend Hook</a>
+
+  <div class="s-label">Use Cases</div>
+  <a class="s-link" onclick="scrollTo('post-job')"><span class="s-ico">💼</span> Paying to Post a Job</a>
+  <a class="s-link" onclick="scrollTo('apply')"><span class="s-ico">📨</span> Paying to Apply</a>
+  <a class="s-link" onclick="scrollTo('contact')"><span class="s-ico">📞</span> Paying to Contact</a>
+  <a class="s-link" onclick="scrollTo('verify')"><span class="s-ico">✅</span> Verification Fee</a>
+  <a class="s-link" onclick="scrollTo('wallet')"><span class="s-ico">💳</span> Wallet Top-Up</a>
+
+  <div class="s-label">Production</div>
+  <a class="s-link" onclick="scrollTo('testing')"><span class="s-ico">🧪</span> Testing & Sandbox</a>
+  <a class="s-link" onclick="scrollTo('errors')"><span class="s-ico">⚠️</span> Error Handling</a>
+  <a class="s-link" onclick="scrollTo('schema')"><span class="s-ico">🗄️</span> DB Schema Addition</a>
+</aside>
+
+<!-- ── CONTENT ── -->
+<div class="content">
+
+  <div id="overview">
+    <div class="page-eye">Integration Guide</div>
+    <h1 class="page-h1">MoMo Payment Integration</h1>
+    <p class="page-sub">Complete implementation for MTN Mobile Money and Airtel Money in Rwanda. Covers every SHINGA payment trigger — job posting fees, application fees, contact fees, verification, and credit wallet top-ups.</p>
+
+    <div class="info-card ok">
+      <div class="ic-title">✅ What this covers</div>
+      <div class="ic-body">
+        <strong>MTN MoMo API (Rwanda)</strong> — Collection API for pulling payments from user wallets.<br>
+        <strong>Airtel Money Rwanda</strong> — Collection API via Flutterwave or direct Airtel API.<br>
+        <strong>Webhook handling</strong> — Receiving payment confirmations asynchronously.<br>
+        <strong>Idempotency</strong> — Safe retries, no double charges.<br>
+        <strong>Credit wallet system</strong> — Prepaid balance that deducts on every action.
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div id="providers">
+    <h2>Payment Providers</h2>
+    <div class="providers">
+      <div class="pcard">
+        <div class="pcard-top">
+          <div class="pcard-icon">📱</div>
+          <div><div class="pcard-name">MTN MoMo Rwanda</div><div class="pcard-tag">Primary</div></div>
+        </div>
+        <div class="pcard-desc">Direct MTN MoMo Collections API. Most common wallet in Rwanda. Apply at <strong>momodeveloper.mtn.com</strong>. Test sandbox available instantly.</div>
+        <div class="pcard-note">Requires business registration in Rwanda. Processing time: 1–3 days for production keys.</div>
+      </div>
+      <div class="pcard">
+        <div class="pcard-top">
+          <div class="pcard-icon">📡</div>
+          <div><div class="pcard-name">Airtel Money Rwanda</div><div class="pcard-tag">Secondary</div></div>
+        </div>
+        <div class="pcard-desc">Via Flutterwave (recommended) or direct Airtel API. Flutterwave handles both MTN and Airtel under one integration.</div>
+        <div class="pcard-note">Flutterwave alternative: one API key for both networks. Slightly higher fees (~1.4%) but faster setup.</div>
+      </div>
+    </div>
+
+    <div class="info-card note">
+      <div class="ic-title">💡 Recommended approach for launch</div>
+      <div class="ic-body">Start with <strong>Flutterwave</strong> — one integration handles MTN MoMo + Airtel Money + bank cards. Once you hit volume, add direct MTN MoMo API to reduce fees. This guide implements both but shows Flutterwave as the primary path.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div id="flow">
+    <h2>Payment Flow</h2>
+    <p>SHINGA uses a <strong>push collection</strong> model — the user approves a debit from their own MoMo wallet. No card details needed.</p>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-n">1</div><div class="flow-body"><div class="flow-title">User clicks "Pay & Post" / "Pay & Apply"</div><div class="flow-desc">Frontend calls your Next.js API route with the action type and amount.</div><div class="flow-tag">POST /api/payments/initiate</div></div></div>
+      <div class="flow-step"><div class="flow-n">2</div><div class="flow-body"><div class="flow-title">Server creates a payment record</div><div class="flow-desc">Generates a unique <code>reference_id</code>, saves to Supabase <code>payments</code> table with status <strong>pending</strong>.</div><div class="flow-tag">DB: INSERT payments</div></div></div>
+      <div class="flow-step"><div class="flow-n">3</div><div class="flow-body"><div class="flow-title">Server calls Flutterwave / MTN API</div><div class="flow-desc">Sends the user's phone number and amount. MoMo sends a USSD push to their phone.</div><div class="flow-tag">POST flutterwave.com/v3/charges</div></div></div>
+      <div class="flow-step"><div class="flow-n">4</div><div class="flow-body"><div class="flow-title">User approves on their phone</div><div class="flow-desc">User enters MoMo PIN on their handset. Takes 10–60 seconds.</div><div class="flow-tag">User action</div></div></div>
+      <div class="flow-step"><div class="flow-n">5</div><div class="flow-body"><div class="flow-title">Webhook fires to your server</div><div class="flow-desc">Flutterwave/MTN sends a POST to <code>/api/payments/webhook</code> with payment status.</div><div class="flow-tag">POST /api/payments/webhook</div></div></div>
+      <div class="flow-step"><div class="flow-n">6</div><div class="flow-body"><div class="flow-title">Server verifies and fulfills</div><div class="flow-desc">Verifies webhook signature. Updates payment status to <strong>completed</strong>. Triggers the action (job goes live, application sent, contact unlocked).</div><div class="flow-tag">DB: UPDATE payments + fulfill action</div></div></div>
+      <div class="flow-step"><div class="flow-n">7</div><div class="flow-body"><div class="flow-title">Frontend polls for confirmation</div><div class="flow-desc">Frontend polls <code>/api/payments/status/:ref</code> every 3s until confirmed or timed out.</div><div class="flow-tag">GET /api/payments/status/:ref</div></div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div id="env">
+    <h2>Environment Variables</h2>
+    <div class="code-wrap">
+      <div class="code-label">.env.local<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="c"># ── Flutterwave (recommended primary) ──────────────────</span>
+<span class="n">FLW_SECRET_KEY</span>=<span class="s">FLWSECK_TEST-xxxxxxxxxxxx</span>          <span class="c"># from dashboard.flutterwave.com</span>
+<span class="n">FLW_PUBLIC_KEY</span>=<span class="s">FLWPUBK_TEST-xxxxxxxxxxxx</span>
+<span class="n">FLW_WEBHOOK_HASH</span>=<span class="s">your-webhook-secret-hash</span>         <span class="c"># set in Flutterwave dashboard</span>
+
+<span class="c"># ── MTN MoMo Direct (for later migration) ──────────────</span>
+<span class="n">MTN_SUBSCRIPTION_KEY</span>=<span class="s">your-subscription-key</span>         <span class="c"># from momodeveloper.mtn.com</span>
+<span class="n">MTN_API_USER_ID</span>=<span class="s">uuid-you-generate</span>
+<span class="n">MTN_API_KEY</span>=<span class="s">generated-api-key</span>
+<span class="n">MTN_CALLBACK_URL</span>=<span class="s">https://shinga.rw/api/payments/webhook/mtn</span>
+<span class="n">MTN_ENVIRONMENT</span>=<span class="s">sandbox</span>                              <span class="c"># sandbox | production</span>
+
+<span class="c"># ── App ─────────────────────────────────────────────────</span>
+<span class="n">NEXT_PUBLIC_APP_URL</span>=<span class="s">https://shinga.rw</span>
+<span class="n">PAYMENT_WEBHOOK_SECRET</span>=<span class="s">random-256-bit-hex</span>           <span class="c"># generate: openssl rand -hex 32</span></pre>
+    </div>
+
+    <table class="env-table">
+      <thead><tr><th>Variable</th><th>Source</th><th>Required</th></tr></thead>
+      <tbody>
+        <tr><td><span class="env-var">FLW_SECRET_KEY</span></td><td>Flutterwave dashboard → Settings → API</td><td><span class="env-req">Required</span></td></tr>
+        <tr><td><span class="env-var">FLW_WEBHOOK_HASH</span></td><td>Set any string in Flutterwave → Webhooks</td><td><span class="env-req">Required</span></td></tr>
+        <tr><td><span class="env-var">MTN_SUBSCRIPTION_KEY</span></td><td>momodeveloper.mtn.com → Your apps</td><td><span class="env-opt">Optional</span></td></tr>
+        <tr><td><span class="env-var">PAYMENT_WEBHOOK_SECRET</span></td><td>Generate yourself: <code>openssl rand -hex 32</code></td><td><span class="env-req">Required</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <div id="lib">
+    <h2>Core Payment Library</h2>
+    <p>Create <code>lib/shinga/payments.ts</code> — the central file for all payment operations.</p>
+    <div class="code-wrap">
+      <div class="code-label">lib/shinga/payments.ts<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="c">// ═══════════════════════════════════════════════════
+// SHINGA — Payment Library (Flutterwave + MTN MoMo)
+// ═══════════════════════════════════════════════════</span>
+
+<span class="k">import</span> { createServerClient } <span class="k">from</span> <span class="s">'./supabase'</span>
+<span class="k">import</span> { v4 <span class="k">as</span> uuidv4 }    <span class="k">from</span> <span class="s">'uuid'</span>
+
+<span class="k">export type</span> <span class="n">PaymentAction</span> =
+  | <span class="s">'post_job'</span>
+  | <span class="s">'apply_job'</span>
+  | <span class="s">'contact_worker'</span>
+  | <span class="s">'verification'</span>
+  | <span class="s">'wallet_topup'</span>
+  | <span class="s">'contact_bundle_5'</span>
+  | <span class="s">'contact_bundle_15'</span>
+
+<span class="k">export interface</span> <span class="n">InitiatePaymentInput</span> {
+  userId:       string
+  phone:        string       <span class="c">// +250XXXXXXXXX</span>
+  amount:       number       <span class="c">// in RWF</span>
+  action:       PaymentAction
+  metadata:     Record&lt;string, <span class="k">unknown</span>&gt;  <span class="c">// job_id, worker_id, etc.</span>
+  provider?:    <span class="s">'flutterwave'</span> | <span class="s">'mtn'</span>
+}
+
+<span class="k">export interface</span> <span class="n">PaymentRecord</span> {
+  id:           string
+  reference_id: string
+  user_id:      string
+  action:       PaymentAction
+  amount:       number
+  currency:     string
+  phone:        string
+  status:       <span class="s">'pending'</span> | <span class="s">'completed'</span> | <span class="s">'failed'</span> | <span class="s">'cancelled'</span>
+  provider:     string
+  metadata:     Record&lt;string, <span class="k">unknown</span>&gt;
+  fulfilled_at: string | <span class="k">null</span>
+  created_at:   string
+}
+
+<span class="c">// ── INITIATE PAYMENT ──────────────────────────────────</span>
+
+<span class="k">export async function</span> <span class="fn">initiatePayment</span>(
+  input: InitiatePaymentInput
+): Promise&lt;{ referenceId: string; error: string | <span class="k">null</span> }&gt; {
+  <span class="k">const</span> supabase   = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> referenceId = uuidv4()
+  <span class="k">const</span> provider    = input.provider ?? <span class="s">'flutterwave'</span>
+
+  <span class="c">// 1. Save payment record (status: pending)</span>
+  <span class="k">const</span> { error: dbErr } = <span class="k">await</span> supabase
+    .from(<span class="s">'payments'</span>)
+    .insert({
+      reference_id: referenceId,
+      user_id:      input.userId,
+      action:       input.action,
+      amount:       input.amount,
+      currency:     <span class="s">'RWF'</span>,
+      phone:        input.phone,
+      status:       <span class="s">'pending'</span>,
+      provider,
+      metadata:     input.metadata,
+    })
+
+  <span class="k">if</span> (dbErr) <span class="k">return</span> { referenceId: <span class="s">''</span>, error: dbErr.message }
+
+  <span class="c">// 2. Call payment provider</span>
+  <span class="k">const</span> result = provider === <span class="s">'mtn'</span>
+    ? <span class="k">await</span> <span class="fn">callMtnMomo</span>(referenceId, input)
+    : <span class="k">await</span> <span class="fn">callFlutterwave</span>(referenceId, input)
+
+  <span class="k">if</span> (result.error) {
+    <span class="c">// Mark as failed immediately if API call itself fails</span>
+    <span class="k">await</span> supabase.from(<span class="s">'payments'</span>).update({ status: <span class="s">'failed'</span> })
+      .eq(<span class="s">'reference_id'</span>, referenceId)
+    <span class="k">return</span> { referenceId: <span class="s">''</span>, error: result.error }
+  }
+
+  <span class="k">return</span> { referenceId, error: <span class="k">null</span> }
+}
+
+<span class="c">// ── FLUTTERWAVE ────────────────────────────────────────</span>
+
+<span class="k">async function</span> <span class="fn">callFlutterwave</span>(
+  referenceId: string,
+  input: InitiatePaymentInput
+): Promise&lt;{ error: string | <span class="k">null</span> }&gt; {
+  <span class="k">const</span> res = <span class="k">await</span> fetch(<span class="s">'https://api.flutterwave.com/v3/charges?type=mobile_money_rwanda'</span>, {
+    method: <span class="s">'POST'</span>,
+    headers: {
+      <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span>,
+      <span class="s">'Authorization'</span>: <span class="s">`Bearer </span><span class="n">${process.env.FLW_SECRET_KEY}</span><span class="s">`</span>,
+    },
+    body: JSON.stringify({
+      tx_ref:   referenceId,
+      amount:   input.amount,
+      currency: <span class="s">'RWF'</span>,
+      email:    <span class="s">`</span><span class="n">${input.userId}</span><span class="s">@shinga.rw`</span>,   <span class="c">// required by FLW</span>
+      phone_number: input.phone,
+      fullname: <span class="s">'SHINGA User'</span>,
+      redirect_url: <span class="s">`</span><span class="n">${process.env.NEXT_PUBLIC_APP_URL}</span><span class="s">/payment/confirm`</span>,
+      meta: { action: input.action, ...input.metadata },
+      network: <span class="fn">detectNetwork</span>(input.phone),  <span class="c">// MTN or AIRTEL</span>
+    }),
+  })
+
+  <span class="k">const</span> data = <span class="k">await</span> res.json()
+  <span class="k">if</span> (data.status !== <span class="s">'success'</span>) {
+    <span class="k">return</span> { error: data.message || <span class="s">'Flutterwave payment initiation failed'</span> }
+  }
+  <span class="k">return</span> { error: <span class="k">null</span> }
+}
+
+<span class="c">// ── MTN MOMO DIRECT ────────────────────────────────────</span>
+
+<span class="k">async function</span> <span class="fn">callMtnMomo</span>(
+  referenceId: string,
+  input: InitiatePaymentInput
+): Promise&lt;{ error: string | <span class="k">null</span> }&gt; {
+  <span class="k">const</span> token = <span class="k">await</span> <span class="fn">getMtnAccessToken</span>()
+  <span class="k">if</span> (!token) <span class="k">return</span> { error: <span class="s">'MTN auth failed'</span> }
+
+  <span class="k">const</span> res = <span class="k">await</span> fetch(
+    <span class="s">`https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay`</span>,
+    {
+      method: <span class="s">'POST'</span>,
+      headers: {
+        <span class="s">'Authorization'</span>:     <span class="s">`Bearer </span><span class="n">${token}</span><span class="s">`</span>,
+        <span class="s">'X-Reference-Id'</span>:    referenceId,
+        <span class="s">'X-Target-Environment'</span>: process.env.MTN_ENVIRONMENT || <span class="s">'sandbox'</span>,
+        <span class="s">'Ocp-Apim-Subscription-Key'</span>: process.env.MTN_SUBSCRIPTION_KEY!,
+        <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span>,
+      },
+      body: JSON.stringify({
+        amount:     String(input.amount),
+        currency:   <span class="s">'RWF'</span>,
+        externalId: referenceId,
+        payer: { partyIdType: <span class="s">'MSISDN'</span>, partyId: input.phone.replace(<span class="s">'+'</span>, <span class="s">''</span>) },
+        payerMessage: <span class="s">`SHINGA: </span><span class="n">${input.action.replace(/_/g, ' ')}</span><span class="s">`</span>,
+        payeeNote:    <span class="s">'SHINGA Rwanda Payment'</span>,
+      }),
+    }
+  )
+
+  <span class="k">if</span> (res.status !== <span class="v">202</span>) {
+    <span class="k">const</span> err = <span class="k">await</span> res.text()
+    <span class="k">return</span> { error: <span class="s">`MTN error: </span><span class="n">${err}</span><span class="s">`</span> }
+  }
+  <span class="k">return</span> { error: <span class="k">null</span> }
+}
+
+<span class="k">async function</span> <span class="fn">getMtnAccessToken</span>(): Promise&lt;string | <span class="k">null</span>&gt; {
+  <span class="k">const</span> creds = Buffer.from(<span class="s">`</span><span class="n">${process.env.MTN_API_USER_ID}</span><span class="s">:</span><span class="n">${process.env.MTN_API_KEY}</span><span class="s">`</span>).toString(<span class="s">'base64'</span>)
+  <span class="k">const</span> res = <span class="k">await</span> fetch(
+    <span class="s">'https://sandbox.momodeveloper.mtn.com/collection/token/'</span>,
+    { method: <span class="s">'POST'</span>, headers: { <span class="s">'Authorization'</span>: <span class="s">`Basic </span><span class="n">${creds}</span><span class="s">`</span>, <span class="s">'Ocp-Apim-Subscription-Key'</span>: process.env.MTN_SUBSCRIPTION_KEY! } }
+  )
+  <span class="k">const</span> data = <span class="k">await</span> res.json()
+  <span class="k">return</span> data.access_token || <span class="k">null</span>
+}
+
+<span class="c">// ── WEBHOOK VERIFICATION ───────────────────────────────</span>
+
+<span class="k">export function</span> <span class="fn">verifyFlutterwaveWebhook</span>(
+  payload: string,
+  signature: string
+): <span class="k">boolean</span> {
+  <span class="k">const</span> crypto   = require(<span class="s">'crypto'</span>)
+  <span class="k">const</span> hash     = crypto
+    .createHmac(<span class="s">'sha256'</span>, process.env.FLW_WEBHOOK_HASH!)
+    .update(payload)
+    .digest(<span class="s">'hex'</span>)
+  <span class="k">return</span> hash === signature
+}
+
+<span class="c">// ── FULFILL ACTION ─────────────────────────────────────</span>
+<span class="c">// Called after webhook confirms payment. Performs the</span>
+<span class="c">// actual platform action the user paid for.</span>
+
+<span class="k">export async function</span> <span class="fn">fulfillPayment</span>(
+  referenceId: string
+): Promise&lt;{ error: string | <span class="k">null</span> }&gt; {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+
+  <span class="k">const</span> { data: payment, error } = <span class="k">await</span> supabase
+    .from(<span class="s">'payments'</span>)
+    .select(<span class="s">'*'</span>)
+    .eq(<span class="s">'reference_id'</span>, referenceId)
+    .single()
+
+  <span class="k">if</span> (error || !payment) <span class="k">return</span> { error: <span class="s">'Payment not found'</span> }
+  <span class="k">if</span> (payment.fulfilled_at) <span class="k">return</span> { error: <span class="k">null</span> }  <span class="c">// idempotent</span>
+
+  <span class="k">switch</span> (payment.action <span class="k">as</span> PaymentAction) {
+    <span class="k">case</span> <span class="s">'post_job'</span>:
+      <span class="k">await</span> supabase.from(<span class="s">'jobs'</span>)
+        .update({ status: <span class="s">'active'</span> })
+        .eq(<span class="s">'id'</span>, payment.metadata.job_id)
+      <span class="k">break</span>
+
+    <span class="k">case</span> <span class="s">'apply_job'</span>:
+      <span class="k">await</span> supabase.from(<span class="s">'applications'</span>).insert({
+        job_id:    payment.metadata.job_id,
+        worker_id: payment.metadata.worker_id,
+        status:    <span class="s">'pending'</span>,
+      })
+      <span class="k">break</span>
+
+    <span class="k">case</span> <span class="s">'contact_worker'</span>:
+    <span class="k">case</span> <span class="s">'contact_bundle_5'</span>:
+    <span class="k">case</span> <span class="s">'contact_bundle_15'</span>: {
+      <span class="k">const</span> qty = payment.action === <span class="s">'contact_bundle_15'</span> ? <span class="v">15</span>
+                : payment.action === <span class="s">'contact_bundle_5'</span>  ? <span class="v">5</span>  : <span class="v">1</span>
+      <span class="k">await</span> supabase.from(<span class="s">'contact_credits'</span>).insert({
+        user_id:  payment.user_id,
+        quantity: qty,
+      })
+      <span class="k">break</span>
+    }
+
+    <span class="k">case</span> <span class="s">'verification'</span>:
+      <span class="k">await</span> supabase.from(<span class="s">'workers'</span>).update({
+        verified:       <span class="k">true</span>,
+        featured_until: <span class="k">new</span> Date(Date.now() + <span class="v">365</span> * <span class="v">24</span> * <span class="v">60</span> * <span class="v">60</span> * <span class="v">1000</span>).toISOString(),
+      }).eq(<span class="s">'profile_id'</span>, payment.user_id)
+      <span class="k">break</span>
+
+    <span class="k">case</span> <span class="s">'wallet_topup'</span>:
+      <span class="k">await</span> supabase.rpc(<span class="s">'increment_wallet'</span>, {
+        p_user_id: payment.user_id,
+        p_amount:  payment.metadata.credit_amount,  <span class="c">// face value, not price paid</span>
+      })
+      <span class="k">break</span>
+  }
+
+  <span class="c">// Mark fulfilled</span>
+  <span class="k">await</span> supabase.from(<span class="s">'payments'</span>).update({
+    status:       <span class="s">'completed'</span>,
+    fulfilled_at: <span class="k">new</span> Date().toISOString(),
+  }).eq(<span class="s">'reference_id'</span>, referenceId)
+
+  <span class="k">return</span> { error: <span class="k">null</span> }
+}
+
+<span class="c">// ── HELPERS ────────────────────────────────────────────</span>
+
+<span class="k">function</span> <span class="fn">detectNetwork</span>(phone: string): <span class="s">'MTN'</span> | <span class="s">'AIRTEL'</span> {
+  <span class="c">// Rwanda: MTN = 078/079, Airtel = 072/073</span>
+  <span class="k">const</span> n = phone.replace(<span class="s">/\D/g</span>, <span class="s">''</span>).slice(-<span class="v">9</span>)
+  <span class="k">return</span> [<span class="s">'78'</span>, <span class="s">'79'</span>].some(p => n.startsWith(p)) ? <span class="s">'MTN'</span> : <span class="s">'AIRTEL'</span>
+}
+
+<span class="k">export async function</span> <span class="fn">getPaymentStatus</span>(referenceId: string) {
+  <span class="k">const</span> supabase = <span class="k">await</span> <span class="fn">createServerClient</span>()
+  <span class="k">const</span> { data } = <span class="k">await</span> supabase
+    .from(<span class="s">'payments'</span>)
+    .select(<span class="s">'status, fulfilled_at, action, amount'</span>)
+    .eq(<span class="s">'reference_id'</span>, referenceId)
+    .single()
+  <span class="k">return</span> data
+}</pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div id="routes">
+    <h2>API Routes</h2>
+
+    <h3>Initiate Payment — <code>app/api/payments/initiate/route.ts</code></h3>
+    <div class="code-wrap">
+      <div class="code-label">route.ts<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="k">import</span> { NextRequest, NextResponse } <span class="k">from</span> <span class="s">'next/server'</span>
+<span class="k">import</span> { initiatePayment } <span class="k">from</span> <span class="s">'@/lib/shinga/payments'</span>
+<span class="k">import</span> { getUser }         <span class="k">from</span> <span class="s">'@/lib/shinga/auth'</span>
+<span class="k">import</span> { PRICES }          <span class="k">from</span> <span class="s">'@/lib/shinga/prices'</span>  <span class="c">// fetched from Supabase</span>
+
+<span class="k">export async function</span> <span class="fn">POST</span>(req: NextRequest) {
+  <span class="k">const</span> user = <span class="k">await</span> <span class="fn">getUser</span>()
+  <span class="k">if</span> (!user) <span class="k">return</span> NextResponse.json({ error: <span class="s">'Unauthorized'</span> }, { status: <span class="v">401</span> })
+
+  <span class="k">const</span> { action, phone, metadata } = <span class="k">await</span> req.json()
+
+  <span class="c">// Resolve correct amount from live pricing config</span>
+  <span class="k">const</span> amountMap: Record&lt;string, number&gt; = {
+    post_job_daily:      PRICES.job_post_daily,
+    post_job_weekly:     PRICES.job_post_weekly,
+    post_job_monthly:    PRICES.job_post_monthly,
+    post_job_bulk:       PRICES.job_post_bulk,
+    post_job_contract:   PRICES.job_post_contract,
+    post_job_permanent:  PRICES.job_post_permanent,
+    post_job_task:       PRICES.job_post_task,
+    apply_job:           PRICES.application_fee,
+    contact_worker:      PRICES.contact_fee_single,
+    contact_bundle_5:    PRICES.contact_fee_5,
+    contact_bundle_15:   PRICES.contact_fee_15,
+    verification:        PRICES.verification_fee,
+    wallet_topup:        metadata?.price ?? <span class="v">0</span>,    <span class="c">// buyer pays price, gets face value</span>
+  }
+
+  <span class="k">const</span> amount = amountMap[action]
+  <span class="k">if</span> (!amount) <span class="k">return</span> NextResponse.json({ error: <span class="s">'Invalid action'</span> }, { status: <span class="v">400</span> })
+
+  <span class="k">const</span> { referenceId, error } = <span class="k">await</span> <span class="fn">initiatePayment</span>({
+    userId: user.id, phone, amount,
+    action, metadata: metadata ?? {},
+  })
+
+  <span class="k">if</span> (error) <span class="k">return</span> NextResponse.json({ error }, { status: <span class="v">400</span> })
+
+  <span class="k">return</span> NextResponse.json({ referenceId, amount })
+}</pre>
+    </div>
+
+    <h3>Webhook Handler — <code>app/api/payments/webhook/route.ts</code></h3>
+    <div class="code-wrap">
+      <div class="code-label">webhook/route.ts<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="k">import</span> { NextRequest, NextResponse } <span class="k">from</span> <span class="s">'next/server'</span>
+<span class="k">import</span> { verifyFlutterwaveWebhook, fulfillPayment } <span class="k">from</span> <span class="s">'@/lib/shinga/payments'</span>
+<span class="k">import</span> { sendSms } <span class="k">from</span> <span class="s">'@/lib/shinga/sms'</span>
+
+<span class="k">export async function</span> <span class="fn">POST</span>(req: NextRequest) {
+  <span class="k">const</span> body      = <span class="k">await</span> req.text()
+  <span class="k">const</span> signature = req.headers.get(<span class="s">'verif-hash'</span>) ?? <span class="s">''</span>
+
+  <span class="c">// Always verify before doing anything</span>
+  <span class="k">if</span> (!<span class="fn">verifyFlutterwaveWebhook</span>(body, signature)) {
+    <span class="k">return</span> NextResponse.json({ error: <span class="s">'Invalid signature'</span> }, { status: <span class="v">401</span> })
+  }
+
+  <span class="k">const</span> event = JSON.parse(body)
+
+  <span class="k">if</span> (event.status === <span class="s">'successful'</span>) {
+    <span class="k">const</span> referenceId = event.data.tx_ref
+
+    <span class="c">// Fulfill the platform action</span>
+    <span class="k">const</span> { error } = <span class="k">await</span> <span class="fn">fulfillPayment</span>(referenceId)
+    <span class="k">if</span> (error) <span class="k">return</span> NextResponse.json({ error }, { status: <span class="v">500</span> })
+
+    <span class="c">// Send SMS confirmation (Africa's Talking)</span>
+    <span class="k">await</span> <span class="fn">sendSms</span>(event.data.customer.phone_number,
+      <span class="s">`SHINGA: Payment of RWF </span><span class="n">${event.data.amount.toLocaleString()}</span><span class="s"> confirmed. Ref: </span><span class="n">${referenceId.slice(0,8)}</span><span class="s">.`</span>)
+  }
+
+  <span class="c">// Always return 200 so Flutterwave stops retrying</span>
+  <span class="k">return</span> NextResponse.json({ received: <span class="k">true</span> })
+}
+
+<span class="c">// Disable body parsing — we need raw text for signature verification</span>
+<span class="k">export const</span> config = { api: { bodyParser: <span class="k">false</span> } }</pre>
+    </div>
+
+    <h3>Status Polling — <code>app/api/payments/status/[ref]/route.ts</code></h3>
+    <div class="code-wrap">
+      <div class="code-label">status/[ref]/route.ts<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="k">import</span> { NextRequest, NextResponse } <span class="k">from</span> <span class="s">'next/server'</span>
+<span class="k">import</span> { getPaymentStatus } <span class="k">from</span> <span class="s">'@/lib/shinga/payments'</span>
+
+<span class="k">export async function</span> <span class="fn">GET</span>(
+  _: NextRequest,
+  { params }: { params: { ref: string } }
+) {
+  <span class="k">const</span> payment = <span class="k">await</span> <span class="fn">getPaymentStatus</span>(params.ref)
+  <span class="k">if</span> (!payment) <span class="k">return</span> NextResponse.json({ error: <span class="s">'Not found'</span> }, { status: <span class="v">404</span> })
+  <span class="k">return</span> NextResponse.json(payment)
+}</pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div id="frontend">
+    <h2>Frontend Payment Hook</h2>
+    <p>Drop this in <code>hooks/shinga/usePayment.ts</code>. It handles initiation, polling, timeout, and success/failure callbacks.</p>
+    <div class="code-wrap">
+      <div class="code-label">hooks/shinga/usePayment.ts<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="s">'use client'</span>
+
+<span class="k">import</span> { useState, useCallback, useRef } <span class="k">from</span> <span class="s">'react'</span>
+
+<span class="k">type</span> <span class="n">PaymentStatus</span> = <span class="s">'idle'</span> | <span class="s">'pending'</span> | <span class="s">'completed'</span> | <span class="s">'failed'</span> | <span class="s">'timeout'</span>
+
+<span class="k">interface</span> <span class="n">UsePaymentOptions</span> {
+  onSuccess?: (referenceId: string) => <span class="k">void</span>
+  onFailure?: (error: string) => <span class="k">void</span>
+  timeoutMs?: number   <span class="c">// default 120 000 ms (2 min)</span>
+  pollMs?:    number   <span class="c">// default 3 000 ms</span>
+}
+
+<span class="k">export function</span> <span class="fn">usePayment</span>(options: UsePaymentOptions = {}) {
+  <span class="k">const</span> { onSuccess, onFailure, timeoutMs = <span class="v">120_000</span>, pollMs = <span class="v">3_000</span> } = options
+  <span class="k">const</span> [status,      setStatus]      = useState&lt;PaymentStatus&gt;(<span class="s">'idle'</span>)
+  <span class="k">const</span> [referenceId, setReferenceId] = useState&lt;string | <span class="k">null</span>&gt;(<span class="k">null</span>)
+  <span class="k">const</span> [amount,      setAmount]      = useState&lt;number&gt;(<span class="v">0</span>)
+  <span class="k">const</span> [error,       setError]       = useState&lt;string | <span class="k">null</span>&gt;(<span class="k">null</span>)
+  <span class="k">const</span> pollRef = useRef&lt;ReturnType&lt;<span class="k">typeof</span> setInterval&gt; | <span class="k">null</span>&gt;(<span class="k">null</span>)
+  <span class="k">const</span> timerRef= useRef&lt;ReturnType&lt;<span class="k">typeof</span> setTimeout&gt; | <span class="k">null</span>&gt;(<span class="k">null</span>)
+
+  <span class="k">const</span> stopPolling = <span class="fn">useCallback</span>(() => {
+    <span class="k">if</span> (pollRef.current)  clearInterval(pollRef.current)
+    <span class="k">if</span> (timerRef.current) clearTimeout(timerRef.current)
+  }, [])
+
+  <span class="k">const</span> pay = <span class="fn">useCallback</span>(<span class="k">async</span> (input: {
+    action:   string
+    phone:    string
+    metadata?: Record&lt;string, <span class="k">unknown</span>&gt;
+  }) => {
+    setStatus(<span class="s">'pending'</span>)
+    setError(<span class="k">null</span>)
+
+    <span class="c">// 1. Initiate payment</span>
+    <span class="k">const</span> res  = <span class="k">await</span> fetch(<span class="s">'/api/payments/initiate'</span>, {
+      method: <span class="s">'POST'</span>,
+      headers: { <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> },
+      body: JSON.stringify(input),
+    })
+    <span class="k">const</span> data = <span class="k">await</span> res.json()
+    <span class="k">if</span> (data.error) { setStatus(<span class="s">'failed'</span>); setError(data.error); onFailure?.(data.error); <span class="k">return</span> }
+
+    setReferenceId(data.referenceId)
+    setAmount(data.amount)
+
+    <span class="c">// 2. Timeout guard</span>
+    timerRef.current = setTimeout(() => {
+      stopPolling()
+      setStatus(<span class="s">'timeout'</span>)
+      onFailure?.(<span class="s">'Payment timed out. Check your MoMo balance and try again.'</span>)
+    }, timeoutMs)
+
+    <span class="c">// 3. Poll for confirmation</span>
+    pollRef.current = setInterval(<span class="k">async</span> () => {
+      <span class="k">const</span> r    = <span class="k">await</span> fetch(<span class="s">`/api/payments/status/</span><span class="n">${data.referenceId}</span><span class="s">`</span>)
+      <span class="k">const</span> stat = <span class="k">await</span> r.json()
+
+      <span class="k">if</span> (stat.status === <span class="s">'completed'</span>) {
+        stopPolling()
+        setStatus(<span class="s">'completed'</span>)
+        onSuccess?.(data.referenceId)
+      } <span class="k">else if</span> (stat.status === <span class="s">'failed'</span>) {
+        stopPolling()
+        setStatus(<span class="s">'failed'</span>)
+        onFailure?.(<span class="s">'Payment was declined. Please try again.'</span>)
+      }
+    }, pollMs)
+  }, [onSuccess, onFailure, stopPolling, timeoutMs, pollMs])
+
+  <span class="k">return</span> { pay, status, referenceId, amount, error, stopPolling }
+}</pre>
+    </div>
+
+    <h3>Usage in a Component</h3>
+    <div class="code-wrap">
+      <div class="code-label">PostJobModal.tsx<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="s">'use client'</span>
+<span class="k">import</span> { usePayment } <span class="k">from</span> <span class="s">'@/hooks/shinga/usePayment'</span>
+<span class="k">import</span> { useAuth }    <span class="k">from</span> <span class="s">'@/hooks/shinga'</span>
+
+<span class="k">export function</span> <span class="fn">PostJobModal</span>({ jobId }: { jobId: string }) {
+  <span class="k">const</span> { profile } = <span class="fn">useAuth</span>()
+  <span class="k">const</span> { pay, status, amount } = <span class="fn">usePayment</span>({
+    onSuccess: (ref) => {
+      <span class="fn">toast</span>(<span class="s">'✓ Payment confirmed! Your job is now live.'</span>)
+      <span class="fn">router</span>.push(<span class="s">`/dashboard/my-jobs`</span>)
+    },
+    onFailure: (err) => <span class="fn">toast</span>(err, <span class="s">'error'</span>),
+  })
+
+  <span class="k">const</span> handlePay = () => <span class="fn">pay</span>({
+    action:   <span class="s">'post_job_daily'</span>,
+    phone:    profile?.phone ?? <span class="s">''</span>,
+    metadata: { job_id: jobId },
+  })
+
+  <span class="k">if</span> (status === <span class="s">'pending'</span>) <span class="k">return</span> (
+    &lt;div className=<span class="s">"payment-pending"</span>&gt;
+      &lt;div className=<span class="s">"spinner"</span> /&gt;
+      &lt;p&gt;Check your phone — approve the MoMo payment of RWF {amount.toLocaleString()}&lt;/p&gt;
+      &lt;small&gt;This will disappear automatically once confirmed&lt;/small&gt;
+    &lt;/div&gt;
+  )
+
+  <span class="k">return</span> &lt;button onClick={handlePay}&gt;Pay &amp; Post Job&lt;/button&gt;
+}</pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div id="schema">
+    <h2>Database Schema Addition</h2>
+    <p>Add to <code>shinga-schema.sql</code> — run in Supabase SQL Editor.</p>
+    <div class="code-wrap">
+      <div class="code-label">SQL — payments + wallet tables<button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="c">-- ── PAYMENTS ─────────────────────────────────────────</span>
+<span class="k">create table</span> payments (
+  id            uuid <span class="k">primary key default</span> uuid_generate_v4(),
+  reference_id  text <span class="k">unique not null</span>,
+  user_id       uuid <span class="k">references</span> profiles(id) <span class="k">on delete set null</span>,
+  action        text <span class="k">not null</span>,
+  amount        numeric(<span class="v">12</span>,<span class="v">2</span>) <span class="k">not null</span>,
+  currency      text <span class="k">default</span> <span class="s">'RWF'</span>,
+  phone         text,
+  provider      text <span class="k">default</span> <span class="s">'flutterwave'</span>,
+  status        text <span class="k">default</span> <span class="s">'pending'</span>
+                  <span class="k">check</span> (status <span class="k">in</span> (<span class="s">'pending'</span>,<span class="s">'completed'</span>,<span class="s">'failed'</span>,<span class="s">'cancelled'</span>)),
+  metadata      jsonb <span class="k">default</span> <span class="s">'{}'</span>,
+  fulfilled_at  timestamptz,
+  created_at    timestamptz <span class="k">default</span> now()
+);
+
+<span class="k">create index</span> payments_user_idx   <span class="k">on</span> payments(user_id);
+<span class="k">create index</span> payments_status_idx <span class="k">on</span> payments(status);
+<span class="k">create index</span> payments_ref_idx    <span class="k">on</span> payments(reference_id);
+
+<span class="c">-- ── WALLET ───────────────────────────────────────────</span>
+<span class="k">create table</span> wallets (
+  user_id   uuid <span class="k">primary key references</span> profiles(id) <span class="k">on delete cascade</span>,
+  balance   numeric(<span class="v">14</span>,<span class="v">2</span>) <span class="k">default</span> <span class="v">0</span> <span class="k">check</span> (balance >= <span class="v">0</span>),
+  updated_at timestamptz <span class="k">default</span> now()
+);
+
+<span class="c">-- ── CONTACT CREDITS ──────────────────────────────────</span>
+<span class="k">create table</span> contact_credits (
+  id         uuid <span class="k">primary key default</span> uuid_generate_v4(),
+  user_id    uuid <span class="k">references</span> profiles(id) <span class="k">on delete cascade</span>,
+  quantity   integer <span class="k">not null</span>,
+  used       integer <span class="k">default</span> <span class="v">0</span>,
+  created_at timestamptz <span class="k">default</span> now()
+);
+
+<span class="c">-- ── WALLET INCREMENT FUNCTION ─────────────────────────</span>
+<span class="k">create or replace function</span> <span class="fn">increment_wallet</span>(
+  p_user_id uuid, p_amount numeric
+) <span class="k">returns void as</span> $$
+<span class="k">begin</span>
+  <span class="k">insert into</span> wallets (user_id, balance)
+  <span class="k">values</span> (p_user_id, p_amount)
+  <span class="k">on conflict</span> (user_id) <span class="k">do update</span>
+    <span class="k">set</span> balance    = wallets.balance + p_amount,
+        updated_at = now();
+<span class="k">end</span>;
+$$ <span class="k">language</span> plpgsql;
+
+<span class="c">-- ── RLS ───────────────────────────────────────────────</span>
+<span class="k">alter table</span> payments        <span class="k">enable row level security</span>;
+<span class="k">alter table</span> wallets         <span class="k">enable row level security</span>;
+<span class="k">alter table</span> contact_credits <span class="k">enable row level security</span>;
+
+<span class="k">create policy</span> <span class="s">"own_payments"</span> <span class="k">on</span> payments
+  <span class="k">for select using</span> (user_id = auth.uid());
+
+<span class="k">create policy</span> <span class="s">"own_wallet"</span> <span class="k">on</span> wallets
+  <span class="k">for all using</span> (user_id = auth.uid());
+
+<span class="k">create policy</span> <span class="s">"own_credits"</span> <span class="k">on</span> contact_credits
+  <span class="k">for select using</span> (user_id = auth.uid());</pre>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div id="testing">
+    <h2>Testing in Sandbox</h2>
+    <div class="info-card warn">
+      <div class="ic-title">⚠️ Sandbox test numbers (Flutterwave Rwanda)</div>
+      <div class="ic-body">
+        <strong>MTN success:</strong> +250788123456 — PIN: 1234<br>
+        <strong>MTN decline:</strong> +250788000000 — any PIN<br>
+        <strong>Airtel success:</strong> +250720123456<br>
+        Use <code>FLW_SECRET_KEY=FLWSECK_TEST-...</code> (test key, not live key)
+      </div>
+    </div>
+    <div class="info-card note">
+      <div class="ic-title">💡 Webhook testing locally</div>
+      <div class="ic-body">Use <strong>ngrok</strong> or <strong>localtunnel</strong> to expose your local server:<br><code>npx ngrok http 3000</code><br>Then set your ngrok URL as the webhook URL in Flutterwave dashboard → Webhooks.</div>
+    </div>
+  </div>
+
+</div><!-- end .content -->
+</div><!-- end .wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+function scrollTo(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'})}
+function copyCode(btn){
+  const pre=btn.closest('.code-wrap').querySelector('pre')
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)
+  })
+}
+document.querySelectorAll('.s-link').forEach(l=>l.addEventListener('click',function(){
+  document.querySelectorAll('.s-link').forEach(x=>x.classList.remove('on'))
+  this.classList.add('on')
+}))
+</script>
+</body>
+</html>

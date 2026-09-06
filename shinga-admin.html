@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHINGA Admin — Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1A7A4A;--green-h:#25A865;--green-dim:#145E38;--green-pale:#E8F5EE;
+  --gold:#F5A623;--gold-dim:#C8841A;
+  --dark:#0F1F15;--mid:#3D5C48;--muted:#6B7C73;
+  --light:#F7FAF8;--white:#FFFFFF;--border:#D0E6DA;--border-d:#B8D9C8;
+  --sidebar-w:230px;--topbar-h:58px;--r:10px;--r-lg:16px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--dark);display:flex;flex-direction:column}
+
+/* ── TOPBAR ── */
+.topbar{height:var(--topbar-h);background:var(--dark);display:flex;align-items:center;justify-content:space-between;padding:0 22px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06);z-index:100}
+.tl{font-family:'Playfair Display',serif;font-weight:900;font-size:1.25rem;color:#F7FAF8;letter-spacing:3px}
+.tl span{color:var(--green-h)}
+.tr{display:flex;align-items:center;gap:14px}
+.t-admin{font-size:.76rem;color:rgba(247,250,248,.4);font-family:'DM Mono',monospace}
+.t-avi{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dim));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#fff;cursor:pointer}
+.notif{position:relative;background:transparent;border:none;cursor:pointer;color:rgba(247,250,248,.45);font-size:1rem;padding:4px}
+.ndot{position:absolute;top:2px;right:2px;width:7px;height:7px;background:var(--gold);border-radius:50%;border:2px solid var(--dark)}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);background:var(--dark);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:3px}.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
+.ns{padding:16px 14px 6px}
+.nl{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:rgba(247,250,248,.25);margin-bottom:7px;padding:0 6px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r);cursor:pointer;color:rgba(247,250,248,.5);font-size:.83rem;font-weight:500;text-decoration:none;margin-bottom:1px;transition:all .15s;border:1px solid transparent}
+.ni:hover{background:rgba(255,255,255,.05);color:#F7FAF8}
+.ni.on{background:rgba(26,122,74,.18);color:var(--green-h);border-color:rgba(26,122,74,.22)}
+.ni-ico{width:16px;text-align:center;font-size:.88rem;flex-shrink:0}
+.nb{margin-left:auto;background:var(--gold);color:var(--dark);font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:100px}
+.nb.g{background:var(--green-pale);color:var(--green)}
+.sf{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.06)}
+.sf a{display:flex;align-items:center;gap:8px;color:rgba(247,250,248,.3);font-size:.78rem;text-decoration:none;padding:7px;transition:color .2s}
+.sf a:hover{color:rgba(247,250,248,.65)}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.main::-webkit-scrollbar{width:5px}.main::-webkit-scrollbar-thumb{background:var(--border-d);border-radius:4px}
+
+/* ── PAGE HEADER ── */
+.ph{padding:24px 28px 0;flex-shrink:0}
+.ph-row{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.ph-eye{font-family:'DM Mono',monospace;font-size:.64rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.ph-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--dark)}
+.ph-acts{display:flex;gap:9px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;border:none;text-decoration:none;transition:all .15s;white-space:nowrap}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--green-h)}
+.btn-gold{background:var(--gold);color:var(--dark)}.btn-gold:hover{background:#F0AC28}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--mid)}.btn-outline:hover{border-color:var(--green);color:var(--green)}
+.btn-danger{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}.btn-danger:hover{background:#FECACA}
+.btn-approve{background:var(--green-pale);color:var(--green);border:1px solid var(--border)}.btn-approve:hover{background:var(--border)}
+.btn-sm{padding:6px 13px;font-size:.75rem}
+.btn-cancel{background:var(--light);color:var(--mid);border:1.5px solid var(--border)}.btn-cancel:hover{background:var(--border)}
+
+/* ── STATUS ── */
+.st{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:.7rem;font-weight:700}
+.st::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.st-active{background:var(--green-pale);color:var(--green)}.st-active::before{background:var(--green)}
+.st-pending{background:rgba(245,166,35,.1);color:var(--gold-dim)}.st-pending::before{background:var(--gold)}
+.st-filled{background:rgba(37,99,235,.08);color:#1D4ED8}.st-filled::before{background:#2563EB}
+.st-paused{background:rgba(107,124,115,.1);color:var(--muted)}.st-paused::before{background:var(--muted)}
+.st-suspended{background:#FEE2E2;color:#DC2626}.st-suspended::before{background:#DC2626}
+.st-hired{background:rgba(37,99,235,.08);color:#1D4ED8}.st-hired::before{background:#2563EB}
+
+/* ── KPI ROW ── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;padding:0 28px;margin-bottom:20px}
+.kpi{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;cursor:pointer;transition:all .15s}
+.kpi:hover{border-color:var(--green);box-shadow:0 4px 14px rgba(26,122,74,.08)}
+.kpi-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:9px}
+.kpi-num{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;color:var(--dark);line-height:1}
+.kpi-sub{font-size:.72rem;color:var(--muted);margin-top:5px;display:flex;align-items:center;gap:4px}
+.kpi-d{font-weight:700}.kpi-d.up{color:var(--green)}.kpi-d.dn{color:#DC2626}
+
+/* ── TABLE ── */
+.tw{padding:0 28px 28px}
+.tb-bar{display:flex;align-items:center;gap:10px;padding:12px 0;flex-wrap:wrap}
+.ts{flex:1;min-width:180px;padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.84rem;color:var(--dark);background:var(--white);outline:none;transition:border-color .2s}
+.ts:focus{border-color:var(--green)}
+.tsel{padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--mid);background:var(--white);outline:none;cursor:pointer}
+.tsel:focus{border-color:var(--green)}
+.tc{font-size:.76rem;color:var(--muted);font-family:'DM Mono',monospace;margin-left:auto}
+
+.dt{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--r-lg);overflow:hidden;border:1.5px solid var(--border)}
+.dt thead th{padding:11px 15px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);background:var(--light);border-bottom:1.5px solid var(--border)}
+.dt tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+.dt tbody tr:last-child{border-bottom:none}
+.dt tbody tr:hover{background:rgba(26,122,74,.03)}
+.dt td{padding:13px 15px;font-size:.81rem;color:var(--dark);vertical-align:middle}
+.td-m{font-weight:600;color:var(--dark)}
+.td-s{font-size:.73rem;color:var(--muted);margin-top:2px}
+
+/* ── TAB BAR ── */
+.tab-bar{display:flex;border-bottom:1px solid var(--border);padding:0 28px;background:var(--white);flex-shrink:0}
+.tab{padding:12px 18px;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--dark)}
+.tab.on{color:var(--green);border-bottom-color:var(--green)}
+.tab-c{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:100px;font-size:.65rem;font-weight:800;margin-left:5px;background:var(--green-pale);color:var(--green)}
+.tab.on .tab-c{background:var(--green);color:#fff}
+
+/* ── ROW AVATAR ── */
+.r-avi{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.r-avi-w{display:flex;align-items:center;gap:9px}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:.68rem;font-weight:700;letter-spacing:.5px}
+.badge-green{background:var(--green-pale);color:var(--green)}
+.badge-gold{background:rgba(245,166,35,.12);color:var(--gold-dim)}
+.badge-muted{background:rgba(107,124,115,.08);color:var(--mid)}
+
+/* ── ROW ACTIONS ── */
+.ra{display:flex;gap:5px;align-items:center}
+
+/* ── PAGINATION ── */
+.pg{display:flex;align-items:center;gap:6px;padding:14px 0;justify-content:flex-end}
+.pg-b{width:30px;height:30px;border-radius:6px;border:1.5px solid var(--border);background:var(--white);color:var(--mid);font-size:.8rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.pg-b:hover{border-color:var(--green);color:var(--green)}
+.pg-b.on{background:var(--green);color:#fff;border-color:var(--green)}
+.pg-info{font-size:.75rem;color:var(--muted);font-family:'DM Mono',monospace;margin-right:auto}
+
+/* ── OVERVIEW PANELS ── */
+.ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:0 28px 28px}
+.panel{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.p-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.p-title{font-family:'Playfair Display',serif;font-weight:700;font-size:.95rem;color:var(--dark)}
+.p-row{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.p-row:last-child{border-bottom:none}
+.p-row:hover{background:var(--light)}
+.pr-m{flex:1;min-width:0}
+.pr-t{font-size:.83rem;font-weight:600;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr-s{font-size:.72rem;color:var(--muted);margin-top:1px}
+.pr-r{text-align:right;flex-shrink:0}
+.pr-v{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--dark)}
+.pr-t2{font-size:.7rem;color:var(--muted)}
+
+/* ── MINI CHART ── */
+.chart-wrap{padding:0 28px 18px}
+.chart-box{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:18px 20px 0}
+.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.chart-title{font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem;color:var(--dark)}
+.bars{display:flex;align-items:flex-end;gap:5px;height:58px;padding-bottom:14px}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
+.bar-f{width:100%;border-radius:3px 3px 0 0;background:var(--green);opacity:.65;cursor:pointer;min-height:4px;transition:opacity .2s}
+.bar-f:hover{opacity:1}
+.bar-l{font-size:.6rem;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* ── REVENUE SUMMARY ── */
+.rev-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:0 28px 18px}
+.rev-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:16px 18px}
+.rev-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px}
+.rev-num{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--dark);line-height:1}
+.rev-sub{font-size:.72rem;margin-top:4px;display:flex;align-items:center;gap:4px;color:var(--muted)}
+.rev-up{color:var(--green);font-weight:700}
+
+/* ── SETTINGS SECTION ── */
+.settings-wrap{padding:0 28px 28px}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.scard{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.sc-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sc-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--dark)}
+.sc-body{padding:16px 20px}
+
+/* price field */
+.pf{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.pf:last-child{border-bottom:none}
+.pf-label{flex:1;font-size:.82rem;color:var(--mid);font-weight:500}
+.pf-note{font-size:.7rem;color:var(--muted);margin-top:2px}
+.pf-input-wrap{display:flex;align-items:center;gap:6px}
+.pf-prefix{font-size:.78rem;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap}
+.pf-input{width:110px;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Mono',monospace;font-size:.85rem;color:var(--dark);background:var(--light);outline:none;text-align:right;transition:border-color .2s}
+.pf-input:focus{border-color:var(--green);background:#fff}
+.pf-changed{border-color:var(--gold)!important;background:rgba(245,166,35,.05)!important}
+
+/* discount card */
+.disc-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;grid-column:1/-1}
+.disc-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:14px}
+.disc-toggle{position:relative;width:44px;height:24px;cursor:pointer}
+.disc-toggle input{opacity:0;width:0;height:0}
+.disc-track{position:absolute;inset:0;background:var(--border-d);border-radius:100px;transition:.2s}
+.disc-toggle input:checked+.disc-track{background:var(--green)}
+.disc-thumb{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.disc-toggle input:checked~.disc-thumb{left:22px}
+.disc-pct-input{width:70px;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Mono',monospace;font-size:.88rem;color:var(--dark);background:var(--light);outline:none;text-align:center;transition:border-color .2s}
+.disc-pct-input:focus{border-color:var(--green)}
+.disc-label-input{flex:1;min-width:150px;padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.84rem;color:var(--dark);background:var(--light);outline:none;transition:border-color .2s}
+.disc-label-input:focus{border-color:var(--green)}
+.disc-preview{margin-top:12px;padding:10px 14px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:var(--r);font-size:.78rem;color:var(--gold-dim)}
+
+/* save bar */
+.save-bar{position:sticky;bottom:0;background:var(--white);border-top:1.5px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px;z-index:50}
+.save-info{font-size:.8rem;color:var(--muted)}
+.save-info strong{color:var(--green);font-family:'DM Mono',monospace}
+.save-acts{display:flex;gap:10px}
+.changed-indicator{display:none;align-items:center;gap:6px;font-size:.78rem;color:var(--gold-dim);font-weight:600}
+.changed-indicator.show{display:flex}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,31,21,.78);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--r-lg);max-width:500px;width:100%;max-height:90vh;overflow-y:auto}
+.m-head{padding:22px 26px 0}
+.m-head h2{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--dark);margin-bottom:4px}
+.m-head p{font-size:.78rem;color:var(--muted);padding-bottom:18px;border-bottom:1px solid var(--border)}
+.m-body{padding:20px 26px}
+.m-foot{padding:14px 26px 22px;display:flex;gap:10px}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:.74rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--dark);background:var(--light);outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus{border-color:var(--green);background:#fff}
+.field textarea{min-height:75px;resize:vertical}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:#F7FAF8;padding:12px 18px;border-radius:var(--r);font-size:.82rem;font-weight:500;z-index:900;transform:translateY(80px);opacity:0;transition:all .3s;border-left:3px solid var(--green);max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ── DRAWER ── */
+.drawer{position:fixed;right:-440px;top:var(--topbar-h);bottom:0;width:420px;background:var(--white);border-left:1.5px solid var(--border);z-index:400;transition:right .22s ease;overflow-y:auto;display:flex;flex-direction:column}
+.drawer.open{right:0}
+.d-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.d-head h3{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--dark)}
+.d-close{background:transparent;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);padding:3px}
+.d-body{padding:20px 22px;flex:1}
+.d-sec{margin-bottom:20px}
+.d-lbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:9px;font-family:'DM Mono',monospace}
+.d-f{margin-bottom:12px}
+.d-fl{font-size:.73rem;color:var(--muted);margin-bottom:2px}
+.d-fv{font-size:.88rem;color:var(--dark);font-weight:500}
+.d-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.d-avi{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:14px}
+
+@media(max-width:1100px){.settings-grid{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(3,1fr)}.ov-grid{grid-template-columns:1fr}.rev-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <div class="tl">SH<span>I</span>NGA <span style="font-size:.6rem;letter-spacing:1px;color:rgba(247,250,248,.3);font-family:'DM Mono',monospace;font-weight:400;margin-left:4px">ADMIN</span></div>
+  <div class="tr">
+    <span class="t-admin">admin@shinga.rw</span>
+    <button class="notif" onclick="toast('3 pending worker approvals')">🔔<div class="ndot"></div></button>
+    <div class="t-avi">AD</div>
+  </div>
+</div>
+
+<div class="app">
+<!-- ── SIDEBAR ── -->
+<nav class="sidebar">
+  <div class="ns">
+    <div class="nl">Overview</div>
+    <a class="ni on" onclick="showPage('overview')"><span class="ni-ico">📊</span> Dashboard</a>
+    <a class="ni" onclick="showPage('revenue')"><span class="ni-ico">💰</span> Revenue</a>
+  </div>
+  <div class="ns">
+    <div class="nl">Content</div>
+    <a class="ni" onclick="showPage('jobs')"><span class="ni-ico">💼</span> Jobs <span class="nb">24</span></a>
+    <a class="ni" onclick="showPage('workers')"><span class="ni-ico">👤</span> Workers <span class="nb g">38</span></a>
+    <a class="ni" onclick="showPage('applications')"><span class="ni-ico">📋</span> Applications</a>
+  </div>
+  <div class="ns">
+    <div class="nl">Platform</div>
+    <a class="ni" onclick="showPage('settings')"><span class="ni-ico">⚙️</span> Pricing & Settings</a>
+    <a class="ni" onclick="showPage('discounts')"><span class="ni-ico">🎉</span> Discounts</a>
+    <a class="ni" onclick="showPage('districts')"><span class="ni-ico">🗺️</span> Districts</a>
+    <a class="ni" onclick="showPage('featured')"><span class="ni-ico">⭐</span> Featured Slots</a>
+  </div>
+  <div class="sf">
+    <a href="shinga.html" target="_blank"><span>↗</span> View Live Site</a>
+    <a href="#"><span>🚪</span> Sign Out</a>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main" id="mainContent">
+
+<!-- ════════════════════
+     OVERVIEW
+════════════════════ -->
+<div id="page-overview">
+  <div class="ph">
+    <div class="ph-row">
+      <div><div class="ph-eye">Good morning</div><div class="ph-title">Platform Overview</div></div>
+      <div class="ph-acts">
+        <button class="btn btn-outline btn-sm" onclick="showPage('jobs')">View Jobs</button>
+        <button class="btn btn-green btn-sm" onclick="openM('addJobM')">+ Add Job</button>
+      </div>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi" onclick="showPage('jobs')"><div class="kpi-label">Open Jobs</div><div class="kpi-num">1,840</div><div class="kpi-sub"><span class="kpi-d up">+124</span> this week</div></div>
+    <div class="kpi" onclick="showPage('workers')"><div class="kpi-label">Workers</div><div class="kpi-num">3,214</div><div class="kpi-sub"><span class="kpi-d up">+87</span> this week</div></div>
+    <div class="kpi" onclick="showPage('applications')"><div class="kpi-label">Applications</div><div class="kpi-num">638</div><div class="kpi-sub"><span class="kpi-d up">+52</span> today</div></div>
+    <div class="kpi"><div class="kpi-label">Revenue MTD</div><div class="kpi-num" style="color:var(--green)" id="revMTD">—</div><div class="kpi-sub">month to date</div></div>
+    <div class="kpi"><div class="kpi-label">Pending Approval</div><div class="kpi-num" style="color:var(--gold)">38</div><div class="kpi-sub" style="color:var(--gold-dim)">Needs attention</div></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-box">
+      <div class="chart-head"><div class="chart-title">Job Postings — Last 7 Days</div><div style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted)">124 new this week</div></div>
+      <div class="bars" id="chartBars"></div>
+    </div>
+  </div>
+  <div class="ov-grid">
+    <div class="panel">
+      <div class="p-head"><div class="p-title">Recent Jobs</div><button class="btn btn-outline btn-sm" onclick="showPage('jobs')">View All</button></div>
+      <div id="ovJobs"></div>
+    </div>
+    <div class="panel">
+      <div class="p-head"><div class="p-title">Pending Worker Approvals</div><button class="btn btn-outline btn-sm" onclick="showPage('workers')">Review All</button></div>
+      <div id="ovWorkers"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════
+     REVENUE
+════════════════════ -->
+<div id="page-revenue" style="display:none">
+  <div class="ph"><div class="ph-row"><div><div class="ph-eye">Financials</div><div class="ph-title">Revenue</div></div><div class="ph-acts"><button class="btn btn-outline btn-sm">↓ Export</button></div></div></div>
+  <div class="rev-row" id="revCards"></div>
+  <div class="tw">
+    <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--dark);margin-bottom:14px">Transaction Log</div>
+    <table class="dt"><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>From</th><th>Amount</th></tr></thead>
+    <tbody id="txBody"></tbody></table>
+  </div>
+</div>
+
+<!-- ════════════════════
+     JOBS
+════════════════════ -->
+<div id="page-jobs" style="display:none">
+  <div class="ph"><div class="ph-row"><div><div class="ph-eye">Content</div><div class="ph-title">Jobs</div></div><div class="ph-acts"><button class="btn btn-outline btn-sm" onclick="exportCSV('jobs')">↓ Export</button><button class="btn btn-green btn-sm" onclick="openM('addJobM')">+ Add Job</button></div></div></div>
+  <div class="tab-bar">
+    <div class="tab on" onclick="filterJobTab(this,'all')">All <span class="tab-c">24</span></div>
+    <div class="tab" onclick="filterJobTab(this,'active')">Active <span class="tab-c">18</span></div>
+    <div class="tab" onclick="filterJobTab(this,'pending')">Pending <span class="tab-c" style="background:var(--gold);color:var(--dark)">3</span></div>
+    <div class="tab" onclick="filterJobTab(this,'filled')">Filled <span class="tab-c">2</span></div>
+    <div class="tab" onclick="filterJobTab(this,'paused')">Paused <span class="tab-c">1</span></div>
+  </div>
+  <div class="tw">
+    <div class="tb-bar">
+      <input class="ts" placeholder="Search jobs…" oninput="filterJobsTable(this.value)">
+      <select class="tsel" onchange="filterJobType(this.value)"><option value="">All Types</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="bulk">Bulk Hire</option><option value="contract">Contract</option><option value="permanent">Permanent</option><option value="task">Per Task</option></select>
+      <select class="tsel"><option>All Districts</option><option>Gasabo</option><option>Kicukiro</option><option>Nyarugenge</option><option>Musanze</option></select>
+      <div class="tc" id="jCount">Showing 12 of 1,840</div>
+    </div>
+    <table class="dt"><thead><tr><th style="width:30px"><input type="checkbox" onchange="selAll('jobs',this)"></th><th>Job</th><th>Type</th><th>District</th><th>Pay</th><th>Fee Paid</th><th>Apps</th><th>Status</th><th>Posted</th><th style="width:90px">Actions</th></tr></thead>
+    <tbody id="jobsBody"></tbody></table>
+    <div class="pg" id="jobsPg"></div>
+  </div>
+</div>
+
+<!-- ════════════════════
+     WORKERS
+════════════════════ -->
+<div id="page-workers" style="display:none">
+  <div class="ph"><div class="ph-row"><div><div class="ph-eye">Content</div><div class="ph-title">Workers</div></div><div class="ph-acts"><button class="btn btn-outline btn-sm" onclick="exportCSV('workers')">↓ Export</button><button class="btn btn-green btn-sm" onclick="openM('addWorkerM')">+ Add Worker</button></div></div></div>
+  <div class="tab-bar">
+    <div class="tab on" onclick="filterWorkerTab(this,'all')">All <span class="tab-c">3,214</span></div>
+    <div class="tab" onclick="filterWorkerTab(this,'active')">Active <span class="tab-c">3,150</span></div>
+    <div class="tab" onclick="filterWorkerTab(this,'pending_review')">Pending <span class="tab-c" style="background:var(--gold);color:var(--dark)">38</span></div>
+    <div class="tab" onclick="filterWorkerTab(this,'suspended')">Suspended <span class="tab-c">26</span></div>
+  </div>
+  <div class="tw">
+    <div class="tb-bar">
+      <input class="ts" placeholder="Search workers…" oninput="filterWorkersTable(this.value)">
+      <select class="tsel"><option>All Categories</option><option>Domestic</option><option>Trades</option><option>Health</option><option>Technology</option><option>Education</option></select>
+      <select class="tsel" onchange="filterVerified(this.value)"><option value="">All</option><option value="yes">Verified</option><option value="no">Unverified</option></select>
+      <div class="tc" id="wCount">Showing 12 of 3,214</div>
+    </div>
+    <table class="dt"><thead><tr><th style="width:30px"><input type="checkbox"></th><th>Worker</th><th>Skill</th><th>District</th><th>Rate</th><th>Rating</th><th>Verified</th><th>Fee Paid</th><th>Status</th><th style="width:110px">Actions</th></tr></thead>
+    <tbody id="workersBody"></tbody></table>
+    <div class="pg" id="workersPg"></div>
+  </div>
+</div>
+
+<!-- ════════════════════
+     APPLICATIONS
+════════════════════ -->
+<div id="page-applications" style="display:none">
+  <div class="ph"><div class="ph-row"><div><div class="ph-eye">Tracking</div><div class="ph-title">Applications</div></div><div class="ph-acts"><button class="btn btn-outline btn-sm">↓ Export</button></div></div></div>
+  <div class="tab-bar">
+    <div class="tab on" onclick="filterAppTab(this,'all')">All <span class="tab-c">638</span></div>
+    <div class="tab" onclick="filterAppTab(this,'pending')">Pending <span class="tab-c" style="background:var(--gold);color:var(--dark)">52</span></div>
+    <div class="tab" onclick="filterAppTab(this,'contacted')">Contacted <span class="tab-c">410</span></div>
+    <div class="tab" onclick="filterAppTab(this,'hired')">Hired <span class="tab-c">142</span></div>
+  </div>
+  <div class="tw">
+    <div class="tb-bar"><input class="ts" placeholder="Search applications…"><div class="tc">Showing 10 of 638</div></div>
+    <table class="dt"><thead><tr><th>Worker</th><th>Applied For</th><th>Type</th><th>Employer</th><th>Fee Paid</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="appsBody"></tbody></table>
+  </div>
+</div>
+
+<!-- ════════════════════
+     PRICING SETTINGS
+════════════════════ -->
+<div id="page-settings" style="display:none">
+  <div class="ph"><div class="ph-row"><div><div class="ph-eye">Configuration</div><div class="ph-title">Pricing & Settings</div></div></div></div>
+  <div class="settings-wrap">
+    <div class="settings-grid">
+
+      <!-- Job Posting Fees -->
+      <div class="scard">
+        <div class="sc-head"><div class="sc-title">📋 Job Posting Fees</div><span class="badge badge-muted">Employer pays</span></div>
+        <div class="sc-body">
+          <div class="pf"><div><div class="pf-label">Daily / One-time</div><div class="pf-note">Single day gig, one-time task</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_job_post_daily" type="number" value="2000" oninput="markChanged(this,'job_post_daily')"></div></div>
+          <div class="pf"><div><div class="pf-label">Weekly</div><div class="pf-note">Recurring weekly arrangement</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_job_post_weekly" type="number" value="4000" oninput="markChanged(this,'job_post_weekly')"></div></div>
+          <div class="pf"><div><div class="pf-label">Per Month</div><div class="pf-note">Monthly employment</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_job_post_monthly" type="number" value="8000" oninput="markChanged(this,'job_post_monthly')"></div></div>
+          <div class="pf"><div><div class="pf-label">Contract (3–12 months)</div><div class="pf-note">Fixed-term contract listing</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_job_post_contract" type="number" value="8000" oninput="markChanged(this,'job_post_contract')"></div></div>
+          <div class="pf"><div><div class="pf-label">Permanent / Full-time</div><div class="pf-note">Long-term hire</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_job_post_permanent" type="number" value="8000" oninput="markChanged(this,'job_post_permanent')"></div></div>
+          <div class="pf"><div><div class="pf-label">Per Task / Project</div><div class="pf-note">Pay per completed task</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_job_post_task" type="number" value="4000" oninput="markChanged(this,'job_post_task')"></div></div>
+          <div class="pf"><div><div class="pf-label">Bulk Hire (10+ workers)</div><div class="pf-note">Construction sites, events</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_job_post_bulk" type="number" value="15000" oninput="markChanged(this,'job_post_bulk')"></div></div>
+        </div>
+      </div>
+
+      <!-- Application & Contact Fees -->
+      <div class="scard">
+        <div class="sc-head"><div class="sc-title">📨 Application & Contact Fees</div><span class="badge badge-muted">Both sides pay</span></div>
+        <div class="sc-body">
+          <div class="pf"><div><div class="pf-label">Application Fee</div><div class="pf-note">Worker pays to apply to a job</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_application_fee" type="number" value="500" oninput="markChanged(this,'application_fee')"></div></div>
+          <div class="pf"><div><div class="pf-label">Contact Fee — Single</div><div class="pf-note">Employer contacts 1 listed worker</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_contact_fee_single" type="number" value="1500" oninput="markChanged(this,'contact_fee_single')"></div></div>
+          <div class="pf"><div><div class="pf-label">Contact Bundle — 5</div><div class="pf-note">Employer buys 5 contacts</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_contact_fee_5" type="number" value="6000" oninput="markChanged(this,'contact_fee_5')"></div></div>
+          <div class="pf"><div><div class="pf-label">Contact Bundle — 15</div><div class="pf-note">Construction sites, bulk hiring</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_contact_fee_15" type="number" value="15000" oninput="markChanged(this,'contact_fee_15')"></div></div>
+        </div>
+      </div>
+
+      <!-- Verification -->
+      <div class="scard">
+        <div class="sc-head"><div class="sc-title">✅ Worker Verification</div><span class="badge badge-green">Annual fee</span></div>
+        <div class="sc-body">
+          <div class="pf"><div><div class="pf-label">Verification Fee</div><div class="pf-note">Annual. ID + skill confirmed. Badge valid 1 year.</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_verification_fee" type="number" value="10000" oninput="markChanged(this,'verification_fee')"></div></div>
+          <div style="margin-top:12px;padding:10px 12px;background:var(--green-pale);border-radius:var(--r);font-size:.76rem;color:var(--green);line-height:1.6">
+            Verified workers appear first in search. Employers can filter "Verified Only". Renewal reminder sent 30 days before expiry.
+          </div>
+        </div>
+      </div>
+
+      <!-- Credit Packs -->
+      <div class="scard">
+        <div class="sc-head"><div class="sc-title">💳 Credit Pack Pricing</div><span class="badge badge-gold">Prepaid wallet</span></div>
+        <div class="sc-body">
+          <div class="pf"><div><div class="pf-label">Pack 1 — Face Value</div><div class="pf-note">Amount credited to wallet</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_cp1_amount" type="number" value="10000" oninput="markChanged(this,'cp1_amount')"></div></div>
+          <div class="pf"><div><div class="pf-label">Pack 1 — Actual Price</div><div class="pf-note">What buyer pays (~15% discount)</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_cp1_price" type="number" value="8500" oninput="markChanged(this,'cp1_price')"></div></div>
+          <div class="pf"><div><div class="pf-label">Pack 2 — Face Value</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_cp2_amount" type="number" value="25000" oninput="markChanged(this,'cp2_amount')"></div></div>
+          <div class="pf"><div><div class="pf-label">Pack 2 — Actual Price</div><div class="pf-note">~20% discount</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_cp2_price" type="number" value="20000" oninput="markChanged(this,'cp2_price')"></div></div>
+          <div class="pf"><div><div class="pf-label">Pack 3 — Face Value</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_cp3_amount" type="number" value="60000" oninput="markChanged(this,'cp3_amount')"></div></div>
+          <div class="pf"><div><div class="pf-label">Pack 3 — Actual Price</div><div class="pf-note">~25% discount</div></div><div class="pf-input-wrap"><span class="pf-prefix">RWF</span><input class="pf-input" id="p_cp3_price" type="number" value="45000" oninput="markChanged(this,'cp3_price')"></div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SAVE BAR -->
+    <div class="save-bar" style="margin-top:18px">
+      <div>
+        <div class="changed-indicator" id="changedIndicator">⚠ Unsaved changes — review before saving</div>
+        <div class="save-info" id="saveInfo">All prices are live immediately after saving. <strong>Changes push to the platform instantly.</strong></div>
+      </div>
+      <div class="save-acts">
+        <button class="btn btn-outline btn-sm" onclick="resetPrices()">Reset to Defaults</button>
+        <button class="btn btn-gold btn-sm" onclick="previewPrices()">Preview Changes</button>
+        <button class="btn btn-green" onclick="savePrices()">💾 Save & Push Live</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════
+     DISCOUNTS
+════════════════════ -->
+<div id="page-discounts" style="display:none">
+  <div class="ph"><div class="ph-row"><div><div class="ph-eye">Promotions</div><div class="ph-title">Discounts & Promotions</div></div></div></div>
+  <div class="settings-wrap">
+
+    <!-- Active Discount -->
+    <div class="disc-card" style="margin-bottom:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--dark)">Platform-wide Discount</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:3px">Applies a percentage discount to all fees sitewide. Visible in the pricing strip and on every modal.</div>
+        </div>
+        <label class="disc-toggle">
+          <input type="checkbox" id="discActive" onchange="toggleDiscount()">
+          <div class="disc-track"></div>
+          <div class="disc-thumb"></div>
+        </label>
+      </div>
+      <div class="disc-row">
+        <div style="font-size:.8rem;font-weight:600;color:var(--mid)">Discount %</div>
+        <input class="disc-pct-input" type="number" id="discPct" value="20" min="1" max="80" oninput="updateDiscPreview()">
+        <div style="font-size:.8rem;font-weight:600;color:var(--mid)">Label shown to users</div>
+        <input class="disc-label-input" type="text" id="discLabel" value="🎉 20% Launch Discount" oninput="updateDiscPreview()">
+        <button class="btn btn-green btn-sm" onclick="applyDiscount()">Apply Now</button>
+      </div>
+      <div class="disc-preview" id="discPreview">Preview: All fees will show 20% off. Job post (Daily): RWF 2,000 → RWF 1,600</div>
+    </div>
+
+    <!-- Scheduled Discounts -->
+    <div class="scard">
+      <div class="sc-head"><div class="sc-title">Scheduled Promotions</div><button class="btn btn-green btn-sm" onclick="toast('Scheduling coming in next build')">+ Schedule</button></div>
+      <div class="sc-body">
+        <table class="dt"><thead><tr><th>Name</th><th>Discount</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td class="td-m">New Year Launch</td><td><span class="badge badge-gold">20% off</span></td><td style="font-family:'DM Mono',monospace;font-size:.78rem">Jan 1</td><td style="font-family:'DM Mono',monospace;font-size:.78rem">Jan 31</td><td><span class="st st-paused">Completed</span></td><td><div class="ra"><button class="btn btn-outline btn-sm" onclick="toast('Duplicating…')">Duplicate</button></div></td></tr>
+          <tr><td class="td-m">Worker Appreciation Week</td><td><span class="badge badge-green">15% off</span></td><td style="font-family:'DM Mono',monospace;font-size:.78rem">Mar 8</td><td style="font-family:'DM Mono',monospace;font-size:.78rem">Mar 14</td><td><span class="st st-pending">Scheduled</span></td><td><div class="ra"><button class="btn btn-danger btn-sm" onclick="toast('Cancelled')">Cancel</button></div></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- Per-category discounts -->
+    <div class="scard" style="margin-top:18px">
+      <div class="sc-head"><div class="sc-title">Category-Specific Discounts</div><span class="badge badge-muted">Coming soon</span></div>
+      <div class="sc-body" style="color:var(--muted);font-size:.83rem;line-height:1.7">
+        Set different discount rates per job category — e.g. 30% off domestic services to grow that category, while keeping professional fees unchanged. Available in next build.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════
+     PLACEHOLDER PAGES
+════════════════════ -->
+<div id="page-districts" style="display:none"><div class="ph"><div class="ph-row"><div><div class="ph-eye">Geography</div><div class="ph-title">Districts (30)</div></div></div></div><div style="padding:28px;color:var(--muted);font-size:.85rem">District-level job density + worker coverage map — coming next build.</div></div>
+<div id="page-featured" style="display:none"><div class="ph"><div class="ph-row"><div><div class="ph-eye">Revenue</div><div class="ph-title">Featured Slots</div></div></div></div><div style="padding:28px;color:var(--muted);font-size:.85rem">Manage featured listings, set expiry, pricing tiers — coming next build.</div></div>
+
+</main>
+</div>
+
+<!-- ── DRAWER ── -->
+<div class="drawer" id="drawer">
+  <div class="d-head"><h3 id="dTitle">Details</h3><button class="d-close" onclick="closeDrawer()">✕</button></div>
+  <div class="d-body" id="dBody"></div>
+</div>
+
+<!-- ── MODALS ── -->
+<div class="overlay" id="addJobM">
+  <div class="modal">
+    <div class="m-head"><h2>Add Job Listing</h2><p>Create a job directly from admin.</p></div>
+    <div class="m-body">
+      <div class="field"><label>Job Title</label><input type="text" placeholder="e.g. 40 Brick Lifters, Live-in Babysitter…"></div>
+      <div class="fr"><div class="field"><label>Type</label><select><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Bulk Hire</option><option>Contract</option><option>Permanent</option><option>Per Task</option></select></div><div class="field"><label>Workers Needed</label><input type="number" value="1" min="1"></div></div>
+      <div class="fr"><div class="field"><label>Category</label><select><option>Domestic</option><option>Trades</option><option>Health</option><option>Education</option><option>Technology</option><option>Casual</option></select></div><div class="field"><label>District</label><select><option>Gasabo</option><option>Kicukiro</option><option>Nyarugenge</option><option>Musanze</option><option>Rubavu</option></select></div></div>
+      <div class="field"><label>Pay (RWF)</label><input type="number" placeholder="e.g. 10000 per day"></div>
+      <div class="field"><label>Description</label><textarea placeholder="Describe the work…"></textarea></div>
+      <div class="fr"><div class="field"><label>Status</label><select><option>Active</option><option>Pending</option></select></div><div class="field"><label>Featured?</label><select><option>No</option><option>Yes — 7 days</option><option>Yes — 30 days</option></select></div></div>
+      <div style="background:var(--green-pale);border-radius:var(--r);padding:10px 13px;font-size:.76rem;color:var(--green)">Admin-created jobs bypass the listing fee. Mark as waived in revenue log.</div>
+    </div>
+    <div class="m-foot"><button class="btn btn-green" style="flex:1" onclick="saveAction('Job created successfully')">Save Job</button><button class="btn btn-cancel" onclick="closeM('addJobM')">Cancel</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="addWorkerM">
+  <div class="modal">
+    <div class="m-head"><h2>Add Worker Profile</h2><p>Register a worker manually.</p></div>
+    <div class="m-body">
+      <div class="fr"><div class="field"><label>First Name</label><input type="text"></div><div class="field"><label>Last Name</label><input type="text"></div></div>
+      <div class="fr"><div class="field"><label>Category</label><select><option>Domestic</option><option>Trades</option><option>Health</option><option>Technology</option><option>Education</option><option>Casual</option></select></div><div class="field"><label>Skill / Role</label><input type="text" placeholder="e.g. Babysitter, Electrician"></div></div>
+      <div class="fr"><div class="field"><label>District</label><select><option>Gasabo</option><option>Kicukiro</option><option>Nyarugenge</option><option>Musanze</option><option>Rubavu</option></select></div><div class="field"><label>Phone</label><input type="tel" placeholder="+250 7XX XXX XXX"></div></div>
+      <div class="fr"><div class="field"><label>Rate (RWF)</label><input type="number"></div><div class="field"><label>Rate Unit</label><select><option>Per Day</option><option>Per Week</option><option>Per Month</option><option>Per Task</option></select></div></div>
+      <div class="fr"><div class="field"><label>Status</label><select><option>Active</option><option>Pending Review</option></select></div><div class="field"><label>Verified</label><select><option>Not Verified</option><option>Verified</option></select></div></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-green" style="flex:1" onclick="saveAction('Worker profile created')">Save Worker</button><button class="btn btn-cancel" onclick="closeM('addWorkerM')">Cancel</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="pricePreviewM">
+  <div class="modal">
+    <div class="m-head"><h2>📊 Price Change Preview</h2><p>Review all changes before pushing live.</p></div>
+    <div class="m-body" id="pricePreviewBody"></div>
+    <div class="m-foot"><button class="btn btn-green" style="flex:1" onclick="closeM('pricePreviewM');savePrices()">Confirm & Push Live</button><button class="btn btn-cancel" onclick="closeM('pricePreviewM')">Go Back</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast-el"></div>
+
+<!-- ══════════════════════════════
+     JAVASCRIPT
+══════════════════════════════ -->
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const GRADS=['#2563EB,#7C3AED','#1A7A4A,#145E38','#0891B2,#059669','#B45309,#D97706','#7C3AED,#EC4899','#DC2626,#C4541A','#0F766E,#0891B2','#16A34A,#059669']
+const g=i=>GRADS[i%GRADS.length]
+
+// Pricing state — mirrors Supabase settings table in production
+let PRICES = {
+  job_post_daily:2000, job_post_weekly:4000, job_post_monthly:8000,
+  job_post_contract:8000, job_post_permanent:8000, job_post_task:4000, job_post_bulk:15000,
+  application_fee:500, contact_fee_single:1500, contact_fee_5:6000, contact_fee_15:15000,
+  verification_fee:10000,
+  cp1_amount:10000, cp1_price:8500,
+  cp2_amount:25000, cp2_price:20000,
+  cp3_amount:60000, cp3_price:45000,
+  discounts:{active:false, pct:20, label:'🎉 20% Launch Discount'},
+}
+
+let pendingChanges = {}
+
+const fmt = n => 'RWF ' + Number(n).toLocaleString()
+
+const JOBS_D = [
+  {id:'J001',title:'Live-in Babysitter',company:'Private Family',type:'monthly',district:'Kicukiro',pay:'RWF 80,000/mo',fee:8000,apps:8,status:'active',posted:'Today',feat:true,slots:1,gi:1},
+  {id:'J002',title:'40 Brick Lifters',company:'BuildRight Co.',type:'bulk',district:'Gasabo',pay:'RWF 8,000/day',fee:15000,apps:22,status:'active',posted:'Today',feat:true,slots:40,gi:3},
+  {id:'J003',title:'House Cleaner 3×/wk',company:'Private Client',type:'weekly',district:'Gasabo',pay:'RWF 21,000/wk',fee:4000,apps:14,status:'active',posted:'Today',feat:false,slots:1,gi:1},
+  {id:'J004',title:'Domestic Cook',company:'Private Household',type:'monthly',district:'Nyarugenge',pay:'RWF 120,000/mo',fee:8000,apps:4,status:'active',posted:'1 day ago',feat:false,slots:1,gi:5},
+  {id:'J005',title:'Electrician Contract',company:'BuildRight Co.',type:'contract',district:'Kicukiro',pay:'RWF 22,000/day',fee:8000,apps:9,status:'active',posted:'Today',feat:false,slots:2,gi:3},
+  {id:'J006',title:'Math Teacher',company:'Green Hills Sch.',type:'permanent',district:'Musanze',pay:'RWF 180,000/mo',fee:8000,apps:6,status:'pending',posted:'2 days ago',feat:true,slots:1,gi:0},
+  {id:'J007',title:'Shoe Cleaner',company:'Fashion Boutique',type:'daily',district:'Gasabo',pay:'RWF 8,000/day',fee:2000,apps:2,status:'paused',posted:'Today',feat:false,slots:1,gi:7},
+  {id:'J008',title:'Gardener Weekly',company:'Private Villa',type:'weekly',district:'Kicukiro',pay:'RWF 15,000/wk',fee:4000,apps:5,status:'active',posted:'Today',feat:false,slots:1,gi:6},
+]
+
+const WORKERS_D = [
+  {id:'W001',name:'Aline Uwimana',skill:'Software Developer',cat:'tech',district:'Gasabo',rate:'RWF 45,000/day',rating:4.9,jobs:23,status:'active',verified:true,fee:10000,gi:0},
+  {id:'W002',name:'Jean-Paul Nkusi',skill:'Babysitter/Nanny',cat:'health',district:'Gasabo',rate:'RWF 8,000/day',rating:4.8,jobs:52,status:'active',verified:true,fee:10000,gi:3},
+  {id:'W003',name:'Alice Kayitesi',skill:'House Cleaner',cat:'domestic',district:'Gasabo',rate:'RWF 7,000/day',rating:4.9,jobs:88,status:'pending_review',verified:false,fee:0,gi:6},
+  {id:'W004',name:'Solange Ingabire',skill:'Domestic Cook',cat:'domestic',district:'Kicukiro',rate:'RWF 10,000/day',rating:4.9,jobs:67,status:'active',verified:false,fee:0,gi:4},
+  {id:'W005',name:'Claude Bizimana',skill:'Mechanic',cat:'trades',district:'Rubavu',rate:'RWF 18,000/day',rating:5.0,jobs:29,status:'active',verified:true,fee:10000,gi:1},
+  {id:'W006',name:'Grace Mukamana',skill:'Secondary Teacher',cat:'education',district:'Musanze',rate:'RWF 180,000/mo',rating:4.8,jobs:35,status:'pending_review',verified:false,fee:0,gi:5},
+  {id:'W007',name:'Théo Ndayisenga',skill:'Electrician',cat:'trades',district:'Kicukiro',rate:'RWF 20,000/day',rating:4.6,jobs:55,status:'suspended',verified:false,fee:0,gi:7},
+  {id:'W008',name:'Marie Mukandori',skill:'Laundry & Ironing',cat:'domestic',district:'Gasabo',rate:'RWF 5,000/day',rating:4.8,jobs:76,status:'pending_review',verified:false,fee:0,gi:2},
+]
+
+const APPS_D = [
+  {worker:'Aline Uwimana',job:'Full-Stack Developer',type:'contract',employer:'Kigali Tech Hub',fee:500,date:'Today',status:'contacted',wi:0},
+  {worker:'Jean-Paul Nkusi',job:'Live-in Babysitter',type:'monthly',employer:'Private Family',fee:500,date:'Today',status:'hired',wi:1},
+  {worker:'Alice Kayitesi',job:'House Cleaner 3×/wk',type:'weekly',employer:'Private Client',fee:500,date:'Today',status:'pending',wi:2},
+  {worker:'Solange Ingabire',job:'Domestic Cook',type:'monthly',employer:'Private Household',fee:500,date:'1 day ago',status:'contacted',wi:3},
+  {worker:'Claude Bizimana',job:'Plumber Urgent',type:'daily',employer:'Rwamagana Hotel',fee:500,date:'Today',status:'pending',wi:4},
+  {worker:'Grace Mukamana',job:'Math Teacher',type:'permanent',employer:'Green Hills Sch.',fee:500,date:'2 days ago',status:'hired',wi:5},
+]
+
+const TX = [
+  {date:'Today',type:'Job Post',desc:'40 Brick Lifters — Bulk Hire',from:'BuildRight Co.',amount:15000},
+  {date:'Today',type:'Job Post',desc:'Live-in Babysitter — Monthly',from:'Private Family',amount:8000},
+  {date:'Today',type:'Application',desc:'Apply: House Cleaner job',from:'Alice Kayitesi',amount:500},
+  {date:'Today',type:'Contact Fee',desc:'Contacted worker: Jean-Paul Nkusi',from:'Private Family',amount:1500},
+  {date:'Today',type:'Verification',desc:'SHINGA Verified — Babysitter/Nanny',from:'Jean-Paul Nkusi',amount:10000},
+  {date:'Yesterday',type:'Application',desc:'Apply: Domestic Cook job',from:'Solange Ingabire',amount:500},
+  {date:'Yesterday',type:'Job Post',desc:'House Cleaner 3×/wk — Weekly',from:'Private Client',amount:4000},
+  {date:'Yesterday',type:'Contact Fee',desc:'Contact Bundle — 5 workers',from:'BuildRight Co.',amount:6000},
+  {date:'2 days ago',type:'Job Post',desc:'Math Teacher — Permanent',from:'Green Hills Sch.',amount:8000},
+  {date:'2 days ago',type:'Verification',desc:'SHINGA Verified — Mechanic',from:'Claude Bizimana',amount:10000},
+]
+
+// ── NAV ───────────────────────────────────────────────────────
+function showPage(p){
+  document.querySelectorAll('[id^="page-"]').forEach(el=>el.style.display='none')
+  document.getElementById('page-'+p).style.display='block'
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'))
+  const map={overview:'Dashboard',revenue:'Revenue',jobs:'Jobs',workers:'Workers',applications:'Applications',settings:'Pricing',discounts:'Discounts',districts:'Districts',featured:'Featured'}
+  document.querySelectorAll('.ni').forEach(n=>{if(n.textContent.trim().startsWith(map[p]?.charAt(0)||'ξ'))n.classList.add('on')})
+  closeDrawer()
+  if(p==='jobs')renderJobsTable(JOBS_D)
+  if(p==='workers')renderWorkersTable(WORKERS_D)
+  if(p==='applications')renderAppsTable(APPS_D)
+  if(p==='revenue')renderRevenue()
+  if(p==='settings')syncPriceInputs()
+}
+
+// ── MODALS ────────────────────────────────────────────────────
+function openM(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
+function closeM(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o){o.classList.remove('open');document.body.style.overflow=''}}))
+function saveAction(msg){document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open'));document.body.style.overflow='';toast(msg)}
+
+// ── TOAST ─────────────────────────────────────────────────────
+let tt2
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast-el')
+  t.style.borderLeftColor=type==='warn'?'var(--gold)':'var(--green)'
+  t.textContent=(type==='ok'?'✓ ':type==='warn'?'⚠ ':'')+msg
+  t.classList.add('show');clearTimeout(tt2);tt2=setTimeout(()=>t.classList.remove('show'),3200)
+}
+
+// ── DRAWER ────────────────────────────────────────────────────
+function openDrawer(title,html){document.getElementById('dTitle').textContent=title;document.getElementById('dBody').innerHTML=html;document.getElementById('drawer').classList.add('open')}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open')}
+
+// ── STATUS HTML ───────────────────────────────────────────────
+function stHtml(s){
+  const m={active:'st-active Active',pending:'st-pending Pending',pending_review:'st-pending Pending Review',filled:'st-filled Filled',paused:'st-paused Paused',suspended:'st-suspended Suspended',contacted:'st-filled Contacted',hired:'st-active Hired',rejected:'st-suspended Rejected'}
+  const [cls,...rest]=(m[s]||'st-paused '+s).split(' ');return`<span class="st ${cls}">${rest.join(' ')}</span>`
+}
+
+// ── JOBS TABLE ────────────────────────────────────────────────
+function renderJobsTable(data){
+  const TL={daily:'Daily',weekly:'Weekly',monthly:'Monthly',contract:'Contract',permanent:'Permanent',task:'Per Task',bulk:'Bulk Hire'}
+  document.getElementById('jobsBody').innerHTML=data.map((j,i)=>`
+    <tr>
+      <td><input type="checkbox"></td>
+      <td><div class="td-m" style="cursor:pointer" onclick="openJobDrawer(${i})">${j.title} ${j.feat?'⭐':''}</div><div class="td-s">${j.company} · ${j.slots>1?j.slots+' workers':''}</div></td>
+      <td><span class="badge badge-green">${TL[j.type]||j.type}</span></td>
+      <td><span style="font-size:.78rem">📍 ${j.district}</span></td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:.8rem">${j.pay}</span></td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--green);font-weight:600">${fmt(j.fee)}</span></td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--green)">${j.apps}</span></td>
+      <td>${stHtml(j.status)}</td>
+      <td><span style="font-size:.72rem;color:var(--muted)">${j.posted}</span></td>
+      <td><div class="ra"><button class="btn btn-outline btn-sm" onclick="openJobDrawer(${i})">View</button><button class="btn btn-danger btn-sm" onclick="toast('Job removed')">✕</button></div></td>
+    </tr>
+  `).join('')
+  document.getElementById('jCount').textContent=`Showing ${data.length} of 1,840`
+  renderPg('jobsPg',1,5)
+}
+
+function openJobDrawer(i){
+  const j=JOBS_D[i]
+  openDrawer(j.title,`
+    <div class="d-sec">
+      <div class="d-lbl">Job Details</div>
+      <div class="d-f"><div class="d-fl">Company</div><div class="d-fv">${j.company}</div></div>
+      <div class="d-f"><div class="d-fl">Type</div><div class="d-fv">${j.type}</div></div>
+      <div class="d-f"><div class="d-fl">District</div><div class="d-fv">📍 ${j.district}</div></div>
+      <div class="d-f"><div class="d-fl">Workers Needed</div><div class="d-fv">${j.slots}</div></div>
+      <div class="d-f"><div class="d-fl">Pay</div><div class="d-fv" style="color:var(--green);font-family:'DM Mono',monospace">${j.pay}</div></div>
+      <div class="d-f"><div class="d-fl">Listing Fee Paid</div><div class="d-fv" style="font-family:'DM Mono',monospace">${fmt(j.fee)}</div></div>
+      <div class="d-f"><div class="d-fl">Applications</div><div class="d-fv">${j.apps} received</div></div>
+      <div class="d-f"><div class="d-fl">Status</div><div class="d-fv">${stHtml(j.status)}</div></div>
+    </div>
+    <div class="d-sec">
+      <div class="d-lbl">Admin Actions</div>
+      <div class="d-acts">
+        <button class="btn btn-green btn-sm" onclick="toast('Status set to Active')">Set Active</button>
+        <button class="btn btn-outline btn-sm" onclick="toast('Job paused')">Pause</button>
+        <button class="btn btn-gold btn-sm" onclick="toast('Marked as Featured')">⭐ Feature</button>
+        <button class="btn btn-danger btn-sm" onclick="toast('Job removed');closeDrawer()">Remove</button>
+      </div>
+    </div>
+  `)
+}
+
+function filterJobsTable(q){renderJobsTable(JOBS_D.filter(j=>j.title.toLowerCase().includes(q.toLowerCase())||j.company.toLowerCase().includes(q.toLowerCase())))}
+function filterJobType(t){renderJobsTable(t?JOBS_D.filter(j=>j.type===t):JOBS_D)}
+function filterJobTab(el,f){document.querySelectorAll('#page-jobs .tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderJobsTable(f==='all'?JOBS_D:JOBS_D.filter(j=>j.status===f))}
+
+// ── WORKERS TABLE ─────────────────────────────────────────────
+function renderWorkersTable(data){
+  document.getElementById('workersBody').innerHTML=data.map((w,i)=>`
+    <tr>
+      <td><input type="checkbox"></td>
+      <td><div class="r-avi-w" style="cursor:pointer" onclick="openWorkerDrawer(${i})">
+        <div class="r-avi" style="background:linear-gradient(135deg,${g(w.gi)})">${w.id.slice(1,3)}</div>
+        <div><div class="td-m">${w.name}</div><div class="td-s">${w.id}</div></div>
+      </div></td>
+      <td class="td-m">${w.skill}</td>
+      <td><span style="font-size:.78rem">📍 ${w.district}</span></td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:.8rem">${w.rate}</span></td>
+      <td><span style="color:var(--gold);font-weight:700">★ ${w.rating}</span></td>
+      <td>${w.verified?'<span class="badge badge-green">✓ Verified</span>':'<span class="badge badge-muted">—</span>'}</td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:.78rem;color:${w.fee>0?'var(--green)':'var(--muted)'}">${w.fee>0?fmt(w.fee):'—'}</span></td>
+      <td>${stHtml(w.status)}</td>
+      <td><div class="ra">
+        ${w.status==='pending_review'?`<button class="btn btn-approve btn-sm" onclick="approveWorker(${i})">✓ Approve</button>`:''}
+        <button class="btn btn-outline btn-sm" onclick="openWorkerDrawer(${i})">View</button>
+        <button class="btn btn-danger btn-sm" onclick="toast('Worker suspended')">✕</button>
+      </div></td>
+    </tr>
+  `).join('')
+  document.getElementById('wCount').textContent=`Showing ${data.length} of 3,214`
+  renderPg('workersPg',1,8)
+}
+
+function openWorkerDrawer(i){
+  const w=WORKERS_D[i]
+  openDrawer(w.name,`
+    <div class="d-avi" style="background:linear-gradient(135deg,${g(w.gi)})">${w.id.slice(1,3)}</div>
+    <div class="d-sec">
+      <div class="d-lbl">Profile</div>
+      <div class="d-f"><div class="d-fl">Skill</div><div class="d-fv">${w.skill}</div></div>
+      <div class="d-f"><div class="d-fl">Category</div><div class="d-fv">${w.cat}</div></div>
+      <div class="d-f"><div class="d-fl">District</div><div class="d-fv">📍 ${w.district}</div></div>
+      <div class="d-f"><div class="d-fl">Rate</div><div class="d-fv" style="color:var(--green);font-family:'DM Mono',monospace">${w.rate}</div></div>
+      <div class="d-f"><div class="d-fl">Rating</div><div class="d-fv">★ ${w.rating} · ${w.jobs} jobs</div></div>
+      <div class="d-f"><div class="d-fl">Status</div><div class="d-fv">${stHtml(w.status)}</div></div>
+      <div class="d-f"><div class="d-fl">Verified</div><div class="d-fv">${w.verified?'✅ ID Verified (fee paid: '+fmt(w.fee)+')':'⚠️ Not Verified'}</div></div>
+    </div>
+    <div class="d-sec">
+      <div class="d-lbl">Actions</div>
+      <div class="d-acts">
+        ${w.status==='pending_review'?`<button class="btn btn-green btn-sm" onclick="approveWorker(${i});closeDrawer()">✓ Approve</button>`:''}
+        <button class="btn btn-gold btn-sm" onclick="toast('Marked as Featured')">⭐ Feature</button>
+        <button class="btn btn-outline btn-sm" onclick="toast('Verify link sent')">Send Verify Link</button>
+        <button class="btn btn-danger btn-sm" onclick="toast('Worker suspended');closeDrawer()">Suspend</button>
+      </div>
+    </div>
+  `)
+}
+
+function approveWorker(i){WORKERS_D[i].status='active';renderWorkersTable(WORKERS_D);toast(WORKERS_D[i].name+' approved ✓')}
+function filterWorkersTable(q){renderWorkersTable(WORKERS_D.filter(w=>w.name.toLowerCase().includes(q.toLowerCase())||w.skill.toLowerCase().includes(q.toLowerCase())))}
+function filterVerified(v){if(!v)renderWorkersTable(WORKERS_D);else if(v==='yes')renderWorkersTable(WORKERS_D.filter(w=>w.verified));else renderWorkersTable(WORKERS_D.filter(w=>!w.verified))}
+function filterWorkerTab(el,f){document.querySelectorAll('#page-workers .tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderWorkersTable(f==='all'?WORKERS_D:WORKERS_D.filter(w=>w.status===f))}
+
+// ── APPS TABLE ────────────────────────────────────────────────
+function renderAppsTable(data){
+  document.getElementById('appsBody').innerHTML=data.map((a,i)=>`
+    <tr>
+      <td><div class="r-avi-w"><div class="r-avi" style="background:linear-gradient(135deg,${g(a.wi)})">${a.worker.split(' ').map(n=>n[0]).join('')}</div><div class="td-m">${a.worker}</div></div></td>
+      <td class="td-m">${a.job}</td>
+      <td><span class="badge badge-green">${a.type}</span></td>
+      <td style="font-size:.8rem;color:var(--mid)">${a.employer}</td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--green)">${fmt(a.fee)}</span></td>
+      <td style="font-size:.73rem;color:var(--muted)">${a.date}</td>
+      <td>${stHtml(a.status)}</td>
+      <td><div class="ra">${a.status==='pending'?`<button class="btn btn-approve btn-sm" onclick="toast('Marked Contacted')">Contact</button>`:''}<button class="btn btn-outline btn-sm" onclick="toast('Opening…')">View</button></div></td>
+    </tr>
+  `).join('')
+}
+function filterAppTab(el,f){document.querySelectorAll('#page-applications .tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderAppsTable(f==='all'?APPS_D:APPS_D.filter(a=>a.status===f))}
+
+// ── REVENUE ───────────────────────────────────────────────────
+function renderRevenue(){
+  const totals={post:0,app:0,contact:0,verif:0}
+  TX.forEach(t=>{
+    if(t.type==='Job Post')totals.post+=t.amount
+    else if(t.type==='Application')totals.app+=t.amount
+    else if(t.type==='Contact Fee')totals.contact+=t.amount
+    else if(t.type==='Verification')totals.verif+=t.amount
+  })
+  const total=Object.values(totals).reduce((a,b)=>a+b,0)
+  document.getElementById('revCards').innerHTML=`
+    <div class="rev-card"><div class="rev-label">Total Revenue MTD</div><div class="rev-num" style="color:var(--green)">${fmt(total)}</div><div class="rev-sub"><span class="rev-up">+18%</span> vs last month</div></div>
+    <div class="rev-card"><div class="rev-label">Job Post Fees</div><div class="rev-num">${fmt(totals.post)}</div><div class="rev-sub"><span class="rev-up">+24%</span></div></div>
+    <div class="rev-card"><div class="rev-label">Application Fees</div><div class="rev-num">${fmt(totals.app)}</div><div class="rev-sub"><span class="rev-up">+31%</span></div></div>
+    <div class="rev-card"><div class="rev-label">Contact + Verification</div><div class="rev-num">${fmt(totals.contact+totals.verif)}</div><div class="rev-sub"><span class="rev-up">+12%</span></div></div>
+  `
+  document.getElementById('revMTD').textContent=fmt(total)
+  const txTypes={'Job Post':'badge-green','Application':'badge-gold','Contact Fee':'badge-muted','Verification':'badge-green'}
+  document.getElementById('txBody').innerHTML=TX.map(t=>`
+    <tr>
+      <td style="font-size:.75rem;color:var(--muted);font-family:'DM Mono',monospace">${t.date}</td>
+      <td><span class="badge ${txTypes[t.type]||'badge-muted'}">${t.type}</span></td>
+      <td class="td-m">${t.desc}</td>
+      <td style="font-size:.8rem;color:var(--mid)">${t.from}</td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:.88rem;color:var(--green);font-weight:600">${fmt(t.amount)}</span></td>
+    </tr>
+  `).join('')
+}
+
+// ── PAGINATION ────────────────────────────────────────────────
+function renderPg(id,cur,total){
+  const c=document.getElementById(id);if(!c)return
+  c.innerHTML=`<div class="pg-info">Page ${cur} of ${total}</div>`
+    +`<button class="pg-b">‹</button>`
+    +Array.from({length:total},(_,i)=>`<button class="pg-b${i+1===cur?' on':''}" onclick="toast('Page ${i+1}')">${i+1}</button>`).join('')
+    +`<button class="pg-b">›</button>`
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────
+function renderOverview(){
+  document.getElementById('ovJobs').innerHTML=JOBS_D.slice(0,5).map(j=>`
+    <div class="p-row" onclick="showPage('jobs')">
+      <div class="pr-m"><div class="pr-t">${j.title}</div><div class="pr-s">${j.company} · ${j.district}</div></div>
+      <div class="pr-r"><div class="pr-v">${j.apps} apps</div><div class="pr-t2">${j.posted}</div></div>
+    </div>
+  `).join('')
+  const pending=WORKERS_D.filter(w=>w.status==='pending_review')
+  document.getElementById('ovWorkers').innerHTML=pending.map((w,i)=>`
+    <div class="p-row">
+      <div class="r-avi" style="background:linear-gradient(135deg,${g(w.gi)});width:34px;height:34px;font-size:.78rem;flex-shrink:0">${w.id.slice(1,3)}</div>
+      <div class="pr-m"><div class="pr-t">${w.name}</div><div class="pr-s">${w.skill} · ${w.district}</div></div>
+      <div class="pr-r" style="display:flex;gap:5px">
+        <button class="btn btn-approve btn-sm" onclick="approveWorker(${WORKERS_D.indexOf(w)});renderOverview()">✓</button>
+        <button class="btn btn-danger btn-sm" onclick="toast('${w.name} rejected')">✕</button>
+      </div>
+    </div>
+  `).join('')||'<div style="padding:20px;text-align:center;color:var(--muted);font-size:.82rem">✅ All workers reviewed.</div>'
+  // Revenue MTD
+  const total=TX.reduce((a,t)=>a+t.amount,0)
+  document.getElementById('revMTD').textContent=fmt(total)
+}
+
+function renderChart(){
+  const data=[18,24,31,16,28,35,22],days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],max=Math.max(...data)
+  document.getElementById('chartBars').innerHTML=data.map((v,i)=>`
+    <div class="bar-col" title="${v} jobs on ${days[i]}">
+      <div class="bar-f" style="height:${Math.round((v/max)*50)+4}px"></div>
+      <div class="bar-l">${days[i]}</div>
+    </div>
+  `).join('')
+}
+
+// ── PRICING SETTINGS ──────────────────────────────────────────
+function syncPriceInputs(){
+  Object.keys(PRICES).forEach(k=>{
+    const el=document.getElementById('p_'+k)
+    if(el)el.value=PRICES[k]
+  })
+  pendingChanges={}
+  document.getElementById('changedIndicator').classList.remove('show')
+}
+
+function markChanged(el,key){
+  el.classList.add('pf-changed')
+  pendingChanges[key]=Number(el.value)
+  document.getElementById('changedIndicator').classList.add('show')
+}
+
+function resetPrices(){
+  syncPriceInputs()
+  pendingChanges={}
+  document.querySelectorAll('.pf-input').forEach(el=>el.classList.remove('pf-changed'))
+  document.getElementById('changedIndicator').classList.remove('show')
+  toast('Prices reset to saved values','warn')
+}
+
+function previewPrices(){
+  if(!Object.keys(pendingChanges).length){toast('No changes to preview','warn');return}
+  const labels={
+    job_post_daily:'Job Post — Daily',job_post_weekly:'Job Post — Weekly',
+    job_post_monthly:'Job Post — Monthly',job_post_bulk:'Job Post — Bulk Hire',
+    application_fee:'Application Fee',contact_fee_single:'Contact Fee (single)',
+    contact_fee_5:'Contact Bundle (5)',contact_fee_15:'Contact Bundle (15)',
+    verification_fee:'Verification Fee (annual)',
+    cp1_price:'Credit Pack 1 — Price',cp2_price:'Credit Pack 2 — Price',cp3_price:'Credit Pack 3 — Price',
+  }
+  document.getElementById('pricePreviewBody').innerHTML=`
+    <div style="font-size:.8rem;color:var(--mid);margin-bottom:14px">${Object.keys(pendingChanges).length} price change${Object.keys(pendingChanges).length>1?'s':''} ready to push live:</div>
+    <table class="dt"><thead><tr><th>Fee</th><th>Current</th><th>New</th><th>Change</th></tr></thead>
+    <tbody>${Object.entries(pendingChanges).map(([k,v])=>{
+      const cur=PRICES[k]||0,diff=v-cur,pct=cur?((diff/cur)*100).toFixed(0):0
+      return`<tr>
+        <td class="td-m">${labels[k]||k}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:.8rem">${fmt(cur)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--green);font-weight:600">${fmt(v)}</td>
+        <td><span style="font-size:.78rem;font-weight:700;color:${diff>0?'var(--green)':'#DC2626'}">${diff>0?'+':''}${pct}%</span></td>
+      </tr>`}).join('')}</tbody></table>
+  `
+  openM('pricePreviewM')
+}
+
+function savePrices(){
+  // Apply pending changes to PRICES
+  Object.assign(PRICES, pendingChanges)
+  pendingChanges={}
+  document.querySelectorAll('.pf-input').forEach(el=>el.classList.remove('pf-changed'))
+  document.getElementById('changedIndicator').classList.remove('show')
+  closeM('pricePreviewM')
+  toast('✓ Prices saved and pushed live to platform')
+
+  // Push to live platform if open in another tab
+  if(window.opener){
+    window.opener.postMessage({type:'SHINGA_PRICE_UPDATE',prices:PRICES},'*')
+  }
+  // Also try broadcast to same-origin frames
+  try{
+    const bc=new BroadcastChannel('shinga_prices')
+    bc.postMessage({type:'SHINGA_PRICE_UPDATE',prices:PRICES})
+    bc.close()
+  }catch(e){}
+}
+
+// ── DISCOUNTS ─────────────────────────────────────────────────
+function toggleDiscount(){
+  const active=document.getElementById('discActive').checked
+  PRICES.discounts.active=active
+  toast(active?'Platform-wide discount enabled':'Discount disabled','warn')
+}
+
+function updateDiscPreview(){
+  const pct=Number(document.getElementById('discPct').value)||0
+  const label=document.getElementById('discLabel').value||''
+  const dailyOrig=PRICES.job_post_daily
+  const dailyDisc=Math.round(dailyOrig*(1-pct/100))
+  document.getElementById('discPreview').textContent=`Preview: ${label} · Job Post (Daily): ${fmt(dailyOrig)} → ${fmt(dailyDisc)} · Verification: ${fmt(PRICES.verification_fee)} → ${fmt(Math.round(PRICES.verification_fee*(1-pct/100)))}`
+}
+
+function applyDiscount(){
+  const active=document.getElementById('discActive').checked
+  const pct=Number(document.getElementById('discPct').value)||0
+  const label=document.getElementById('discLabel').value||''
+  PRICES.discounts={active,pct,label}
+  toast(active?`${pct}% discount applied platform-wide`:'Discount removed','warn')
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function selAll(type,cb){document.querySelectorAll(`#${type}sBody input[type="checkbox"]`).forEach(c=>c.checked=cb.checked)}
+function exportCSV(type){toast(`Exporting ${type} CSV…`)}
+
+// ── INIT ──────────────────────────────────────────────────────
+renderOverview()
+renderChart()
+
+// Listen for price updates from the live site pinging back
+try{
+  const bc=new BroadcastChannel('shinga_prices')
+  bc.onmessage=e=>{if(e.data?.type==='SHINGA_PRICE_UPDATE')Object.assign(PRICES,e.data.prices)}
+}catch(e){}
+</script>
+</body>
+</html>
